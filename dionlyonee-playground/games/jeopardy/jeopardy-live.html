@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dionlyonee Playground — Jeopardy LIVE</title>
+<link rel="stylesheet" href="jeopardy.css">
+</head>
+<body class="live-page">
+
+<header class="jeo-header live-header">
+  <div class="jeo-brand">
+    <div class="jeo-logo">D</div>
+    <div>
+      <div class="jeo-brand-name">DIONLYONEE PLAYGROUND</div>
+      <div class="jeo-brand-sub">JEOPARDY</div>
+    </div>
+  </div>
+  <div class="jeo-live-badge"><span class="jeo-live-dot"></span>LIVE</div>
+</header>
+
+<main class="jeo-main">
+  <section class="panel">
+    <div id="message-banner" class="message-banner">Waiting for the host...</div>
+    <div id="players-row" class="players-row"></div>
+  </section>
+
+  <section id="board-panel" class="panel">
+    <div id="jeo-board" class="jeo-board"></div>
+  </section>
+
+  <section id="clue-panel" class="panel" style="display:none;">
+    <div id="clue-value" class="jeo-clue-value">FOR $—</div>
+    <div id="clue-cat" class="jeo-clue-cat">—</div>
+    <div id="clue-text" class="jeo-clue-text">—</div>
+  </section>
+</main>
+
+<footer class="live-footer">DIONLYONEE PLAYGROUND ◆ JEOPARDY</footer>
+
+<div id="dramatic-banner" class="dramatic-banner">
+  <div class="text" id="dramatic-text"></div>
+</div>
+
+<script type="module" src="jeopardy-live.js"></script>
+
+</body>
+</html>
