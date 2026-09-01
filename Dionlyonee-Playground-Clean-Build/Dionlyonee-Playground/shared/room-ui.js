@@ -1,6 +1,0 @@
-import{createRoom,roomExists,getRoom,setConnection}from "./firebase-room.js";import{createSession}from "./game-session.js";
-const HOST_PASSWORD="Brown123",checkHostPassword=p=>p===HOST_PASSWORD;
-async function createHostRoom(game,password){if(!checkHostPassword(password))throw Error("Incorrect host password.");const code=await createRoom(game);createSession(code,"host",game);await setConnection(code,"host",true);return code}
-async function join(code,role){code=String(code).trim().toUpperCase();if(!await roomExists(code))throw Error("Room not found.");const room=await getRoom(code);createSession(code,role,room.roomInfo.game);await setConnection(code,role,true);return room}
-const joinAsCohost=c=>join(c,"cohost"),joinAsLive=c=>join(c,"live");const displayRoomCode=(e,c)=>{if(e)e.textContent=String(c).trim().toUpperCase()};async function copyRoomCode(c){try{await navigator.clipboard.writeText(String(c).trim().toUpperCase());return true}catch{return false}}
-export{HOST_PASSWORD,checkHostPassword,createHostRoom,joinAsCohost,joinAsLive,displayRoomCode,copyRoomCode};
