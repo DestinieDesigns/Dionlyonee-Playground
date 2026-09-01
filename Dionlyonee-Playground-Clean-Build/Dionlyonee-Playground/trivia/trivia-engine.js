@@ -1,1 +1,0 @@
-import{TRIVIA_QUESTIONS}from "./questions.js";export function getUnusedQuestion(used=[]){const p=TRIVIA_QUESTIONS.filter(q=>!used.includes(q.id));return p.length?p[Math.floor(Math.random()*p.length)]:null}
