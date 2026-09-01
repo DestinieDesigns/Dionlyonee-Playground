@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+
+<html lang="en">
+<head>
+
+  <meta charset="UTF-8" />
+
+<meta
+ name="viewport"
+ content="width=device-width, initial-scale=1.0"
+/>
+
+  <title>Trivia Host | Dionlyonee Playground</title>
+
+  <!-- Fonts -->
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin
+  />
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Cinzel:wght@600;700;800;900&family=Montserrat:wght@400;500;600;700;800;900&family=Orbitron:wght@500;600;700;800;900&display=swap"
+    rel="stylesheet"
+  />
+
+  <!-- CSS -->
+
+  <link rel="stylesheet" href="../shared/dionlyonee-theme.css" />
+
+  <link rel="stylesheet" href="trivia.css" />
+
+</head>
+
+<body class="trivia-page trivia-control-page">
+
+  <!-- BACKGROUND -->
+
+  <div class="trivia-background">
+    <div class="trivia-stars"></div>
+    <div class="trivia-glow trivia-glow-one"></div>
+    <div class="trivia-glow trivia-glow-two"></div>
+  </div>
+
+  <!-- TOP BAR -->
+
+  <header class="control-header">
+
+```
+<div class="control-brand">
+
+  <div class="control-logo">
+    👑
+  </div>
+
+  <div>
+
+    <div class="control-brand-small">
+      DIONLYONEE PLAYGROUND
+    </div>
+
+    <div class="control-brand-title">
+      TRIVIA HOST CONTROL
+    </div>
+
+  </div>
+
+</div>
+
+
+<div class="room-display">
+
+  <span class="room-label">
+    ROOM CODE
+  </span>
+
+  <strong id="room-code-display">
+    ------
+  </strong>
+
+</div>
+```
+
+  </header>
+
+  <!-- HOST LOCK SCREEN -->
+
+  <div
+    id="host-lock-screen"
+    class="host-lock-screen"
+  >
+
+```
+<div class="host-lock-card">
+
+  <div class="lock-icon">
+    🔐
+  </div>
+
+  <h1>HOST ACCESS</h1>
+
+  <p>
+    Enter the host access code to control the game.
+  </p>
+
+  <input
+    id="host-access-code"
+    type="password"
+    placeholder="Enter access code"
+    autocomplete="off"
+  />
+
+  <button
+    id="unlock-host"
+    class="trivia-button gold-button"
+  >
+    UNLOCK HOST PANEL
+  </button>
+
+  <div
+    id="host-access-message"
+    class="form-message"
+  ></div>
+
+</div>
+```
+
+  </div>
+
+  <!-- MAIN HOST PANEL -->
+
+  <main
+    id="host-panel"
+    class="host-dashboard hidden"
+  >
+
+```
+<!-- LEFT SIDEBAR -->
+<aside class="host-sidebar">
+
+  <section class="sidebar-section">
+
+    <h3>GAME ROOM</h3>
+
+    <button
+      id="create-room"
+      class="trivia-button gold-button full-button"
+    >
+      CREATE NEW ROOM
+    </button>
+
+    <div class="room-input-group">
+
+      <label for="existing-room-code">
+        JOIN EXISTING ROOM
+      </label>
+
+      <input
+        id="existing-room-code"
+        type="text"
+        placeholder="ROOM CODE"
+        maxlength="12"
+      />
+
+      <button
+        id="join-room"
+        class="trivia-button dark-button full-button"
+      >
+        JOIN ROOM
+      </button>
+
+    </div>
+
+  </section>
+
+
+  <section class="sidebar-section">
+
+    <h3>QUESTION SETTINGS</h3>
+
+
+    <label for="category-select">
+      CATEGORY
+    </label>
+
+    <select id="category-select">
+
+      <option value="all">
+        🎲 Random Category
+      </option>
+
+      <option value="Math">
+        🧮 Math
+      </option>
+
+      <option value="English">
+        📚 English
+      </option>
+
+      <option value="Science">
+        🔬 Science
+      </option>
+
+      <option value="Social Studies">
+        🌎 Social Studies
+      </option>
+
+      <option value="Geography">
+        🗺️ Geography
+      </option>
+
+      <option value="History">
+        🏛️ History
+      </option>
+
+      <option value="Technology">
+        💻 Technology
+      </option>
+
+      <option value="Entertainment">
+        🎬 Entertainment
+      </option>
+
+      <option value="General Knowledge">
+        🧠 General Knowledge
+      </option>
+
+    </select>
+
+
+    <label for="difficulty-select">
+      DIFFICULTY
+    </label>
+
+    <select id="difficulty-select">
+
+      <option value="all">
+        🎲 Any Difficulty
+      </option>
+
+      <option value="easy">
+        🟢 Easy
+      </option>
+
+      <option value="medium">
+        🟡 Medium
+      </option>
+
+      <option value="hard">
+        🔴 Hard
+      </option>
+
+    </select>
+
+  </section>
+
+
+  <section class="sidebar-section">
+
+    <h3>TIMER</h3>
+
+    <div class="timer-setting">
+
+      <button
+        class="timer-adjust"
+        data-timer-change="-5"
+      >
+        −
+      </button>
+
+      <strong id="timer-setting-display">
+        30
+      </strong>
+
+      <button
+        class="timer-adjust"
+        data-timer-change="5"
+      >
+        +
+      </button>
+
+    </div>
+
+    <span class="seconds-label">
+      SECONDS
+    </span>
+
+  </section>
+
+
+  <section class="sidebar-section">
+
+    <h3>GAME ACTIONS</h3>
+
+    <button
+      id="new-question"
+      class="trivia-button gold-button full-button"
+    >
+      🎲 NEW QUESTION
+    </button>
+
+    <button
+      id="start-question"
+      class="trivia-button dark-button full-button"
+    >
+      ▶ START TIMER
+    </button>
+
+    <button
+      id="pause-question"
+      class="trivia-button dark-button full-button"
+    >
+      ⏸ PAUSE TIMER
+    </button>
+
+    <button
+      id="reveal-answer"
+      class="trivia-button answer-button full-button"
+    >
+      💡 REVEAL ANSWER
+    </button>
+
+    <button
+      id="skip-question"
+      class="trivia-button danger-button full-button"
+    >
+      ⏭ SKIP QUESTION
+    </button>
+
+  </section>
+
+</aside>
+
+
+<!-- MAIN GAME AREA -->
+<section class="host-main-stage">
+
+
+  <!-- STATUS BAR -->
+  <div class="host-status-bar">
+
+    <div class="status-box">
+
+      <span>STATUS</span>
+
+      <strong id="host-game-status">
+        WAITING FOR ROOM
+      </strong>
+
+    </div>
+
+
+    <div class="status-box">
+
+      <span>QUESTION</span>
+
+      <strong id="host-question-number">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="status-box">
+
+      <span>USED</span>
+
+      <strong id="host-used-count">
+        0
+      </strong>
+
+    </div>
+
+
+    <div class="status-box">
+
+      <span>TIME</span>
+
+      <strong id="host-timer-display">
+        30
+      </strong>
+
+    </div>
+
+  </div>
+
+
+  <!-- QUESTION CARD -->
+  <section class="host-question-card">
+
+
+    <div class="question-meta">
+
+      <span
+        id="host-category"
+        class="category-badge"
+      >
+        CATEGORY
+      </span>
+
+      <span
+        id="host-difficulty"
+        class="difficulty-badge"
+      >
+        DIFFICULTY
+      </span>
+
+    </div>
+
+
+    <div class="question-label">
+      CURRENT QUESTION
+    </div>
+
+
+    <h1 id="host-question-text">
+
+      Create or join a room to begin the Trivia game.
+
+    </h1>
+
+
+    <!-- ANSWER CHOICES -->
+    <div
+      id="host-answer-choices"
+      class="answer-choice-grid"
+    >
+
+      <!-- JavaScript renders answers -->
+
+    </div>
+
+
+    <!-- CORRECT ANSWER -->
+    <div
+      id="host-correct-answer"
+      class="correct-answer-panel hidden"
+    >
+
+      <span>CORRECT ANSWER</span>
+
+      <strong id="host-answer-text">
+        —
+      </strong>
+
+    </div>
+
+
+  </section>
+
+
+  <!-- HOST INFORMATION -->
+  <section class="host-bottom-info">
+
+    <div class="host-info-card">
+
+      <span class="host-info-title">
+        SESSION RULE
+      </span>
+
+      <p>
+        Questions used in this room will not repeat during this game session.
+      </p>
+
+    </div>
+
+
+    <div class="host-info-card">
+
+      <span class="host-info-title">
+        COHOST
+      </span>
+
+      <p id="cohost-status">
+        No cohost connected.
+      </p>
+
+    </div>
+
+
+    <div class="host-info-card">
+
+      <span class="host-info-title">
+        LIVE SCREEN
+      </span>
+
+      <p id="live-status">
+        Waiting for live display.
+      </p>
+
+    </div>
+
+  </section>
+
+</section>
+```
+
+  </main>
+
+  <!-- JAVASCRIPT -->
+
+  <script type="module" src="../shared/firebase-config.js"></script>
+
+  <script type="module" src="../shared/firebase-room.js"></script>
+
+  <script type="module" src="../shared/game-session.js"></script>
+
+  <script type="module" src="../shared/room-ui.js"></script>
+
+  <script type="module" src="trivia-game.js"></script>
+
+  <script type="module" src="trivia-ui.js"></script>
+
+  <script type="module" src="trivia-host.js"></script>
+
+</body>
+</html>

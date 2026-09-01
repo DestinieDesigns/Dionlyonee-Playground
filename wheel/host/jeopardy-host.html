@@ -1,0 +1,1634 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>Dionlyonee Jeorpardy — Host Control</title>
+
+    <link
+        rel="stylesheet"
+        href="jeopardy-host.css"
+    >
+
+</head>
+
+<body>
+
+<div class="jeopardy-host">
+
+
+    <!-- HEADER -->
+
+    <header class="jeopardy-host-header">
+
+        <div class="jeopardy-host-brand">
+
+            <div class="jeopardy-host-logo">
+                D
+            </div>
+
+            <div>
+
+                <h1>
+                    DIONLYONEE JEORPARDY
+                </h1>
+
+                <span>
+                    HOST CONTROL BOARD
+                </span>
+
+            </div>
+
+        </div>
+
+
+        <div class="jeopardy-host-status">
+
+            <span
+                id="statusLight"
+                class="jeopardy-status-light">
+            </span>
+
+            <div>
+
+                <span class="jeopardy-status-label">
+                    GAME STATUS
+                </span>
+
+                <strong id="gameStatus">
+                    READY
+                </strong>
+
+            </div>
+
+        </div>
+
+    </header>
+
+
+    <!-- MAIN -->
+
+    <main class="jeopardy-host-content">
+
+
+        <!-- LEFT -->
+
+        <section class="jeopardy-control-column">
+
+
+            <div class="jeopardy-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        GAME CONTROLS
+                    </span>
+
+                    <small>
+                        MAIN
+                    </small>
+
+                </div>
+
+
+                <div class="jeopardy-control-grid">
+
+
+                    <button
+                        id="startButton"
+                        class="jeopardy-control-button start"
+                        type="button">
+
+                        <span class="jeopardy-button-icon">
+                            ▶
+                        </span>
+
+                        <span>
+                            START GAME
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        id="pauseButton"
+                        class="jeopardy-control-button pause"
+                        type="button"
+                        disabled>
+
+                        <span class="jeopardy-button-icon">
+                            ⏸
+                        </span>
+
+                        <span id="pauseButtonText">
+                            PAUSE GAME
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        id="nextButton"
+                        class="jeopardy-control-button next"
+                        type="button">
+
+                        <span class="jeopardy-button-icon">
+                            ⏭
+                        </span>
+
+                        <span>
+                            NEXT PUZZLE
+                        </span>
+
+                    </button>
+
+
+                    <button
+                        id="hintButton"
+                        class="jeopardy-control-button hint"
+                        type="button"
+                        disabled>
+
+                        <span class="jeopardy-button-icon">
+                            💡
+                        </span>
+
+                        <span>
+                            REVEAL LETTER
+                        </span>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- CATEGORY -->
+
+            <div class="jeopardy-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        CATEGORY
+                    </span>
+
+                    <small>
+                        PUZZLE SELECTION
+                    </small>
+
+                </div>
+
+
+                <select
+                    id="categorySelect"
+                    class="jeopardy-category-select">
+
+                    <option value="RANDOM">
+                        RANDOM CATEGORY
+                    </option>
+
+                    <option value="Countries">
+                        COUNTRIES
+                    </option>
+
+                    <option value="Animals">
+                        ANIMALS
+                    </option>
+
+                    <option value="Jamaican Phrases">
+                        JAMAICAN PHRASES
+                    </option>
+
+                    <option value="Food">
+                        FOOD
+                    </option>
+
+                    <option value="Things You Do">
+                        THINGS YOU DO
+                    </option>
+
+                    <option value="Music">
+                        MUSIC
+                    </option>
+
+                    <option value="Sports">
+                        SPORTS
+                    </option>
+
+                </select>
+
+
+                <div
+                    id="selectedCategory"
+                    class="jeopardy-category-display">
+
+                    RANDOM
+
+                </div>
+
+            </div>
+
+
+            <!-- TIMER SETTINGS -->
+
+            <div class="jeopardy-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        TIMER SETTINGS
+                    </span>
+
+                    <small>
+                        LETTER REVEAL
+                    </small>
+
+                </div>
+
+
+                <div class="jeopardy-time-options">
+
+                    <button
+                        class="jeopardy-time-button"
+                        data-time="15"
+                        type="button">
+
+                        15 SEC
+
+                    </button>
+
+
+                    <button
+                        class="jeopardy-time-button active"
+                        data-time="30"
+                        type="button">
+
+                        30 SEC
+
+                    </button>
+
+
+                    <button
+                        class="jeopardy-time-button"
+                        data-time="60"
+                        type="button">
+
+                        1 MIN
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <button
+                id="resetButton"
+                class="jeopardy-reset-button"
+                type="button">
+
+                ↻ RESET GAME
+
+            </button>
+
+
+        </section>
+
+
+        <!-- CENTER -->
+
+        <section class="jeopardy-puzzle-column">
+
+
+            <div class="jeopardy-timer-panel">
+
+                <span class="jeopardy-timer-label">
+                    NEXT LETTER IN
+                </span>
+
+                <div
+                    id="timer"
+                    class="jeopardy-timer">
+
+                    30
+
+                </div>
+
+                <span class="jeopardy-timer-unit">
+                    SECONDS
+                </span>
+
+            </div>
+
+
+            <div class="jeopardy-current-category">
+
+                <span>
+                    CURRENT CATEGORY
+                </span>
+
+                <strong id="currentCategory">
+                    READY
+                </strong>
+
+            </div>
+
+
+            <div class="jeopardy-answer-panel">
+
+                <span class="jeopardy-answer-label">
+                    HOST ANSWER
+                </span>
+
+                <div
+                    id="answer"
+                    class="jeopardy-answer">
+
+                    —
+
+                </div>
+
+                <div class="jeopardy-answer-warning">
+                    ⚠ KEEP THIS SCREEN PRIVATE
+                </div>
+
+            </div>
+
+
+            <div class="jeopardy-revealed-panel">
+
+                <span class="jeopardy-answer-label">
+                    REVEALED LETTERS
+                </span>
+
+                <div
+                    id="revealedLetters"
+                    class="jeopardy-revealed-letters">
+
+                    NONE
+
+                </div>
+
+            </div>
+
+
+            <div
+                id="hostMessage"
+                class="jeopardy-host-message">
+
+                READY TO START
+
+            </div>
+
+
+        </section>
+
+
+        <!-- RIGHT -->
+
+        <section class="jeopardy-info-column">
+
+
+            <div class="jeopardy-panel jeopardy-live-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        LIVE SCREEN
+                    </span>
+
+                    <small>
+                        BROADCAST
+                    </small>
+
+                </div>
+
+
+                <div class="jeopardy-live-indicator">
+
+                    <span
+                        id="liveDot"
+                        class="jeopardy-live-dot">
+                    </span>
+
+                    <span id="liveText">
+                        WAITING
+                    </span>
+
+                </div>
+
+
+                <p>
+                    The audience screen receives
+                    game updates automatically.
+                </p>
+
+            </div>
+
+
+            <div class="jeopardy-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        GAME FLOW
+                    </span>
+
+                    <small>
+                        QUICK GUIDE
+                    </small>
+
+                </div>
+
+
+                <div class="jeopardy-flow-list">
+
+                    <div class="jeopardy-flow-item">
+
+                        <span class="jeopardy-flow-number">
+                            01
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                START
+                            </strong>
+
+                            <small>
+                                Begin a new puzzle.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="jeopardy-flow-item">
+
+                        <span class="jeopardy-flow-number">
+                            02
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                GUESS
+                            </strong>
+
+                            <small>
+                                Players guess in chat.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="jeopardy-flow-item">
+
+                        <span class="jeopardy-flow-number">
+                            03
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                HINT
+                            </strong>
+
+                            <small>
+                                Reveal a letter.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="jeopardy-flow-item">
+
+                        <span class="jeopardy-flow-number">
+                            04
+                        </span>
+
+                        <div>
+
+                            <strong>
+                                NEXT
+                            </strong>
+
+                            <small>
+                                Move to another puzzle.
+                            </small>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="jeopardy-panel">
+
+                <div class="jeopardy-panel-title">
+
+                    <span>
+                        SHORTCUTS
+                    </span>
+
+                </div>
+
+
+                <div class="jeopardy-shortcut">
+
+                    <kbd>
+                        SPACE
+                    </kbd>
+
+                    <span>
+                        Start / Next
+                    </span>
+
+                </div>
+
+
+                <div class="jeopardy-shortcut">
+
+                    <kbd>
+                        P
+                    </kbd>
+
+                    <span>
+                        Pause / Resume
+                    </span>
+
+                </div>
+
+
+                <div class="jeopardy-shortcut">
+
+                    <kbd>
+                        H
+                    </kbd>
+
+                    <span>
+                        Reveal Letter
+                    </span>
+
+                </div>
+
+
+                <div class="jeopardy-shortcut">
+
+                    <kbd>
+                        ESC
+                    </kbd>
+
+                    <span>
+                        Reset
+                    </span>
+
+                </div>
+
+            </div>
+
+
+        </section>
+
+    </main>
+
+
+    <footer class="jeopardy-host-footer">
+
+        <span>
+            DIONLYONEE JEORPARDY
+        </span>
+
+        <span>◆</span>
+
+        <span>
+            HOST CONTROL BOARD
+        </span>
+
+        <span>◆</span>
+
+        <span>
+            v1.0
+        </span>
+
+    </footer>
+
+</div>
+
+
+<script>
+
+(function () {
+
+    "use strict";
+
+
+    /* =====================================================
+       BROADCAST CHANNEL
+    ===================================================== */
+
+    const channel =
+        new BroadcastChannel(
+            "dionlyonee-jeorpardy-game"
+        );
+
+
+    /* =====================================================
+       PUZZLES
+    ===================================================== */
+
+    const puzzles = {
+
+        Countries: [
+            "JAMAICA",
+            "CANADA",
+            "BRAZIL",
+            "JAPAN",
+            "MEXICO",
+            "BAHAMAS",
+            "BARBADOS",
+            "FRANCE",
+            "GERMANY",
+            "AUSTRALIA",
+            "UNITED STATES",
+            "UNITED KINGDOM",
+            "SPAIN",
+            "ITALY",
+            "PORTUGAL",
+            "ARGENTINA",
+            "CHILE",
+            "COLOMBIA",
+            "CUBA",
+            "DOMINICAN REPUBLIC",
+            "HAITI",
+            "TRINIDAD AND TOBAGO",
+            "GUYANA",
+            "COSTA RICA",
+            "PANAMA",
+            "BELIZE",
+            "SOUTH AFRICA",
+            "NIGERIA",
+            "GHANA",
+            "KENYA",
+            "EGYPT",
+            "MOROCCO",
+            "INDIA",
+            "CHINA",
+            "SOUTH KOREA",
+            "THAILAND",
+            "PHILIPPINES",
+            "INDONESIA",
+            "NEW ZEALAND",
+            "IRELAND",
+            "GREECE",
+            "TURKEY"
+        ],
+
+        Animals: [
+            "ELEPHANT",
+            "GIRAFFE",
+            "MONKEY",
+            "DOLPHIN",
+            "CROCODILE",
+            "KANGAROO",
+            "TIGER",
+            "GORILLA",
+            "PENGUIN",
+            "ZEBRA",
+            "LION",
+            "CHEETAH",
+            "LEOPARD",
+            "BEAR",
+            "POLAR BEAR",
+            "WOLF",
+            "FOX",
+            "RABBIT",
+            "HORSE",
+            "DONKEY",
+            "GOAT",
+            "SHEEP",
+            "COW",
+            "PIG",
+            "CHICKEN",
+            "EAGLE",
+            "PARROT",
+            "OWL",
+            "FLAMINGO",
+            "PEACOCK",
+            "OSTRICH",
+            "SNAKE",
+            "LIZARD",
+            "TURTLE",
+            "FROG",
+            "SHARK",
+            "WHALE",
+            "OCTOPUS",
+            "SEAL",
+            "BUTTERFLY",
+            "SPIDER",
+            "LOBSTER",
+            "CRAB",
+            "BAT"
+        ],
+
+        "Jamaican Phrases": [
+            "WAH GWAAN",
+            "WEH YUH A SEH",
+            "MI DEH YA",
+            "EVERYTING IRIE",
+            "BIG UP",
+            "WALK GOOD",
+            "NO PROBLEM",
+            "MEK WE GO",
+            "YEAH MON",
+            "MI SOON COME",
+            "WEH DI DEAL",
+            "HOW YUH MEAN",
+            "MI NUH KNOW",
+            "MI NUH CARE",
+            "NO WORRIES",
+            "ONE LOVE",
+            "RESPECT",
+            "BLESS UP",
+            "GIVE THANKS",
+            "NUFF RESPECT",
+            "IRIE VIBES",
+            "COME YA",
+            "TEK TIME",
+            "HOLD A FAITH",
+            "MEK IT GO",
+            "WHA YUH A DO",
+            "HOW TING DEH",
+            "MI GOOD",
+            "YUH GOOD",
+            "SEEN",
+            "FI REAL",
+            "NO LIE",
+            "MI TELL YUH",
+            "WAH FI DO",
+            "MI A COME",
+            "MI A GO",
+            "MEK WE LINK"
+        ],
+
+        Food: [
+            "JERK CHICKEN",
+            "RICE AND PEAS",
+            "PIZZA",
+            "HAMBURGER",
+            "ICE CREAM",
+            "FRIED CHICKEN",
+            "CURRY GOAT",
+            "OXTAIL",
+            "BROWN STEW CHICKEN",
+            "ESCOVITCH FISH",
+            "ACKEE AND SALTFISH",
+            "FESTIVAL",
+            "FRIED DUMPLING",
+            "BAMMY",
+            "CALLALOO",
+            "PEPPER POT SOUP",
+            "GOAT SOUP",
+            "CHICKEN SOUP",
+            "RED PEA SOUP",
+            "BEEF PATTY",
+            "COCO BREAD",
+            "CURRY CHICKEN",
+            "STEAMED FISH",
+            "JERK PORK",
+            "JERK SHRIMP",
+            "MAC AND CHEESE",
+            "FRIED FISH",
+            "FRENCH FRIES",
+            "TACOS",
+            "BURRITO",
+            "HOT DOG",
+            "CHEESEBURGER",
+            "PANCAKES",
+            "WAFFLES",
+            "CHOCOLATE CAKE",
+            "CHEESECAKE",
+            "DONUTS",
+            "COOKIES",
+            "POPCORN",
+            "CHICKEN WINGS",
+            "SPAGHETTI",
+            "LASAGNA",
+            "FRIED RICE",
+            "NOODLES",
+            "RAMEN",
+            "SUSHI"
+        ],
+
+        "Things You Do": [
+            "WATCH TV",
+            "PLAY VIDEO GAMES",
+            "GO SHOPPING",
+            "GO TO THE BEACH",
+            "WATCH A MOVIE",
+            "LISTEN TO MUSIC",
+            "GO TO SCHOOL",
+            "GO TO WORK",
+            "TAKE A NAP",
+            "GO TO SLEEP",
+            "BRUSH YOUR TEETH",
+            "TAKE A SHOWER",
+            "COOK DINNER",
+            "ORDER FOOD",
+            "GO TO THE GYM",
+            "PLAY BASKETBALL",
+            "PLAY FOOTBALL",
+            "PLAY SOCCER",
+            "GO SWIMMING",
+            "GO FOR A WALK",
+            "DRIVE A CAR",
+            "TAKE A FLIGHT",
+            "GO ON VACATION",
+            "CLEAN THE HOUSE",
+            "DO LAUNDRY",
+            "WASH THE DISHES",
+            "TAKE OUT THE TRASH",
+            "MAKE BREAKFAST",
+            "DRINK COFFEE",
+            "DRINK WATER",
+            "READ A BOOK",
+            "USE YOUR PHONE",
+            "TAKE A SELFIE",
+            "GO TO A PARTY",
+            "HANG OUT WITH FRIENDS",
+            "CALL YOUR FAMILY",
+            "GO TO THE STORE",
+            "GO TO THE MOVIES",
+            "GO TO A CONCERT"
+        ],
+
+        Music: [
+            "REGGAE MUSIC",
+            "DANCEHALL MUSIC",
+            "HIP HOP",
+            "RHYTHM AND BLUES",
+            "COUNTRY MUSIC",
+            "ROCK AND ROLL",
+            "POP MUSIC",
+            "GOSPEL MUSIC",
+            "JAZZ MUSIC",
+            "CLASSICAL MUSIC",
+            "REGGAETON",
+            "AFROBEATS",
+            "SOCA MUSIC",
+            "CALYPSO MUSIC",
+            "LIVE CONCERT",
+            "MUSIC VIDEO",
+            "DJ PARTY",
+            "SOUND SYSTEM",
+            "MUSIC FESTIVAL",
+            "DANCE FLOOR"
+        ],
+
+        Sports: [
+            "BASKETBALL",
+            "FOOTBALL",
+            "SOCCER",
+            "BASEBALL",
+            "CRICKET",
+            "TENNIS",
+            "GOLF",
+            "VOLLEYBALL",
+            "BOXING",
+            "WRESTLING",
+            "SWIMMING",
+            "TRACK AND FIELD",
+            "TABLE TENNIS",
+            "BADMINTON",
+            "HOCKEY",
+            "SKATEBOARDING",
+            "SURFING",
+            "CYCLING",
+            "BOWLING",
+            "GYMNASTICS",
+            "MARATHON",
+            "FORMULA ONE",
+            "CAR RACING",
+            "HORSE RACING",
+            "DARTS",
+            "KICKBOXING",
+            "MMA",
+            "STREET BASKETBALL"
+        ]
+
+    };
+
+
+    /* =====================================================
+       GAME STATE
+    ===================================================== */
+
+    let revealTime = 30;
+
+    let answer = "";
+
+    let category = "";
+
+    let selectedCategory = "RANDOM";
+
+    let revealed = [];
+
+    let seconds = revealTime;
+
+    let running = false;
+
+    let paused = false;
+
+    let timer = null;
+
+
+    /* =====================================================
+       ELEMENTS
+    ===================================================== */
+
+    const startButton =
+        document.getElementById("startButton");
+
+    const pauseButton =
+        document.getElementById("pauseButton");
+
+    const pauseButtonText =
+        document.getElementById("pauseButtonText");
+
+    const nextButton =
+        document.getElementById("nextButton");
+
+    const hintButton =
+        document.getElementById("hintButton");
+
+    const resetButton =
+        document.getElementById("resetButton");
+
+    const categorySelect =
+        document.getElementById("categorySelect");
+
+    const selectedCategoryDisplay =
+        document.getElementById("selectedCategory");
+
+    const currentCategory =
+        document.getElementById("currentCategory");
+
+    const answerElement =
+        document.getElementById("answer");
+
+    const revealedElement =
+        document.getElementById("revealedLetters");
+
+    const timerElement =
+        document.getElementById("timer");
+
+    const hostMessage =
+        document.getElementById("hostMessage");
+
+    const gameStatus =
+        document.getElementById("gameStatus");
+
+    const statusLight =
+        document.getElementById("statusLight");
+
+    const liveDot =
+        document.getElementById("liveDot");
+
+    const liveText =
+        document.getElementById("liveText");
+
+
+    /* =====================================================
+       SEND STATE
+    ===================================================== */
+
+    function sendState() {
+
+        channel.postMessage({
+
+            category,
+            answer,
+            revealed,
+            seconds,
+            running,
+            paused,
+
+            phase:
+                paused
+                    ? "paused"
+                    : running
+                        ? "playing"
+                        : "waiting"
+
+        });
+
+    }
+
+
+    /* =====================================================
+       CHOOSE PUZZLE
+    ===================================================== */
+
+    function choosePuzzle() {
+
+        const categories =
+            Object.keys(puzzles);
+
+        category =
+            selectedCategory === "RANDOM"
+                ? categories[
+                    Math.floor(
+                        Math.random() *
+                        categories.length
+                    )
+                ]
+                : selectedCategory;
+
+        const categoryPuzzles =
+            puzzles[category];
+
+        answer =
+            categoryPuzzles[
+                Math.floor(
+                    Math.random() *
+                    categoryPuzzles.length
+                )
+            ];
+
+        revealed = [];
+
+    }
+
+
+    /* =====================================================
+       START
+    ===================================================== */
+
+    function startGame() {
+
+        clearInterval(timer);
+
+        choosePuzzle();
+
+        seconds = revealTime;
+
+        running = true;
+
+        paused = false;
+
+        updateDisplay();
+
+        updateStatus("LIVE", true);
+
+        pauseButton.disabled = false;
+
+        hintButton.disabled = false;
+
+        pauseButtonText.textContent =
+            "PAUSE GAME";
+
+        hostMessage.textContent =
+            "GAME IS LIVE";
+
+        sendState();
+
+        timer =
+            setInterval(
+                tick,
+                1000
+            );
+
+    }
+
+
+    /* =====================================================
+       TIMER
+    ===================================================== */
+
+    function tick() {
+
+        if (paused) {
+            return;
+        }
+
+        seconds--;
+
+        updateDisplay();
+
+        sendState();
+
+        if (seconds <= 0) {
+            revealLetter();
+        }
+
+    }
+
+
+    /* =====================================================
+       REVEAL
+    ===================================================== */
+
+    function revealLetter() {
+
+        if (!running || paused) {
+            return;
+        }
+
+        clearInterval(timer);
+
+        const hiddenLetters =
+            [
+                ...new Set(
+                    answer
+                        .replace(/ /g, "")
+                        .split("")
+                        .filter(
+                            letter =>
+                                !revealed.includes(letter)
+                        )
+                )
+            ];
+
+        if (!hiddenLetters.length) {
+
+            completeGame();
+
+            return;
+
+        }
+
+        const letter =
+            hiddenLetters[
+                Math.floor(
+                    Math.random() *
+                    hiddenLetters.length
+                )
+            ];
+
+        revealed.push(letter);
+
+        seconds = revealTime;
+
+        hostMessage.textContent =
+            "LETTER REVEALED: " + letter;
+
+        updateDisplay();
+
+        sendState();
+
+        if (puzzleComplete()) {
+
+            completeGame();
+
+            return;
+
+        }
+
+        timer =
+            setInterval(
+                tick,
+                1000
+            );
+
+    }
+
+
+    /* =====================================================
+       COMPLETE
+    ===================================================== */
+
+    function puzzleComplete() {
+
+        const letters =
+            [
+                ...new Set(
+                    answer
+                        .replace(/ /g, "")
+                        .split("")
+                )
+            ];
+
+        return letters.every(
+            letter =>
+                revealed.includes(letter)
+        );
+
+    }
+
+
+    function completeGame() {
+
+        clearInterval(timer);
+
+        running = false;
+
+        paused = false;
+
+        timerElement.textContent = "✓";
+
+        updateStatus(
+            "COMPLETE",
+            false
+        );
+
+        hostMessage.textContent =
+            "PUZZLE COMPLETE";
+
+        pauseButton.disabled = true;
+
+        hintButton.disabled = true;
+
+        sendState();
+
+    }
+
+
+    /* =====================================================
+       PAUSE
+    ===================================================== */
+
+    function togglePause() {
+
+        if (!running) {
+            return;
+        }
+
+        paused = !paused;
+
+        if (paused) {
+
+            clearInterval(timer);
+
+            pauseButtonText.textContent =
+                "RESUME GAME";
+
+            hostMessage.textContent =
+                "GAME PAUSED";
+
+            updateStatus(
+                "PAUSED",
+                false
+            );
+
+        } else {
+
+            pauseButtonText.textContent =
+                "PAUSE GAME";
+
+            hostMessage.textContent =
+                "GAME IS LIVE";
+
+            updateStatus(
+                "LIVE",
+                true
+            );
+
+            timer =
+                setInterval(
+                    tick,
+                    1000
+                );
+
+        }
+
+        sendState();
+
+    }
+
+
+    /* =====================================================
+       NEXT
+    ===================================================== */
+
+    function nextPuzzle() {
+
+        startGame();
+
+        hostMessage.textContent =
+            "NEW PUZZLE STARTED";
+
+        sendState();
+
+    }
+
+
+    /* =====================================================
+       RESET
+    ===================================================== */
+
+    function resetGame() {
+
+        clearInterval(timer);
+
+        answer = "";
+
+        category = "";
+
+        revealed = [];
+
+        seconds = revealTime;
+
+        running = false;
+
+        paused = false;
+
+        updateDisplay();
+
+        updateStatus(
+            "READY",
+            false
+        );
+
+        hostMessage.textContent =
+            "READY TO START";
+
+        pauseButton.disabled = true;
+
+        hintButton.disabled = true;
+
+        pauseButtonText.textContent =
+            "PAUSE GAME";
+
+        sendState();
+
+    }
+
+
+    /* =====================================================
+       DISPLAY
+    ===================================================== */
+
+    function updateDisplay() {
+
+        selectedCategoryDisplay.textContent =
+            selectedCategory === "RANDOM"
+                ? "RANDOM"
+                : selectedCategory.toUpperCase();
+
+        currentCategory.textContent =
+            category
+                ? category.toUpperCase()
+                : "READY";
+
+        answerElement.textContent =
+            answer || "—";
+
+        revealedElement.textContent =
+            revealed.length
+                ? revealed.join(" • ")
+                : "NONE";
+
+        timerElement.textContent =
+            seconds;
+
+    }
+
+
+    /* =====================================================
+       STATUS
+    ===================================================== */
+
+    function updateStatus(status, live) {
+
+        gameStatus.textContent =
+            status;
+
+        statusLight.className =
+            "jeopardy-status-light";
+
+        if (status === "LIVE") {
+            statusLight.classList.add("live");
+        }
+
+        if (status === "PAUSED") {
+            statusLight.classList.add("paused");
+        }
+
+        if (status === "COMPLETE") {
+            statusLight.classList.add("complete");
+        }
+
+        if (live) {
+
+            liveDot.classList.add("active");
+
+            liveText.textContent =
+                "LIVE";
+
+        } else {
+
+            liveDot.classList.remove("active");
+
+            liveText.textContent =
+                "WAITING";
+
+        }
+
+    }
+
+
+    /* =====================================================
+       EVENTS
+    ===================================================== */
+
+    startButton.addEventListener(
+        "click",
+        startGame
+    );
+
+    pauseButton.addEventListener(
+        "click",
+        togglePause
+    );
+
+    nextButton.addEventListener(
+        "click",
+        nextPuzzle
+    );
+
+    hintButton.addEventListener(
+        "click",
+        revealLetter
+    );
+
+    resetButton.addEventListener(
+        "click",
+        function () {
+
+            if (
+                confirm(
+                    "Reset the current game?"
+                )
+            ) {
+
+                resetGame();
+
+            }
+
+        }
+    );
+
+
+    /* CATEGORY */
+
+    categorySelect.addEventListener(
+        "change",
+        function () {
+
+            selectedCategory =
+                categorySelect.value;
+
+            updateDisplay();
+
+        }
+    );
+
+
+    /* TIMER SETTINGS */
+
+    document
+        .querySelectorAll(".jeopardy-time-button")
+        .forEach(
+            function (button) {
+
+                button.addEventListener(
+                    "click",
+                    function () {
+
+                        if (running) {
+                            return;
+                        }
+
+                        document
+                            .querySelectorAll(
+                                ".jeopardy-time-button"
+                            )
+                            .forEach(
+                                item =>
+                                    item.classList.remove(
+                                        "active"
+                                    )
+                            );
+
+                        button.classList.add(
+                            "active"
+                        );
+
+                        revealTime =
+                            Number(
+                                button.dataset.time
+                            );
+
+                        seconds =
+                            revealTime;
+
+                        updateDisplay();
+
+                    }
+                );
+
+            }
+        );
+
+
+    /* KEYBOARD */
+
+    document.addEventListener(
+        "keydown",
+        function (event) {
+
+            const tag =
+                document.activeElement.tagName;
+
+            if (
+                tag === "SELECT" ||
+                tag === "INPUT" ||
+                tag === "TEXTAREA"
+            ) {
+                return;
+            }
+
+            if (event.code === "Space") {
+
+                event.preventDefault();
+
+                if (running) {
+                    nextPuzzle();
+                } else {
+                    startGame();
+                }
+
+            }
+
+            if (
+                event.key.toLowerCase() === "p"
+            ) {
+                togglePause();
+            }
+
+            if (
+                event.key.toLowerCase() === "h"
+            ) {
+                revealLetter();
+            }
+
+            if (event.key === "Escape") {
+                resetGame();
+            }
+
+        }
+    );
+
+
+    /* =====================================================
+       INITIALIZE
+    ===================================================== */
+
+    updateDisplay();
+
+    updateStatus(
+        "READY",
+        false
+    );
+
+    sendState();
+
+
+    /* =====================================================
+       CLEANUP
+    ===================================================== */
+
+    window.addEventListener(
+        "beforeunload",
+        function () {
+
+            clearInterval(timer);
+
+            channel.close();
+
+        }
+    );
+
+})();
+
+</script>
+
+</body>
+</html>
