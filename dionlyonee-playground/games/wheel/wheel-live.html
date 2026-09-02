@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dionlyonee Playground — Wheel LIVE</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="wheel.css">
+<link rel="stylesheet" href="../../shared/waiting-scene.css">
+</head>
+<body class="live-page">
+
+<header class="wheel-header live-header">
+  <div class="wheel-brand">
+    <div class="wheel-logo">D</div>
+    <div>
+      <div class="wheel-brand-name">DIONLYONEE PLAYGROUND</div>
+      <div class="wheel-brand-sub">WHEEL OF FORTUNE</div>
+    </div>
+  </div>
+  <div class="wheel-live-badge"><span class="wheel-live-dot"></span>LIVE</div>
+</header>
+
+<main class="wheel-main">
+  <div id="waiting-scene-container"></div>
+
+  <section id="game-section" class="panel" style="display:none;">
+    <div class="category-label">CATEGORY</div>
+    <div id="category-display" class="category-value">WAITING FOR HOST</div>
+
+    <div id="message-banner" class="message-banner">Waiting for the game to start...</div>
+
+    <div id="puzzle-board" class="puzzle-board"></div>
+
+    <div class="wheel-wrap">
+      <div class="wheel-pointer"></div>
+      <canvas id="wheel-canvas" width="360" height="360"></canvas>
+    </div>
+
+    <div id="players-row" class="players-row"></div>
+  </section>
+</main>
+
+<footer class="live-footer">DIONLYONEE PLAYGROUND ◆ GUESS ALONG IN CHAT</footer>
+
+<div id="dramatic-banner" class="dramatic-banner">
+  <div class="text" id="dramatic-text"></div>
+</div>
+
+<script src="wheel-engine.js"></script>
+<script type="module" src="wheel-live.js"></script>
+
+</body>
+</html>

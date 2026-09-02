@@ -1,0 +1,178 @@
+/* =========================================================
+   DIONLYONEE PLAYGROUND — HUB / MAIN SCREEN
+========================================================= */
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { background: #020303; }
+
+body {
+  min-height: 100vh;
+  font-family: 'Montserrat', Arial, Helvetica, sans-serif;
+  color: #ffffff;
+  background:
+    radial-gradient(circle at 50% -10%, #16383a 0%, #0b1d1e 25%, #050909 55%, #020303 100%);
+}
+
+.playground { min-height: 100vh; }
+
+/* ---------- Header ---------- */
+
+.playground-header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  padding: 20px 32px;
+  border-bottom: 1px solid rgba(212, 175, 55, 0.2);
+}
+
+.brand-mark {
+  width: 46px; height: 46px; border-radius: 12px;
+  background: linear-gradient(135deg, #d4af37, #8c7322);
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 900; font-size: 22px; color: #07090e;
+  box-shadow: 0 0 20px rgba(212, 175, 55, 0.35);
+}
+
+.brand-name { font-weight: 900; font-size: 17px; letter-spacing: 1px; }
+.brand-subtitle { font-size: 11px; color: #94a3b8; letter-spacing: 2px; }
+
+/* ---------- Hero ---------- */
+
+.hero {
+  text-align: center;
+  padding: 56px 24px 36px;
+}
+
+.hero-eyebrow {
+  font-size: 12px; letter-spacing: 4px; color: #f7e07d; margin-bottom: 10px;
+}
+
+.hero h1 {
+  font-size: clamp(32px, 6vw, 56px);
+  font-weight: 900;
+  letter-spacing: 1px;
+}
+
+.hero h1 span { color: #f7e07d; }
+
+.hero p {
+  max-width: 480px;
+  margin: 14px auto 0;
+  color: #cbd5e1;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+/* ---------- Room panel ---------- */
+
+.room-panel {
+  max-width: 460px;
+  margin: 0 auto 40px;
+  padding: 18px 22px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  text-align: center;
+}
+
+.room-panel-label {
+  font-size: 11px; letter-spacing: 2px; color: #94a3b8; margin-bottom: 8px;
+}
+
+.room-code-big {
+  font-family: 'Space Grotesk', monospace;
+  font-size: 34px;
+  font-weight: 900;
+  letter-spacing: 4px;
+  color: #f7e07d;
+  margin-bottom: 14px;
+}
+
+.room-actions { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+
+.room-actions button {
+  padding: 10px 18px;
+  font-size: 13px;
+  font-weight: 800;
+  border: none;
+  border-radius: 999px;
+  cursor: pointer;
+}
+
+.btn-gold {
+  background: linear-gradient(135deg, #d4af37, #8c7322);
+  color: #07090e;
+}
+
+.btn-outline {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.25) !important;
+  color: #fff;
+}
+
+/* ---------- Games grid ---------- */
+
+.games-section {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 0 24px 64px;
+}
+
+.games-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 18px;
+}
+
+.game-card {
+  border-radius: 18px;
+  padding: 22px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(212, 175, 55, 0.25);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.game-card.disabled {
+  opacity: 0.45;
+}
+
+.game-card-icon { font-size: 30px; }
+.game-card-title { font-size: 17px; font-weight: 900; letter-spacing: 0.5px; }
+.game-card-desc { font-size: 12.5px; color: #94a3b8; line-height: 1.5; flex: 1; }
+
+.game-card-actions {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.role-btn {
+  flex: 1;
+  min-width: 80px;
+  text-align: center;
+  padding: 10px 8px;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  border-radius: 9px;
+  text-decoration: none;
+  cursor: pointer;
+  border: none;
+}
+
+.role-btn.host { background: linear-gradient(135deg, #d4af37, #8c7322); color: #07090e; }
+.role-btn.cohost { background: rgba(255,255,255,0.1); color: #fff; border: 1px solid rgba(255,255,255,0.25); }
+.role-btn.live { background: rgba(239, 68, 68, 0.15); color: #fecaca; border: 1px solid rgba(239,68,68,0.4); }
+
+.coming-soon-badge {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #f7e07d;
+  border: 1px solid rgba(212, 175, 55, 0.4);
+  border-radius: 999px;
+  padding: 3px 10px;
+  align-self: flex-start;
+}

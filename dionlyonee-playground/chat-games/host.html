@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dionlyonee Playground — Game Center (HOST)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="chat-games.css">
+</head>
+<body>
+
+<header class="cg-header host-header">
+  <div class="cg-brand">
+    <div class="cg-logo">D</div>
+    <div>
+      <div class="cg-brand-name">DIONLYONEE GAME CENTER</div>
+      <div class="cg-brand-sub">CHAT GAMES — HOST</div>
+    </div>
+  </div>
+</header>
+
+<main class="cg-host-main">
+
+  <section class="cg-panel">
+    <h2>GAME</h2>
+    <select id="cg-game-picker" class="cg-game-picker">
+      <option value="">— No games installed yet —</option>
+    </select>
+
+    <div class="cg-transport-row">
+      <button id="cg-btn-start" class="cg-btn-start">START</button>
+      <button id="cg-btn-next" class="cg-btn-next">NEXT</button>
+      <button id="cg-btn-reveal" class="cg-btn-reveal">REVEAL</button>
+      <button id="cg-btn-reset" class="cg-btn-reset">RESET</button>
+    </div>
+
+    <div id="cg-status-line" class="cg-status-line">Pick a game to begin.</div>
+  </section>
+
+  <section class="cg-panel">
+    <h2>GAME CONTROLS</h2>
+    <div id="cg-module-controls">
+      <div class="cg-empty-state">
+        No chat-game modules are registered yet.<br>
+        Add one to <code>chat-games/modules/</code> following
+        <code>modules/CONTRACT.md</code>, then register it at the
+        top of <code>host.js</code>.
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<script type="module" src="host.js"></script>
+
+</body>
+</html>

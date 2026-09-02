@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dionlyonee Playground</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;800;900&family=Space+Grotesk:wght@600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="shared/playground.css">
+</head>
+<body>
+
+<div class="playground">
+
+  <header class="playground-header">
+    <div class="brand-mark">D</div>
+    <div>
+      <div class="brand-name">DIONLYONEE PLAYGROUND</div>
+      <div class="brand-subtitle">INTERACTIVE LIVESTREAM GAME SHOWS</div>
+    </div>
+  </header>
+
+  <section class="hero">
+    <div class="hero-eyebrow">TIKTOK · TWITCH · STREAMLABS · OBS</div>
+    <h1>LET'S <span>PLAY.</span></h1>
+    <p>Pick a room code, choose your role, and start the show. Host controls the game,
+       Cohost helps run it, and the Live Screen is what your audience sees.</p>
+  </section>
+
+  <section class="room-panel">
+    <div class="room-panel-label">CURRENT ROOM CODE</div>
+    <div id="room-code-display" class="room-code-big">DION1</div>
+    <div class="room-actions">
+      <button id="btn-join-room" class="btn-outline">JOIN A ROOM</button>
+      <button id="btn-new-room" class="btn-gold">GENERATE NEW ROOM</button>
+      <button id="btn-copy-room" class="btn-outline">COPY LINK</button>
+    </div>
+  </section>
+
+  <section class="games-section">
+    <div class="games-grid">
+
+      <!-- WHEEL OF FORTUNE — active -->
+      <div class="game-card">
+        <div class="game-card-icon">🎡</div>
+        <div class="game-card-title">WHEEL OF FORTUNE</div>
+        <div class="game-card-desc">Spin, guess letters, avoid Bankrupt, solve the puzzle before anyone else.</div>
+        <div class="game-card-actions">
+          <a class="role-btn host" data-role-link href="games/wheel/wheel-host.html">HOST</a>
+          <a class="role-btn cohost" data-role-link href="games/wheel/wheel-cohost.html">COHOST</a>
+          <a class="role-btn live" data-role-link href="games/wheel/wheel-live.html">LIVE</a>
+        </div>
+      </div>
+
+      <!-- GAME CENTER — universal chat-game panel, foundation only, no games plugged in yet -->
+      <div class="game-card">
+        <div class="game-card-icon">🎮</div>
+        <div class="game-card-title">GAME CENTER</div>
+        <div class="game-card-desc">Finish the Sentence, Hot Take, Hangman, and more — one host panel for all the chat-driven party games.</div>
+        <div class="game-card-actions">
+          <a class="role-btn host" data-role-link href="chat-games/host.html">HOST</a>
+          <a class="role-btn live" data-role-link href="chat-games/live.html">LIVE</a>
+        </div>
+      </div>
+
+      <!-- TRIVIA — coming soon -->
+      <div class="game-card disabled">
+        <div class="coming-soon-badge">COMING SOON</div>
+        <div class="game-card-icon">🧠</div>
+        <div class="game-card-title">TRIVIA</div>
+        <div class="game-card-desc">Timed multiple-choice questions across categories and difficulty levels. Built as its own dedicated Main Game, like Wheel.</div>
+      </div>
+
+      <!-- JEOPARDY — active -->
+      <div class="game-card">
+        <div class="game-card-icon">❓</div>
+        <div class="game-card-title">JEOPARDY</div>
+        <div class="game-card-desc">Category boards, dollar values, and buzz-in judging.</div>
+        <div class="game-card-actions">
+          <a class="role-btn host" data-role-link href="games/jeopardy/jeopardy-host.html">HOST</a>
+          <a class="role-btn cohost" data-role-link href="games/jeopardy/jeopardy-cohost.html">COHOST</a>
+          <a class="role-btn live" data-role-link href="games/jeopardy/jeopardy-live.html">LIVE</a>
+        </div>
+      </div>
+
+      <!-- WORD GAMES — coming soon -->
+      <div class="game-card disabled">
+        <div class="coming-soon-badge">COMING SOON</div>
+        <div class="game-card-icon">🔤</div>
+        <div class="game-card-title">WORD GAMES</div>
+        <div class="game-card-desc">Fast-paced word and party games for quick livestream segments.</div>
+      </div>
+
+    </div>
+  </section>
+
+</div>
+
+<script type="module" src="index.js"></script>
+
+</body>
+</html>
