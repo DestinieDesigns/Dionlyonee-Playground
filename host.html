@@ -117,8 +117,8 @@
   const timerElement = document.getElementById('hostTimer');
   const messageElement = document.getElementById('hostMessage');
 
-  function sendGame(state) {
-    channel.postMessage({
+  function sendGame(state = {}) {
+    const payload = {
       category: state.category || category,
       answer: state.answer || answer,
       revealed: state.revealed || revealed,
@@ -126,8 +126,18 @@
       running: typeof state.running === 'boolean' ? state.running : running,
       phase: state.phase || (running ? 'playing' : 'waiting'),
       timestamp: Date.now()
-    });
+    };
+    try {
+      sessionStorage.setItem('dion_live_wheel', JSON.stringify(payload));
+    } catch (e) {}
+    channel.postMessage(payload);
   }
+
+  channel.onmessage = function (event) {
+    if (event.data && event.data.type === 'REQUEST_STATE') {
+      sendGame();
+    }
+  };
 
   function choosePuzzle() {
     const categories = Object.keys(puzzles);

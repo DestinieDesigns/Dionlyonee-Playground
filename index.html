@@ -1,614 +1,774 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
     <meta charset="UTF-8">
-
-    <meta
-        name="viewport"
-        content="width=device-width, initial-scale=1.0"
-    >
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dionlyonee Playground</title>
-
-    <link
-        rel="stylesheet"
-        href="playground.css"
-    >
-
+    <meta name="description" content="Dionlyonee Game Show Playground — Interactive live stream gaming hub featuring Wheel of Fortune, Jeopardy, Hot Take, Trivia, and chat creative games.">
+    <meta property="og:title" content="Dionlyonee Playground">
+    <meta property="og:description" content="Dionlyonee Game Show Playground — Interactive live stream gaming hub.">
+    <link rel="stylesheet" href="playground.css">
+    <style>
+      /* Quick Launcher Modal Overlay */
+      .game-launcher-modal {
+        position: fixed;
+        inset: 0;
+        z-index: 10000;
+        background: rgba(2, 4, 4, 0.9);
+        backdrop-filter: blur(14px);
+        display: none;
+        align-items: center;
+        justify-content: center;
+        padding: 20px;
+        opacity: 0;
+        transition: opacity 0.25s ease;
+      }
+      .game-launcher-modal.active {
+        display: flex;
+        opacity: 1;
+      }
+      .modal-box {
+        background: radial-gradient(circle at 50% 0%, #16383a 0%, #0b1d1e 35%, #050909 70%, #020303 100%);
+        border: 1.5px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px;
+        box-shadow: 0 0 40px rgba(212, 175, 55, 0.2), 0 20px 50px rgba(0,0,0,0.8);
+        width: 100%;
+        max-width: 580px;
+        padding: 32px 28px;
+        text-align: center;
+        position: relative;
+      }
+      .modal-close {
+        position: absolute;
+        top: 18px;
+        right: 20px;
+        background: none;
+        border: none;
+        color: #8ba1a2;
+        font-size: 24px;
+        cursor: pointer;
+        padding: 4px;
+        line-height: 1;
+        transition: color 0.2s;
+      }
+      .modal-close:hover {
+        color: #d4af37;
+      }
+      .modal-badge {
+        display: inline-block;
+        padding: 4px 12px;
+        border-radius: 20px;
+        border: 1px solid rgba(212, 175, 55, 0.35);
+        background: rgba(212, 175, 55, 0.1);
+        color: #d4af37;
+        font-size: 8.5px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        margin-bottom: 12px;
+      }
+      .modal-title {
+        font-size: 26px;
+        font-weight: 900;
+        letter-spacing: 3px;
+        color: #ffffff;
+        margin-bottom: 6px;
+      }
+      .modal-desc {
+        color: #8ba1a2;
+        font-size: 11px;
+        letter-spacing: 1px;
+        margin-bottom: 24px;
+      }
+      .modal-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 14px;
+        margin-bottom: 18px;
+      }
+      @media (max-width: 480px) {
+        .modal-grid { grid-template-columns: 1fr; }
+      }
+      .modal-btn {
+        background: rgba(14, 28, 30, 0.85);
+        border: 1px solid rgba(212, 175, 55, 0.3);
+        border-radius: 12px;
+        padding: 16px 14px;
+        color: #fff;
+        text-align: left;
+        cursor: pointer;
+        transition: all 0.2s;
+        text-decoration: none;
+        display: block;
+      }
+      .modal-btn:hover {
+        border-color: #d4af37;
+        background: rgba(22, 56, 58, 0.9);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 18px rgba(212, 175, 55, 0.2);
+      }
+      .modal-btn-icon {
+        font-size: 22px;
+        margin-bottom: 6px;
+      }
+      .modal-btn-title {
+        color: #d4af37;
+        font-size: 11px;
+        font-weight: 900;
+        letter-spacing: 2px;
+      }
+      .modal-btn-sub {
+        color: #8ba1a2;
+        font-size: 9px;
+        margin-top: 3px;
+        letter-spacing: 0.5px;
+      }
+    </style>
 </head>
-
 <body>
 
 <div class="playground">
 
-
     <!-- =========================================
          HEADER
     ========================================== -->
-
     <header class="playground-header">
-
         <div class="brand-mark">
             D
         </div>
-
         <div>
-
             <div class="brand-name">
                 DIONLYONEE
             </div>
-
             <div class="brand-subtitle">
                 GAME SHOW PLAYGROUND
             </div>
-
         </div>
-
     </header>
-
 
     <!-- =========================================
          HERO
     ========================================== -->
-
     <section class="hero">
-
         <div class="hero-eyebrow">
             WELCOME TO THE PLAYGROUND
         </div>
-
         <h1>
             LET'S
             <span>PLAY.</span>
         </h1>
-
         <p>
             Choose a game below and bring the conversation,
             competition and chaos to the stream.
         </p>
-
     </section>
-
 
     <!-- =========================================
          FEATURED GAME
     ========================================== -->
-
     <section class="featured-section">
-
         <div class="section-heading">
-
             <span>
                 FEATURED GAME
             </span>
-
             <small>
                 MAIN EVENT
             </small>
-
         </div>
-
 
         <button
             type="button"
             class="featured-game"
-            onclick="openGame('jeopardy/jeopardy.html')"
+            onclick="openGame('wheel')"
         >
-
             <div class="featured-glow"></div>
-
-
             <div class="featured-content">
-
                 <div class="featured-badge">
                     FEATURED
                 </div>
-
-
                 <div class="featured-icon">
                     D
                 </div>
-
-
                 <div class="featured-title">
                     DIONLYONEE
                 </div>
-
-
                 <div class="featured-game-name">
-                    JEOPARDY
+                    WHEEL OF FORTUNE
                 </div>
-
-
                 <div class="featured-description">
                     THE DIONLYONEE GAME SHOW
                 </div>
-
-
                 <div class="featured-action">
-                    ENTER GAME
-                    <span>→</span>
+                    ENTER GAME <span>→</span>
                 </div>
-
             </div>
-
         </button>
-
     </section>
 
-
     <!-- =========================================
-         OTHER GAMES
+         GAME LIBRARY CAROUSEL
     ========================================== -->
-
     <section class="games-section">
-
         <div class="section-heading">
-
             <span>
                 GAME LIBRARY
             </span>
-
             <small>
                 SWIPE TO EXPLORE
             </small>
-
         </div>
 
+        <div class="game-carousel" id="gameCarousel">
 
-        <div class="game-carousel">
-
-
-            <!-- FINISH THE SENTENCE -->
-
+            <!-- 1. WHEEL OF FORTUNE -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('finish-the-sentence/index.html')"
+                onclick="openGame('wheel')"
             >
-
                 <div class="game-card-top">
+                    <div class="game-icon">
+                        🎡
+                    </div>
+                </div>
+                <h2>
+                    WHEEL OF<br>
+                    FORTUNE
+                </h2>
+                <p>
+                    Spin the 24-wedge wheel, reveal puzzle letters and win big.
+                </p>
+                <div class="game-type">
+                    MAIN EVENT
+                </div>
+            </button>
 
+            <!-- 2. JEOPARDY -->
+            <button
+                type="button"
+                class="game-card"
+                onclick="openGame('jeopardy')"
+            >
+                <div class="game-card-top">
+                    <div class="game-icon">
+                        🏆
+                    </div>
+                </div>
+                <h2>
+                    DION<br>
+                    JEOPARDY
+                </h2>
+                <p>
+                    Classic TV quiz board with categories, clues, and buzzer locks.
+                </p>
+                <div class="game-type">
+                    KNOWLEDGE
+                </div>
+            </button>
+
+            <!-- 3. FINISH THE SENTENCE -->
+            <button
+                type="button"
+                class="game-card"
+                onclick="openGame('finish-the-sentence')"
+            >
+                <div class="game-card-top">
                     <div class="game-icon">
                         😂
                     </div>
-
                 </div>
-
                 <h2>
                     FINISH THE<br>
                     SENTENCE
                 </h2>
-
                 <p>
-                    Give chat a sentence starter
-                    and see what they come up with.
+                    Host gives the setup.
+                    Chat finishes the sentence.
                 </p>
-
                 <div class="game-type">
                     CHAT CREATIVE
                 </div>
-
             </button>
 
-
-            <!-- WHAT WOULD YOU DO -->
-
+            <!-- 4. WHAT WOULD YOU DO? -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('what-would-you-do/index.html')"
+                onclick="openGame('what-would-you-do')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🤔
                     </div>
-
                 </div>
-
                 <h2>
                     WHAT WOULD<br>
                     YOU DO?
                 </h2>
-
                 <p>
-                    Give chat a wild situation
-                    and let the conversation begin.
+                    Moral dilemmas, wild scenarios
+                    and split-second decisions.
                 </p>
-
                 <div class="game-type">
                     CHAT CREATIVE
                 </div>
-
             </button>
 
-
-            <!-- HOT TAKE -->
-
+            <!-- 5. HOT TAKE -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('hot-take/index.html')"
+                onclick="openGame('hot-take')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🔥
                     </div>
-
                 </div>
-
                 <h2>
                     HOT<br>
                     TAKE
                 </h2>
-
                 <p>
-                    Agree or disagree?
-                    Let chat decide.
+                    Drop a spicy opinion and
+                    let chat battle it out.
                 </p>
-
                 <div class="game-type">
                     CHAT CREATIVE
                 </div>
-
             </button>
 
-
-            <!-- WHO WOULD YOU PICK -->
-
+            <!-- 6. WHO WOULD YOU PICK? -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('who-would-you-pick/index.html')"
+                onclick="openGame('who-would-you-pick')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         👑
                     </div>
-
                 </div>
-
                 <h2>
                     WHO WOULD<br>
                     YOU PICK?
                 </h2>
-
                 <p>
-                    Give chat multiple choices
-                    and see who they choose.
+                    Draft your dream team
+                    or pick the worst option.
                 </p>
-
                 <div class="game-type">
                     CHAT CREATIVE
                 </div>
-
             </button>
 
-
-            <!-- TRIVIA -->
-
+            <!-- 7. TRIVIA -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('trivia/index.html')"
+                onclick="openGame('trivia')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🧠
                     </div>
-
                 </div>
-
                 <h2>
-                    TRIVIA
+                    TRIVIA<br>
+                    SHOWDOWN
                 </h2>
-
                 <p>
-                    Test chat with questions
-                    across multiple categories.
+                    Fast-paced questions.
+                    First to answer in chat wins.
                 </p>
-
                 <div class="game-type">
                     KNOWLEDGE
                 </div>
-
             </button>
 
-
-            <!-- EMOJI GUESS -->
-
+            <!-- 8. EMOJI GUESS -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('emoji-guess/index.html')"
+                onclick="openGame('emoji-guess')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         👀
                     </div>
-
                 </div>
-
                 <h2>
                     EMOJI<br>
                     GUESS
                 </h2>
-
                 <p>
-                    Can chat figure out the
-                    answer from the emojis?
+                    Decode the title, phrase
+                    or celebrity from emojis.
                 </p>
-
                 <div class="game-type">
                     GUESSING
                 </div>
-
             </button>
 
-
-            <!-- UNSCRAMBLE IT -->
-
+            <!-- 9. UNSCRAMBLE IT -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('unscramble-it/index.html')"
+                onclick="openGame('unscramble-it')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🔀
                     </div>
-
                 </div>
-
                 <h2>
                     UNSCRAMBLE<br>
                     IT
                 </h2>
-
                 <p>
-                    Rearrange the letters
-                    and find the answer.
+                    Rearrange the letters to
+                    find the hidden word.
                 </p>
-
                 <div class="game-type">
                     GUESSING
                 </div>
-
             </button>
 
-
-            <!-- WHO DIS -->
-
+            <!-- 10. WHO DIS? -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('who-dis/index.html')"
+                onclick="openGame('who-dis')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🕵🏾
                     </div>
-
                 </div>
-
                 <h2>
                     WHO<br>
                     DIS?
                 </h2>
-
                 <p>
-                    Listen to the clues
-                    and guess the character.
+                    Guess the mystery person
+                    from clues and hints.
                 </p>
-
                 <div class="game-type">
                     GUESSING
                 </div>
-
             </button>
 
-
-            <!-- HANGMAN -->
-
+            <!-- 11. HANGMAN -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('hangman/index.html')"
+                onclick="openGame('hangman')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🔤
                     </div>
-
                 </div>
-
                 <h2>
-                    HANGMAN
+                    HANGMAN<br>
+                    SHOW
                 </h2>
-
                 <p>
-                    Guess letters and uncover
-                    the hidden word.
+                    Guess the letters before
+                    the strikes run out.
                 </p>
-
                 <div class="game-type">
                     GUESSING
                 </div>
-
             </button>
 
-
-            <!-- CHARADES -->
-
+            <!-- 12. CHARADES -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('charades/index.html')"
+                onclick="openGame('charades')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🎭
                     </div>
-
                 </div>
-
                 <h2>
+                    STREAM<br>
                     CHARADES
                 </h2>
-
                 <p>
                     Act it out and let chat
                     figure out the clue.
                 </p>
-
                 <div class="game-type">
                     PERFORMANCE
                 </div>
-
             </button>
 
-
-            <!-- WOULD YOU RATHER -->
-
+            <!-- 13. WOULD YOU RATHER -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('would-you-rather/index.html')"
+                onclick="openGame('would-you-rather')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         ⚖️
                     </div>
-
                 </div>
-
                 <h2>
                     WOULD YOU<br>
                     RATHER
                 </h2>
-
                 <p>
                     Two choices.
                     One impossible decision.
                 </p>
-
                 <div class="game-type">
                     CHAT GAME
                 </div>
-
             </button>
 
-
-            <!-- MOST LIKELY -->
-
+            <!-- 14. MOST LIKELY -->
             <button
                 type="button"
                 class="game-card"
-                onclick="openGame('most-likely/index.html')"
+                onclick="openGame('most-likely')"
             >
-
                 <div class="game-card-top">
-
                     <div class="game-icon">
                         🃏
                     </div>
-
                 </div>
-
                 <h2>
                     MOST<br>
                     LIKELY
                 </h2>
-
                 <p>
                     Who is most likely to...?
                     Let chat debate it.
                 </p>
-
                 <div class="game-type">
                     CHAT GAME
                 </div>
-
             </button>
 
-
         </div>
-
 
         <div class="swipe-hint">
-
             <span>←</span>
-
             SWIPE TO EXPLORE
-
             <span>→</span>
-
         </div>
-
     </section>
-
 
     <!-- =========================================
          FOOTER
     ========================================== -->
-
     <footer>
-
         <span>
             DIONLYONEE
         </span>
-
         <b>◆</b>
-
         <span>
             GAME SHOW PLAYGROUND
         </span>
-
         <b>◆</b>
-
         <span>
             2026
         </span>
-
     </footer>
-
 
 </div>
 
+<!-- =========================================
+     LAUNCHER MODAL
+========================================== -->
+<div id="gameLauncherModal" class="game-launcher-modal">
+    <div class="modal-box">
+        <button type="button" class="modal-close" onclick="closeModal()">✕</button>
+        <div id="modalBadge" class="modal-badge">GAME SHOW</div>
+        <div id="modalTitle" class="modal-title">GAME NAME</div>
+        <div id="modalDesc" class="modal-desc">Select screen to launch</div>
+        <div class="modal-grid">
+            <a id="btnHost" href="#" target="_blank" class="modal-btn">
+                <div class="modal-btn-icon">🎤</div>
+                <div class="modal-btn-title">HOST CONTROL</div>
+                <div class="modal-btn-sub">Primary broadcast control panel (unlocked)</div>
+            </a>
+            <a id="btnLive" href="#" target="_blank" class="modal-btn">
+                <div class="modal-btn-icon">📺</div>
+                <div class="modal-btn-title">LIVE STAGE</div>
+                <div class="modal-btn-sub">Audience screen for OBS / stream overlay</div>
+            </a>
+            <a id="btnSplit" href="#" target="_blank" class="modal-btn">
+                <div class="modal-btn-icon">🎛️</div>
+                <div class="modal-btn-title">SPLIT SCREEN</div>
+                <div class="modal-btn-sub">Host + Live side-by-side on 1 screen</div>
+            </a>
+            <a id="btnDirect" href="#" target="_blank" class="modal-btn">
+                <div class="modal-btn-icon">🚀</div>
+                <div class="modal-btn-title">GAME LAUNCHER</div>
+                <div class="modal-btn-sub">Open standalone launcher screen</div>
+            </a>
+        </div>
+    </div>
+</div>
 
 <script>
+const GAME_DIRECTORY = {
+  'wheel': {
+    title: 'WHEEL OF FORTUNE',
+    badge: 'MAIN EVENT',
+    desc: 'Classic 24-wedge spinning wheel, 4-row puzzle board, and stream reveal engine.',
+    host: 'wheel/host/index.html',
+    live: 'wheel/live/index.html',
+    split: 'dual-view.html',
+    direct: 'wheel/index.html'
+  },
+  'jeopardy': {
+    title: 'DION JEOPARDY',
+    badge: 'KNOWLEDGE',
+    desc: 'Interactive 25-clue TV Jeopardy grid, buzzer lockouts, and clue reveal.',
+    host: 'jeopardy/jeopardy-host.html',
+    live: 'jeopardy/jeopardy-live.html',
+    split: 'jeopardy/host/index.html',
+    direct: 'jeopardy/jeopardy.html'
+  },
+  'finish-the-sentence': {
+    title: 'FINISH THE SENTENCE',
+    badge: 'CHAT CREATIVE',
+    desc: 'Host reads the setup prompt, audience answers in chat.',
+    host: 'finish-the-sentence/host.html',
+    live: 'finish-the-sentence/live.html',
+    split: 'finish-the-sentence/host.html',
+    direct: 'finish-the-sentence/index.html'
+  },
+  'what-would-you-do': {
+    title: 'WHAT WOULD YOU DO?',
+    badge: 'CHAT CREATIVE',
+    desc: 'Wild moral dilemmas and split-second decisions for the stream.',
+    host: 'what-would-you-do/host.html',
+    live: 'what-would-you-do/live.html',
+    split: 'what-would-you-do/host.html',
+    direct: 'what-would-you-do/index.html'
+  },
+  'hot-take': {
+    title: 'HOT TAKE',
+    badge: 'CHAT CREATIVE',
+    desc: 'Spicy opinions with debate timer and vote reactions.',
+    host: 'hot-take/hot-take-host.html',
+    live: 'hot-take/hot-take.html',
+    split: 'hot-take/hot-take-host.html',
+    direct: 'hot-take/index.html'
+  },
+  'who-would-you-pick': {
+    title: 'WHO WOULD YOU PICK?',
+    badge: 'CHAT CREATIVE',
+    desc: 'Head-to-head celebrity, character, and stream draft choices.',
+    host: 'who-would-you-pick/host.html',
+    live: 'who-would-you-pick/live.html',
+    split: 'who-would-you-pick/host.html',
+    direct: 'who-would-you-pick/index.html'
+  },
+  'trivia': {
+    title: 'TRIVIA SHOWDOWN',
+    badge: 'KNOWLEDGE',
+    desc: 'Fast-paced buzzer quiz arena across multiple categories.',
+    host: 'trivia/host/index.html',
+    live: 'trivia/live/index.html',
+    split: 'trivia/host/index.html',
+    direct: 'trivia/index.html'
+  },
+  'emoji-guess': {
+    title: 'EMOJI GUESS',
+    badge: 'GUESSING',
+    desc: 'Visual emoji combinations to decode movies, titles, and celebrities.',
+    host: 'emoji-guess/host.html',
+    live: 'emoji-guess/live.html',
+    split: 'emoji-guess/host.html',
+    direct: 'emoji-guess/index.html'
+  },
+  'unscramble-it': {
+    title: 'UNSCRAMBLE IT',
+    badge: 'GUESSING',
+    desc: 'Scrambled anagram letters with hints and time countdown.',
+    host: 'unscramble-it/host.html',
+    live: 'unscramble-it/live.html',
+    split: 'unscramble-it/host.html',
+    direct: 'unscramble-it/index.html'
+  },
+  'who-dis': {
+    title: 'WHO DIS?',
+    badge: 'GUESSING',
+    desc: '3 progressive clues and silhouette reveals to guess the mystery icon.',
+    host: 'who-dis/host.html',
+    live: 'who-dis/live.html',
+    split: 'who-dis/host.html',
+    direct: 'who-dis/index.html'
+  },
+  'hangman': {
+    title: 'HANGMAN SHOW',
+    badge: 'GUESSING',
+    desc: 'Guess letters, avoid strikes, and solve the hidden phrase.',
+    host: 'hangman/host.html',
+    live: 'hangman/live.html',
+    split: 'hangman/host.html',
+    direct: 'hangman/index.html'
+  },
+  'charades': {
+    title: 'STREAM CHARADES',
+    badge: 'PERFORMANCE',
+    desc: 'Silent acting prompts with 60s countdown timer and scoring.',
+    host: 'charades/host.html',
+    live: 'charades/live.html',
+    split: 'charades/host.html',
+    direct: 'charades/index.html'
+  },
+  'would-you-rather': {
+    title: 'WOULD YOU RATHER',
+    badge: 'CHAT GAME',
+    desc: 'Two impossible choices with real-time percentage vote meter.',
+    host: 'would-you-rather/host.html',
+    live: 'would-you-rather/live.html',
+    split: 'would-you-rather/host.html',
+    direct: 'would-you-rather/index.html'
+  },
+  'most-likely': {
+    title: 'MOST LIKELY',
+    badge: 'CHAT GAME',
+    desc: 'Who is most likely to...? Let chat debate and vote live.',
+    host: 'most-likely/most-likely-host.html',
+    live: 'most-likely/most-likely-live.html',
+    split: 'most-likely-host.html',
+    direct: 'most-likely/index.html'
+  }
+};
 
-function openGame(path) {
+function openGame(gameKey) {
+  const g = GAME_DIRECTORY[gameKey];
+  if (!g) return;
 
-    window.open(
-        path,
-        "_blank"
-    );
+  const modal = document.getElementById('gameLauncherModal');
+  document.getElementById('modalBadge').textContent = g.badge;
+  document.getElementById('modalTitle').textContent = g.title;
+  document.getElementById('modalDesc').textContent = g.desc;
 
+  document.getElementById('btnHost').href = g.host;
+  document.getElementById('btnLive').href = g.live;
+  document.getElementById('btnSplit').href = g.split;
+  document.getElementById('btnDirect').href = g.direct;
+
+  modal.classList.add('active');
 }
 
+function closeModal() {
+  document.getElementById('gameLauncherModal').classList.remove('active');
+}
+
+document.getElementById('gameLauncherModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
 </script>
 
 </body>

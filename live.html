@@ -87,6 +87,23 @@
     }
   };
 
+  try {
+    const cached = sessionStorage.getItem('dion_live_wheel');
+    if (cached) {
+      const g = JSON.parse(cached);
+      categoryElement.textContent = g.category || 'WAITING FOR GAME';
+      drawPuzzle(g.answer || '', g.revealed || []);
+      if (g.running) {
+        timerElement.textContent = typeof g.seconds === 'number' ? g.seconds : '—';
+        messageElement.textContent = 'GUESS THE ANSWER IN CHAT';
+      }
+    }
+  } catch (e) {}
+
+  try {
+    channel.postMessage({ type: 'REQUEST_STATE' });
+  } catch (e) {}
+
   window.addEventListener('beforeunload', () => channel.close());
 })();
 </script>

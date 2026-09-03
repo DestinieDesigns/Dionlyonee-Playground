@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Wheel of Fortune Co-Host Assistant | Dionlyonee Stream</title>
+  <meta name="description" content="Co-Host assist screen for Dionlyonee Wheel of Fortune live stream game show." />
+
+  <!-- FONTS -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;800;900&family=Space+Grotesk:wght@600;700;900&display=swap" rel="stylesheet" />
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="wheel-cohost.css" />
+</head>
+
+<body>
+
+  <!-- TOP HEADER -->
+  <header class="cohost-header">
+    <div class="brand-group">
+      <div class="brand-icon">🎤</div>
+      <div>
+        <div class="brand-title">WHEEL OF FORTUNE</div>
+        <div class="brand-sub">CO-HOST ASSIST DESK</div>
+      </div>
+    </div>
+
+    <!-- HUD STATS -->
+    <div class="hud-stats">
+      <div id="cohost-round" class="hud-pill">ROUND 1</div>
+      <div id="cohost-timer" class="hud-pill gold">30s</div>
+      <div id="cohost-status" class="status-tag waiting">WAITING</div>
+    </div>
+  </header>
+
+  <!-- CO-HOST ASSIST DESK -->
+  <main class="cohost-container">
+
+    <!-- ACTIVE CALLER & WHEEL STATUS -->
+    <div style="display: flex; gap: 12px; margin-bottom: 16px; flex-wrap: wrap;">
+      <div style="flex: 1; background: rgba(3, 32, 18, 0.85); border: 1px solid var(--border-gold); border-radius: 8px; padding: 10px 14px;">
+        <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">ACTIVE CONTESTANT</div>
+        <div id="cohost-active-player" style="font-size: 16px; font-weight: 900; color: var(--gold-bright); margin-top: 2px;">PLAYER 1 (RED)</div>
+      </div>
+      <div style="flex: 1; background: rgba(3, 32, 18, 0.85); border: 1px solid var(--border-gold); border-radius: 8px; padding: 10px 14px;">
+        <div style="font-size: 10px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1px;">LANDED WEDGE</div>
+        <div id="cohost-last-wedge" style="font-size: 16px; font-weight: 900; color: #38bdf8; margin-top: 2px;">$1,000</div>
+      </div>
+    </div>
+
+    <!-- ACTIVE PUZZLE SECRET ANSWER KEY -->
+    <div class="secret-card">
+      <div class="secret-label">
+        <span>🔒 CO-HOST CONFIDENTIAL ANSWER KEY</span>
+        <span class="live-pill">LIVE SYNCED</span>
+      </div>
+
+      <!-- CATEGORY -->
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px;">CATEGORY</div>
+        <div id="cohost-category" class="secret-category-text">JAMAICAN / PATWA PHRASES</div>
+      </div>
+
+      <!-- UNLOCKED FULL ANSWER -->
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px;">FULL SECRET PHRASE</div>
+        <div id="cohost-answer" class="secret-answer-text">WAH GWAAN</div>
+      </div>
+
+      <!-- SECRET HINT -->
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 4px; letter-spacing: 1px;">CLUE NOTES</div>
+        <div id="cohost-hint" class="secret-hint-box">
+          💡 <strong>CLUE:</strong> Popular Jamaican greeting
+        </div>
+      </div>
+
+      <!-- 4-ROW BOARD LETTER REVEAL STATUS -->
+      <div>
+        <div style="font-size: 11px; font-weight: 800; color: var(--text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px;">
+          STAGE BOARD MATRIX (DIM = UNREVEALED TO AUDIENCE, BRIGHT = REVEALED)
+        </div>
+        <div id="cohost-tiles" class="cohost-tiles-row">
+          <!-- Rendered via wheel-cohost.js -->
+        </div>
+      </div>
+
+      <!-- CO-HOST ACTION BUTTONS (MOBILE FRIENDLY) -->
+      <div style="margin-top: 14px; display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+        <button id="btn-cohost-buzz" class="cohost-buzz-btn" style="margin: 0; padding: 14px 12px; font-size: 13px;">
+          🚨 BUZZER ALERT
+        </button>
+        <button id="btn-cohost-spin" class="cohost-buzz-btn" style="margin: 0; padding: 14px 12px; font-size: 13px; background: linear-gradient(135deg, #059669, #10b981); box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);">
+          🎡 SPIN WHEEL
+        </button>
+      </div>
+
+    </div>
+
+    <!-- QUICK RULES & HOST CO-PILOT TIPS -->
+    <div class="tips-card">
+      <h3 style="font-size: 14px; font-weight: 800; color: var(--gold-bright); margin-bottom: 8px; display: flex; align-items: center; gap: 6px;">
+        <span>📋</span> CO-HOST RUN SHEET
+      </h3>
+      <ul style="font-size: 12px; color: var(--text-muted); line-height: 1.6; padding-left: 18px;">
+        <li>Keep the audience hyped while the wheel spins!</li>
+        <li>Watch the live stage tiles: unrevealed letters stay greyed out until called.</li>
+        <li>Hit the <strong>Co-Host Buzzer Alert</strong> to notify the host when a chat contestant guesses correctly.</li>
+      </ul>
+    </div>
+
+  </main>
+
+  <!-- PURE VANILLA JAVASCRIPT -->
+  <script src="sounds.js"></script>
+  <script src="wheel-engine.js"></script>
+  <script src="sync-client.js"></script>
+  <script src="wheel-cohost.js"></script>
+
+</body>
+</html>

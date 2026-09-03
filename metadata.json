@@ -1,0 +1,6 @@
+{
+  "name": "Dionlyonee Game Show Playground",
+  "description": "Interactive live stream gaming hub featuring Wheel of Fortune with classic 4-row matrix & spinning wheel, Jeopardy word puzzle & trivia clues (minus wheel), and Most Likely To flashcards with synchronized multi-device Host, Live Stage, and Co-Host consoles in pure Vanilla JavaScript.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
