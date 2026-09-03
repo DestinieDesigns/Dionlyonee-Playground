@@ -62,6 +62,22 @@
         waiting: '/word-reveal/waiting/'
       },
       features: ['Progressive Letter Flips', 'Clue & Hint Engine', 'Vote Counter', 'Social Stream Prompts']
+    },
+    {
+      id: 'speak-out',
+      title: 'DIONLYONEE SPEAK OUT!',
+      genre: 'Live Speaking & Rapid Stream Challenge',
+      icon: '🎤',
+      accent: '#f59e0b',
+      status: 'ready',
+      desc: 'Fast-paced live stream speaking challenge with 650+ stream-tested prompts. Eliminate dead air with Tongue Twisters, Rapid Fire, Forbidden Words, Voice Challenges, Keep Talking, and Finish the Phrase.',
+      links: {
+        host: '/speak-out/host/',
+        cohost: '/speak-out/cohost/',
+        live: '/speak-out/live/',
+        waiting: '/speak-out/waiting/'
+      },
+      features: ['650+ Dynamic Challenges', '7 Game Modes', 'Hot Streak Multipliers', 'Zero Dead Air Timer']
     }
   ];
 

@@ -56,7 +56,14 @@
           isRunning: false,
           revealedClues: 1,
           revealedAnswer: false,
-          votes: { optionA: 0, optionB: 0 }
+          votes: { optionA: 0, optionB: 0 },
+          hangmanState: this.gameId === 'hangman' ? {
+            guessedLetters: [],
+            strikes: 0,
+            maxStrikes: 6,
+            status: 'PLAYING',
+            showHint: false
+          } : null
         };
       }
 
@@ -74,13 +81,15 @@
       const timerEl = document.getElementById('live-timer');
       const messageEl = document.getElementById('live-message');
 
+      const isWaiting = Boolean(this.state.showWaitingScreen);
+
       if (categoryEl) {
-        categoryEl.textContent = p.category || this.gameMeta.badge || 'STREAM GAME';
+        categoryEl.textContent = isWaiting ? 'STANDBY • WAITING FOR HOST' : (p.category || this.state.category || this.gameMeta.badge || 'STREAM GAME');
       }
 
       if (timerEl) {
-        timerEl.textContent = typeof this.state.remainingSeconds === 'number' ? this.state.remainingSeconds : '—';
-        if (this.state.remainingSeconds <= 5 && this.state.remainingSeconds > 0) {
+        timerEl.textContent = isWaiting ? '—' : (typeof this.state.remainingSeconds === 'number' ? this.state.remainingSeconds : '—');
+        if (!isWaiting && this.state.remainingSeconds <= 5 && this.state.remainingSeconds > 0) {
           timerEl.style.color = '#ef4444';
           timerEl.style.textShadow = '0 0 25px rgba(239, 68, 68, 0.7)';
         } else {
@@ -90,7 +99,9 @@
       }
 
       if (messageEl) {
-        if (this.state.isRunning) {
+        if (isWaiting) {
+          messageEl.textContent = 'HOST IS CHOOSING NEXT QUESTION';
+        } else if (this.state.isRunning) {
           messageEl.textContent = 'GUESS OR VOTE IN CHAT NOW!';
         } else if (this.state.remainingSeconds === 0) {
           messageEl.textContent = 'TIME IS UP!';
@@ -100,6 +111,18 @@
       }
 
       if (!contentEl) return;
+
+      if (isWaiting) {
+        contentEl.innerHTML = `
+          <div class="live-waiting-stage">
+            <img src="/dionlyonee-pon-di-app.png" alt="Dionlyonee Pon Di App" class="live-waiting-hero-img" referrerPolicy="no-referrer" />
+            <div class="live-waiting-badge">🇯🇲 DIONLYONEE PON DI APP • STANDBY LOBBY</div>
+            <h2 class="live-waiting-title">GET READY!</h2>
+            <p class="live-waiting-sub">Host is picking the category and next question. Stay locked in!</p>
+          </div>
+        `;
+        return;
+      }
 
       if (this.gameId === 'finish-the-sentence') {
         contentEl.innerHTML = `
@@ -200,15 +223,271 @@
           ` : ''}
         `;
       } else if (this.gameId === 'charades') {
+        if (this.state.revealedAnswer) {
+          contentEl.innerHTML = `
+            <div style="animation: fadeIn 0.4s ease-out; max-width: 860px; margin: 0 auto;">
+              <div style="font-size: 20px; font-weight: 900; letter-spacing: 4px; color: #10b981; margin-bottom: 15px;">
+                🎉 CHARADE SOLVED! WINNER IN CHAT!
+              </div>
+              <div style="font-size: 38px; font-weight: 900; line-height: 1.3; color: #ffffff; padding: 36px 28px; background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(14,28,30,0.95)); border: 3px solid #d4af37; border-radius: 20px; box-shadow: 0 0 50px rgba(212,175,55,0.5), 0 10px 40px rgba(0,0,0,0.8);">
+                "${p.prompt}"
+              </div>
+              <div style="margin-top: 24px; display: inline-flex; gap: 12px; align-items: center; background: rgba(16, 185, 129, 0.2); border: 1px solid #10b981; border-radius: 30px; padding: 8px 24px; color: #6ee7b7; font-size: 16px; font-weight: 800; letter-spacing: 2px;">
+                🏆 ROUND COMPLETE • HOST PICKING NEXT PROMPT
+              </div>
+            </div>
+          `;
+        } else {
+          contentEl.innerHTML = `
+            <div style="animation: fadeIn 0.3s ease-out; max-width: 860px; margin: 0 auto;">
+              <div style="display: inline-flex; align-items: center; gap: 8px; font-size: 16px; font-weight: 900; letter-spacing: 3px; color: #ef4444; background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); border-radius: 30px; padding: 8px 20px; margin-bottom: 20px;">
+                🤫 SILENT CHARADES • NO TALKING!
+              </div>
+
+              <!-- Center Stage Instruction Card -->
+              <div style="font-size: 36px; font-weight: 900; line-height: 1.35; color: #ffffff; padding: 34px 28px; background: rgba(14,28,30,0.85); border: 2px solid rgba(212,175,55,0.35); border-radius: 20px; box-shadow: 0 10px 40px rgba(0,0,0,0.6);">
+                👀 WATCH THE HOST ON CAM!
+              </div>
+
+              <!-- Live Clues Sent by Host -->
+              ${(this.state.showWordCount || this.state.showChatClue) ? `
+                <div style="display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 20px;">
+                  ${this.state.showWordCount ? `
+                    <div style="background: rgba(56, 189, 248, 0.2); border: 1px solid #38bdf8; color: #7dd3fc; padding: 10px 22px; border-radius: 24px; font-size: 18px; font-weight: 900; letter-spacing: 2px; box-shadow: 0 0 20px rgba(56,189,248,0.3);">
+                      📝 ${p.words || (p.prompt ? p.prompt.split(' ').length : 3)} WORDS
+                    </div>
+                  ` : ''}
+                  ${this.state.showChatClue ? `
+                    <div style="background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #fde68a; padding: 10px 22px; border-radius: 24px; font-size: 18px; font-weight: 900; letter-spacing: 2px; box-shadow: 0 0 20px rgba(245,158,11,0.3);">
+                      💡 TOPIC: ${p.chatClue || p.category}
+                    </div>
+                  ` : ''}
+                </div>
+              ` : ''}
+
+              <!-- Live Reaction Banner from Host -->
+              ${this.state.charadesReaction ? `
+                <div style="margin-top: 24px; padding: 14px 28px; background: linear-gradient(135deg, #d4af37, #f7e07d); color: #020303; font-size: 24px; font-weight: 900; letter-spacing: 3px; border-radius: 16px; display: inline-block; box-shadow: 0 0 35px rgba(212,175,55,0.8);">
+                  ${this.state.charadesReaction}
+                </div>
+              ` : ''}
+
+              <div style="margin-top: 24px; font-size: 17px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
+                💬 TYPE YOUR GUESS IN CHAT NOW!
+              </div>
+            </div>
+          `;
+        }
+      } else if (this.gameId === 'hangman') {
+        const hState = this.state.hangmanState || { guessedLetters: [], strikes: 0, maxStrikes: 6, status: 'PLAYING', showHint: false };
+        const rawWord = (p.word || 'HANGMAN').toUpperCase();
+        const strikes = Math.max(0, Math.min(6, hState.strikes || 0));
+        const maxStrikes = 6;
+        const status = hState.status || (this.state.revealedAnswer ? 'WON' : 'PLAYING');
+        const guessedLetters = hState.guessedLetters || [];
+        const isRevealed = this.state.revealedAnswer || status === 'WON' || status === 'LOST';
+
+        // Filter correct (in word) vs wrong (miss/strike) letters
+        const correctLetters = guessedLetters.filter(ch => rawWord.includes(ch));
+        const wrongLetters = guessedLetters.filter(ch => !rawWord.includes(ch));
+
+        // Word Blanks Display
+        // Guessed letters glow in vivid Emerald Green (#10b981)
+        // Letters missed on round loss appear in vivid Crimson Red (#ef4444)
+        const words = rawWord.split(' ');
+        const wordGroupsHtml = words.map(w => {
+          const charBoxes = w.split('').map(ch => {
+            if (/[A-Z]/.test(ch)) {
+              const wasGuessed = guessedLetters.includes(ch);
+              const isShown = wasGuessed || isRevealed;
+              const isMissedAtLoss = !wasGuessed && status === 'LOST' && isRevealed;
+
+              const letterColor = isMissedAtLoss ? '#ef4444' : (wasGuessed ? '#10b981' : (isRevealed ? '#10b981' : '#ffffff'));
+              const letterBorder = isMissedAtLoss ? '#ef4444' : (wasGuessed ? '#10b981' : '#d4af37');
+              const letterShadow = isMissedAtLoss ? '0 0 20px rgba(239,68,68,0.85)' : (wasGuessed ? '0 0 20px rgba(16,185,129,0.85)' : 'none');
+              const bgBox = isMissedAtLoss ? 'rgba(239,68,68,0.14)' : (wasGuessed ? 'rgba(16,185,129,0.12)' : 'rgba(0,0,0,0.5)');
+
+              return `
+                <div style="width: 54px; height: 68px; background: ${bgBox}; border-bottom: 5px solid ${letterBorder}; border-radius: 8px 8px 0 0; display: inline-flex; align-items: center; justify-content: center; font-size: 38px; font-weight: 900; color: ${letterColor}; text-shadow: ${letterShadow}; box-shadow: 0 6px 20px rgba(0,0,0,0.5); margin: 0 4px; transition: all 0.25s;">
+                  ${isShown ? ch : ''}
+                </div>
+              `;
+            } else {
+              return `
+                <div style="display: inline-flex; align-items: center; justify-content: center; font-size: 36px; font-weight: 900; color: #d4af37; margin: 0 4px;">
+                  ${ch}
+                </div>
+              `;
+            }
+          }).join('');
+          return `<div style="display: inline-flex; margin: 8px 14px; flex-wrap: nowrap;">${charBoxes}</div>`;
+        }).join('');
+
+        // Classic Hangman Gallows & Stick Figure Visual
+        const visualSvg = window.renderHangmanStageSvg ? window.renderHangmanStageSvg(strikes, status, 340, 270) : '';
+
+        // Strike Dots with 6 body parts labeled
+        const strikeParts = ['Head', 'Body', 'L-Arm', 'R-Arm', 'L-Leg', 'R-Leg'];
+        const strikeDotsHtml = [];
+        for (let i = 1; i <= maxStrikes; i++) {
+          const struck = i <= strikes;
+          strikeDotsHtml.push(`
+            <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+              <span style="display: inline-flex; align-items: center; justify-content: center; width: 34px; height: 34px; border-radius: 50%; background: ${struck ? 'linear-gradient(135deg, #ef4444, #dc2626)' : 'rgba(255,255,255,0.06)'}; border: 2px solid ${struck ? '#f87171' : 'rgba(255,255,255,0.2)'}; color: ${struck ? '#ffffff' : '#64748b'}; font-size: 15px; font-weight: 900; box-shadow: ${struck ? '0 0 15px rgba(239,68,68,0.8)' : 'none'}; transition: all 0.25s;">
+                ${struck ? '✕' : i}
+              </span>
+              <span style="font-size: 10px; font-weight: 800; color: ${struck ? '#f87171' : '#64748b'}; letter-spacing: 0.5px;">
+                ${strikeParts[i - 1]}
+              </span>
+            </div>
+          `);
+        }
+
+        // Audience Letter Board (A-Z) with vivid RED (wrong) and GREEN (correct)
+        const alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'.split('');
+        const alphabetHtml = alphabet.map(letter => {
+          const isGuessed = guessedLetters.includes(letter);
+          const inWord = rawWord.includes(letter);
+          if (isGuessed) {
+            if (inWord) {
+              // CORRECT GUESS: EMERALD GREEN
+              return `
+                <div title="${letter} (Correct)" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #047857); border: 2.5px solid #34d399; color: #ffffff; font-weight: 900; font-size: 20px; box-shadow: 0 0 16px rgba(16,185,129,0.7); transform: scale(1.03);">
+                  ${letter}
+                  <span style="position: absolute; bottom: 1px; right: 3px; font-size: 9px; font-weight: 900; color: #d1fae5;">✓</span>
+                </div>
+              `;
+            } else {
+              // WRONG GUESS / STRIKE: CRIMSON RED WITH STRIKE-THROUGH
+              return `
+                <div title="${letter} (Wrong / Strike)" style="position: relative; display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; border-radius: 8px; background: linear-gradient(135deg, #ef4444, #b91c1c); border: 2.5px solid #f87171; color: #ffffff; font-weight: 900; font-size: 20px; box-shadow: 0 0 16px rgba(239,68,68,0.7); text-decoration: line-through;">
+                  ${letter}
+                  <span style="position: absolute; bottom: 1px; right: 3px; font-size: 9px; font-weight: 900; color: #fee2e2;">✕</span>
+                </div>
+              `;
+            }
+          } else {
+            // UNGUESSED: AVAILABLE NEUTRAL WHITE/GOLD
+            return `
+              <div title="${letter} (Available)" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 48px; border-radius: 8px; background: rgba(255,255,255,0.06); border: 1.5px solid rgba(212,175,55,0.35); color: #f8fafc; font-weight: 800; font-size: 19px;">
+                ${letter}
+              </div>
+            `;
+          }
+        }).join('');
+
+        // Summary Badges
+        const correctChipsHtml = correctLetters.length > 0 
+          ? correctLetters.map(l => `<span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #10b981; color: #ffffff; font-weight: 900; font-size: 16px; box-shadow: 0 0 10px rgba(16,185,129,0.5);">${l}</span>`).join('')
+          : `<span style="font-size: 12px; color: #6ee7b7; font-style: italic;">None yet</span>`;
+
+        const wrongChipsHtml = wrongLetters.length > 0
+          ? wrongLetters.map(l => `<span style="display: inline-flex; align-items: center; justify-content: center; width: 32px; height: 32px; border-radius: 6px; background: #ef4444; color: #ffffff; font-weight: 900; font-size: 16px; text-decoration: line-through; box-shadow: 0 0 10px rgba(239,68,68,0.5);">${l}</span>`).join('')
+          : `<span style="font-size: 12px; color: #fca5a5; font-style: italic;">0 strikes</span>`;
+
         contentEl.innerHTML = `
-          <div style="font-size: 24px; font-weight: 900; letter-spacing: 3px; color: #ef4444; margin-bottom: 20px;">
-            🤫 SILENT ACTING ONLY • NO TALKING!
-          </div>
-          <div style="font-size: 32px; font-weight: 900; line-height: 1.35; color: #ffffff; max-width: 800px; margin: 0 auto; padding: 30px; background: rgba(14,28,30,0.8); border: 2px solid rgba(212,175,55,0.3); border-radius: 18px;">
-            WATCH THE HOST / CONTESTANT ON CAM!
-          </div>
-          <div style="margin-top: 25px; font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
-            FIRST ONE TO TYPE THE CORRECT ACTION IN CHAT WINS!
+          <div style="animation: fadeIn 0.3s ease-out; max-width: 1040px; margin: 0 auto; width: 100%;">
+            
+            <!-- Visual Gallows Stage & Strike Meter Grid -->
+            <div style="display: grid; grid-template-columns: 340px 1fr; gap: 24px; align-items: center; background: rgba(14,28,30,0.85); border: 2px solid rgba(212,175,55,0.35); border-radius: 20px; padding: 20px 24px; box-shadow: 0 10px 40px rgba(0,0,0,0.7);">
+              
+              <!-- Hangman Gallows & Stick Figure Graphic -->
+              <div style="display: flex; justify-content: center; align-items: center; background: rgba(0,0,0,0.35); border: 1.5px solid rgba(212,175,55,0.25); border-radius: 16px; padding: 10px;">
+                ${visualSvg}
+              </div>
+
+              <!-- Right Column: Strikes Counter, Legend & Summary -->
+              <div style="display: flex; flex-direction: column; gap: 14px;">
+                
+                <!-- Strike Meter Bar with Body Parts -->
+                <div style="background: rgba(0,0,0,0.4); border: 1px solid rgba(255,255,255,0.1); border-radius: 14px; padding: 12px 18px;">
+                  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px;">
+                    <div style="font-size: 13px; font-weight: 900; letter-spacing: 2px; color: ${strikes >= 5 ? '#ef4444' : (strikes >= 3 ? '#f59e0b' : '#d4af37')};">
+                      ⚠️ HANGMAN STRIKES: ${strikes} / ${maxStrikes}
+                    </div>
+                    <div style="font-size: 12px; font-weight: 800; color: ${strikes >= 5 ? '#f87171' : '#94a3b8'};">
+                      ${6 - strikes} ${6 - strikes === 1 ? 'GUESS' : 'GUESSES'} REMAINING
+                    </div>
+                  </div>
+                  <div style="display: flex; gap: 10px; justify-content: space-between;">
+                    ${strikeDotsHtml.join('')}
+                  </div>
+                </div>
+
+                <!-- Letter Color Legend (Green = In Word, Red = Strike) -->
+                <div style="display: flex; gap: 12px; justify-content: space-between; flex-wrap: wrap;">
+                  <!-- Green Correct Box -->
+                  <div style="flex: 1; min-width: 170px; background: rgba(16,185,129,0.12); border: 1.5px solid #10b981; border-radius: 12px; padding: 8px 12px;">
+                    <div style="font-size: 11px; font-weight: 900; color: #34d399; letter-spacing: 1.5px; margin-bottom: 6px;">
+                      🟢 CORRECT (${correctLetters.length})
+                    </div>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; min-height: 32px; align-items: center;">
+                      ${correctChipsHtml}
+                    </div>
+                  </div>
+
+                  <!-- Red Wrong Box -->
+                  <div style="flex: 1; min-width: 170px; background: rgba(239,68,68,0.12); border: 1.5px solid #ef4444; border-radius: 12px; padding: 8px 12px;">
+                    <div style="font-size: 11px; font-weight: 900; color: #f87171; letter-spacing: 1.5px; margin-bottom: 6px;">
+                      🔴 WRONG / STRIKES (${wrongLetters.length}/6)
+                    </div>
+                    <div style="display: flex; gap: 5px; flex-wrap: wrap; min-height: 32px; align-items: center;">
+                      ${wrongChipsHtml}
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Optional Clue from Host -->
+                ${(hState.showHint && p.hint) ? `
+                  <div style="background: rgba(245, 158, 11, 0.2); border: 1.5px solid #f59e0b; border-radius: 12px; padding: 10px 16px; color: #fde68a; font-size: 14px; font-weight: 800; letter-spacing: 1.5px; box-shadow: 0 0 20px rgba(245,158,11,0.3); text-align: center;">
+                    💡 HOST CLUE: ${p.hint}
+                  </div>
+                ` : ''}
+
+              </div>
+            </div>
+
+            <!-- Big Word Puzzle Blanks Section -->
+            <div style="margin-top: 22px; padding: 24px 20px; background: rgba(0,0,0,0.45); border: 2px solid ${status === 'WON' ? '#10b981' : (status === 'LOST' ? '#ef4444' : 'rgba(212,175,55,0.4)')}; border-radius: 20px; box-shadow: 0 10px 35px rgba(0,0,0,0.6);">
+              
+              <!-- Word Blanks (Letters in Green or Red) -->
+              <div style="display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+                ${wordGroupsHtml}
+              </div>
+
+              <!-- Round Status Banner -->
+              ${status === 'WON' ? `
+                <div style="margin-top: 20px; padding: 12px 28px; background: linear-gradient(135deg, #10b981, #059669); color: #ffffff; font-size: 22px; font-weight: 900; letter-spacing: 3px; border-radius: 14px; display: inline-block; box-shadow: 0 0 35px rgba(16,185,129,0.7);">
+                  🎉 WORD SOLVED! CHAT SAVED THE HANGMAN! 🎉
+                </div>
+              ` : (status === 'LOST' ? `
+                <div style="margin-top: 20px; padding: 12px 28px; background: linear-gradient(135deg, #ef4444, #b91c1c); color: #ffffff; font-size: 20px; font-weight: 900; letter-spacing: 3px; border-radius: 14px; display: inline-block; box-shadow: 0 0 35px rgba(239,68,68,0.7);">
+                  💀 6 STRIKES REACHED! HANGMAN COMPLETED! 💀
+                </div>
+              ` : `
+                <div style="margin-top: 16px; font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
+                  💬 TYPE ANY LETTER IN STREAM CHAT!
+                </div>
+              `)}
+            </div>
+
+            <!-- Audience Live Keyboard Letter Board (A-Z in Red or Green) -->
+            <div style="margin-top: 20px; background: rgba(14,28,30,0.85); border: 2px solid rgba(212,175,55,0.35); border-radius: 20px; padding: 18px 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.6);">
+              <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; flex-wrap: wrap; gap: 8px;">
+                <div style="font-size: 13px; font-weight: 900; letter-spacing: 2px; color: #f7e07d;">
+                  🔤 AUDIENCE LETTER BOARD
+                </div>
+                <div style="display: flex; gap: 14px; align-items: center; font-size: 12px; font-weight: 800;">
+                  <span style="color: #34d399;">🟢 GREEN = IN WORD</span>
+                  <span style="color: #f87171;">🔴 RED = STRIKE</span>
+                  <span style="color: #94a3b8;">⚪ WHITE = UNGUESSED</span>
+                </div>
+              </div>
+              <div style="display: flex; flex-wrap: wrap; gap: 7px; justify-content: center;">
+                ${alphabetHtml}
+              </div>
+            </div>
+
           </div>
         `;
       } else if (this.gameId === 'would-you-rather') {

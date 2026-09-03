@@ -39,6 +39,75 @@
   const cohostScoresRow = document.getElementById('cohost-scores-row');
   const btnBuzz = document.getElementById('btn-cohost-buzz');
 
+  const animateScoreDisplay = window.animateScoreDisplay || function (elem, targetVal, options = {}) {
+    if (!elem) return;
+    const prefix = options.prefix !== undefined ? options.prefix : '$';
+    const suffix = options.suffix !== undefined ? options.suffix : '';
+    const duration = typeof options.duration === 'number' ? options.duration : 450;
+
+    let prevVal = 0;
+    if (typeof elem._currentScoreVal === 'number') {
+      prevVal = elem._currentScoreVal;
+    } else {
+      const rawText = elem.textContent || '';
+      const match = rawText.match(/-?\d[\d,]*/);
+      if (match) {
+        prevVal = parseInt(match[0].replace(/,/g, ''), 10) || 0;
+      }
+    }
+
+    const targetNum = typeof targetVal === 'number'
+      ? targetVal
+      : parseInt(String(targetVal).replace(/[^0-9-]/g, ''), 10) || 0;
+
+    if (!elem.classList.contains('score-transition-active')) {
+      elem.classList.add('score-transition-active');
+    }
+
+    if (prevVal === targetNum) {
+      elem.textContent = `${prefix}${targetNum.toLocaleString()}${suffix}`;
+      elem._currentScoreVal = targetNum;
+      return;
+    }
+
+    elem._currentScoreVal = targetNum;
+
+    if (elem._scoreAnimRaf) cancelAnimationFrame(elem._scoreAnimRaf);
+    if (elem._scoreClassTimeout) clearTimeout(elem._scoreClassTimeout);
+
+    const isUp = targetNum > prevVal;
+    const isBankrupt = targetNum === 0 && prevVal > 0;
+    const bumpClass = isBankrupt ? 'score-bump-bankrupt' : (isUp ? 'score-bump-up' : 'score-bump-down');
+
+    elem.classList.remove('score-bump-up', 'score-bump-down', 'score-bump-bankrupt');
+    void elem.offsetWidth;
+    elem.classList.add(bumpClass);
+
+    const startTime = performance.now();
+
+    function step(now) {
+      const elapsed = now - startTime;
+      const progress = Math.min(1, elapsed / duration);
+      const ease = 1 - Math.pow(1 - progress, 3);
+      const current = Math.round(prevVal + (targetNum - prevVal) * ease);
+
+      elem.textContent = `${prefix}${current.toLocaleString()}${suffix}`;
+
+      if (progress < 1) {
+        elem._scoreAnimRaf = requestAnimationFrame(step);
+      } else {
+        elem.textContent = `${prefix}${targetNum.toLocaleString()}${suffix}`;
+        elem._scoreAnimRaf = null;
+        elem._scoreClassTimeout = setTimeout(() => {
+          elem.classList.remove('score-bump-up', 'score-bump-down', 'score-bump-bankrupt');
+          elem._scoreClassTimeout = null;
+        }, 150);
+      }
+    }
+
+    elem._scoreAnimRaf = requestAnimationFrame(step);
+  };
+
   function renderCoHostUI() {
     if (cohostValue) {
       cohostValue.textContent = typeof state.currentValue === 'number' ? `$${state.currentValue}` : state.currentValue;
@@ -68,14 +137,21 @@
 
     // Render Contestant Scores
     if (cohostScoresRow && state.contestants) {
-      cohostScoresRow.innerHTML = state.contestants
-        .map((p) => `
-          <div class="cohost-score-card">
-            <div class="cohost-score-name">${p.name}</div>
-            <div class="cohost-score-val">$${p.score}</div>
-          </div>
-        `)
-        .join('');
+      state.contestants.forEach((p, idx) => {
+        let card = document.getElementById(`cohost-score-card-${idx}`);
+        if (!card) {
+          card = document.createElement('div');
+          card.id = `cohost-score-card-${idx}`;
+          card.className = 'cohost-score-card';
+          card.innerHTML = `<div class="cohost-score-name">${p.name}</div><div class="cohost-score-val" id="cohost-score-val-${idx}">$${p.score}</div>`;
+          cohostScoresRow.appendChild(card);
+        } else {
+          const nameEl = card.querySelector('.cohost-score-name');
+          const valEl = document.getElementById(`cohost-score-val-${idx}`);
+          if (nameEl) nameEl.textContent = p.name;
+          if (valEl) animateScoreDisplay(valEl, p.score || 0, { prefix: '$' });
+        }
+      });
     }
 
     // Render Board Matrix with dimmed unrevealed letters
