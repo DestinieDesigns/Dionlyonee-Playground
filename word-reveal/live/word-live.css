@@ -1,0 +1,7 @@
+/* Word Reveal Live Styles */
+@import '../css/word-reveal.css';
+@import '../css/word-animations.css';
+
+body {
+  background-image: radial-gradient(circle at 50% 20%, rgba(16, 185, 129, 0.15) 0%, transparent 60%);
+}
