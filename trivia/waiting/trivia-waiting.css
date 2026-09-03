@@ -1,0 +1,56 @@
+/* Trivia Waiting Styling */
+@import '../css/trivia.css';
+
+body {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 100vh;
+}
+
+.waiting-container {
+  text-align: center;
+  max-width: 640px;
+  width: 100%;
+  padding: 40px 24px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+
+.waiting-logo {
+  font-size: 64px;
+  color: #c084fc;
+}
+
+.waiting-title {
+  font-family: 'Cinzel', serif;
+  font-size: 36px;
+  font-weight: 900;
+  color: #fff;
+}
+
+.waiting-badge {
+  padding: 8px 18px;
+  border-radius: 9999px;
+  background: rgba(168, 85, 247, 0.15);
+  border: 1px solid rgba(168, 85, 247, 0.4);
+  color: #c084fc;
+  font-size: 12px;
+  font-weight: 800;
+}
+
+.waiting-room-tag {
+  font-size: 14px;
+  color: #94a3b8;
+  font-family: 'Cinzel', serif;
+}
+
+.waiting-podiums {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 16px;
+  width: 100%;
+  margin-top: 24px;
+}

@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Trivia Host Desk | Dionlyonee Stream</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@700;900&family=Montserrat:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="../../css/global.css" />
+  <link rel="stylesheet" href="trivia-host.css" />
+</head>
+<body>
+  <header class="main-header">
+    <a href="../index.html" class="brand">
+      <div class="brand-icon" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff;">⚡</div>
+      <div>
+        <div class="brand-title">TRIVIA SHOWDOWN</div>
+        <div class="brand-tag">HOST CONSOLE</div>
+      </div>
+    </a>
+    <div id="header-hud"></div>
+  </header>
+
+  <main class="hub-container">
+    <div style="display: grid; grid-template-columns: 1fr 360px; gap: 24px;">
+      <!-- Active Question Area -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div id="trivia-active-card"></div>
+
+        <div style="display: flex; gap: 12px;">
+          <button id="btn-next-question" style="
+            flex: 1; padding: 14px; border-radius: 10px;
+            background: linear-gradient(135deg, #a855f7, #6366f1);
+            color: #fff; font-weight: 800; font-size: 14px; cursor: pointer;
+          ">
+            🎲 PICK NEXT QUESTION
+          </button>
+          <button id="btn-reveal-answer" style="
+            flex: 1; padding: 14px; border-radius: 10px;
+            background: #10b981; color: #07090e; font-weight: 800; font-size: 14px; cursor: pointer;
+          ">
+            ✨ REVEAL ANSWER
+          </button>
+          <button id="btn-start-timer" style="
+            padding: 14px 20px; border-radius: 10px;
+            background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2);
+            color: #fff; font-weight: 800; font-size: 14px; cursor: pointer;
+          ">
+            ⏱️ 15s TIMER
+          </button>
+        </div>
+      </div>
+
+      <!-- Controls & Contestants -->
+      <div style="display: flex; flex-direction: column; gap: 20px;">
+        <div class="dion-card">
+          <h3 style="font-family: 'Cinzel', serif; font-size: 16px; margin-bottom: 12px; color: #fff;">
+            TIER SELECTION
+          </h3>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button class="tier-btn active" data-tier="all">ALL MIXED</button>
+            <button class="tier-btn" data-tier="easy">EASY (200)</button>
+            <button class="tier-btn" data-tier="medium">MEDIUM (400)</button>
+            <button class="tier-btn" data-tier="hard">HARD (600)</button>
+            <button class="tier-btn" data-tier="expert">EXPERT (1000)</button>
+          </div>
+        </div>
+
+        <div class="dion-card">
+          <h3 style="font-family: 'Cinzel', serif; font-size: 16px; margin-bottom: 12px; color: #fff;">
+            CONTESTANT SCORES
+          </h3>
+          <div id="trivia-contestants-list"></div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="../../shared/sound-manager.js"></script>
+  <script src="../../shared/room-manager.js"></script>
+  <script src="../../shared/firebase-room.js"></script>
+  <script src="../../shared/host-auth.js"></script>
+  <script src="../../shared/room-ui.js"></script>
+  <script src="../../shared/timer-manager.js"></script>
+  <script src="../../shared/used-content-manager.js"></script>
+  <script src="../../shared/contestant-manager.js"></script>
+  <script src="../data/easy.js"></script>
+  <script src="../data/medium.js"></script>
+  <script src="../data/hard.js"></script>
+  <script src="../data/expert.js"></script>
+  <script src="../data/trivia-data.js"></script>
+  <script src="../js/trivia-engine.js"></script>
+  <script src="../js/trivia-randomizer.js"></script>
+  <script src="../js/trivia-ui.js"></script>
+  <script src="../js/trivia-game.js"></script>
+  <script src="trivia-host.js"></script>
+</body>
+</html>
