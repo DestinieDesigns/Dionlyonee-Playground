@@ -31,6 +31,16 @@
           renderContestants(state.contestants);
         }
       });
+
+      if (typeof window.FirebaseRoom.onSound === 'function') {
+        window.FirebaseRoom.onSound((sound) => {
+          if (window.SoundManager && typeof window.SoundManager.play === 'function') {
+            window.SoundManager.play(sound);
+          } else if (window.sounds) {
+            window.sounds.play(sound);
+          }
+        });
+      }
     }
   }
 

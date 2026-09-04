@@ -30,6 +30,7 @@
     document.getElementById('btn-reveal-one').addEventListener('click', () => {
       if (window.WordEngine) {
         window.WordEngine.revealNextLetter();
+        if (window.SoundManager) window.SoundManager.playSound('reveal', true);
         syncState('letter');
         renderTiles();
       }
@@ -38,6 +39,7 @@
     document.getElementById('btn-reveal-all').addEventListener('click', () => {
       if (window.WordEngine) {
         window.WordEngine.revealAll();
+        if (window.SoundManager) window.SoundManager.playSound('solve', true);
         syncState('solve');
         renderTiles();
       }
@@ -49,7 +51,11 @@
     });
 
     document.getElementById('btn-buzz-correct').addEventListener('click', () => {
-      if (window.sounds) window.sounds.play('correct');
+      if (window.SoundManager) {
+        window.SoundManager.playSound('correct', true);
+      } else if (window.sounds) {
+        window.sounds.play('correct');
+      }
       if (window.ContestantManager) {
         window.ContestantManager.addRoundScore(500);
         renderContestants();

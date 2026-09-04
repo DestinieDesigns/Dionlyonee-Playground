@@ -13,9 +13,11 @@
       this.listeners = [];
       this.spinListeners = [];
       this.buzzerListeners = [];
+      this.soundListeners = [];
       this.lastTimestamp = 0;
       this.lastSpinTimestamp = 0;
       this.lastBuzzerTimestamp = 0;
+      this.lastSoundTimestamp = 0;
       this.pollInterval = null;
       this.heartbeatInterval = null;
       this.broadcastChannel = null;
@@ -97,6 +99,8 @@
             if (!data) return;
             if (data.type === 'ROOM_STATE') {
               this.notify(data.state, data.sound, data.timestamp);
+            } else if (data.type === 'PLAY_SOUND' || data.type === 'SOUND') {
+              this.notifySound(data.sound || data.name, data);
             } else if (data.type === 'WHEEL_SPIN') {
               this.notifyWheelSpin(data);
             } else if (data.type === 'COHOST_BUZZ') {
@@ -167,6 +171,8 @@
             const data = JSON.parse(event.data);
             if (data.type === 'ROOM_STATE' && (data.roomId === this.roomId || !data.roomId)) {
               this.notify(data.state, data.sound, data.timestamp);
+            } else if ((data.type === 'PLAY_SOUND' || data.type === 'SOUND') && (data.roomId === this.roomId || !data.roomId)) {
+              this.notifySound(data.sound || data.name, data);
             } else if (data.type === 'WHEEL_SPIN' && (data.roomId === this.roomId || !data.roomId)) {
               this.notifyWheelSpin(data);
             } else if (data.type === 'COHOST_BUZZ' && (data.roomId === this.roomId || !data.roomId)) {
@@ -246,6 +252,12 @@
             if (r.lastBuzzer && r.lastBuzzer.timestamp && r.lastBuzzer.timestamp > this.lastBuzzerTimestamp) {
               this.lastBuzzerTimestamp = r.lastBuzzer.timestamp;
               this.notifyBuzzer(r.lastBuzzer);
+            }
+
+            // 4. Sync Sound
+            if (r.lastSound && r.lastSound.timestamp && r.lastSound.timestamp > this.lastSoundTimestamp) {
+              this.lastSoundTimestamp = r.lastSound.timestamp;
+              this.notifySound(r.lastSound.sound, r.lastSound);
             }
           }
         }
@@ -377,6 +389,49 @@
       this.buzzerListeners.push(fn);
     }
 
+    onSound(fn) {
+      if (typeof fn === 'function') {
+        this.soundListeners.push(fn);
+      }
+      return () => {
+        const idx = this.soundListeners.indexOf(fn);
+        if (idx !== -1) this.soundListeners.splice(idx, 1);
+      };
+    }
+
+    broadcastSound(sound, meta = {}) {
+      if (!sound) return;
+      const now = Date.now();
+      this.lastSoundTimestamp = now;
+
+      const payload = {
+        type: 'PLAY_SOUND',
+        roomId: this.roomId,
+        gameType: this.gameType,
+        sound,
+        meta: meta || {},
+        timestamp: now
+      };
+
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        try { this.ws.send(JSON.stringify(payload)); } catch (e) {}
+      }
+
+      if (this.broadcastChannel) {
+        try { this.broadcastChannel.postMessage(payload); } catch (e) {}
+      }
+
+      fetch(`/api/rooms/${this.roomId}/sound`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ sound, meta })
+      }).catch((e) => console.warn('[Sync] HTTP sound broadcast error:', e));
+    }
+
+    sendSound(sound, meta = {}) {
+      this.broadcastSound(sound, meta);
+    }
+
     notify(state, sound, timestamp) {
       if (timestamp && timestamp < this.lastTimestamp) return;
       if (timestamp) this.lastTimestamp = timestamp;
@@ -386,6 +441,21 @@
           fn(state, sound);
         } catch (e) {
           console.error('[Sync] listener error:', e);
+        }
+      });
+
+      if (sound) {
+        this.notifySound(sound, { state, timestamp });
+      }
+    }
+
+    notifySound(sound, data) {
+      if (!sound) return;
+      this.soundListeners.forEach((fn) => {
+        try {
+          fn(sound, data);
+        } catch (e) {
+          console.error('[Sync] sound listener error:', e);
         }
       });
     }
