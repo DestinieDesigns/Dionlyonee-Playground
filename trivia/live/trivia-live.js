@@ -18,7 +18,25 @@
           renderContestants();
         }
 
-        if (state.question) {
+        if (state.showWaitingScreen) {
+          const container = document.getElementById('live-question-card');
+          if (container) {
+            container.innerHTML = `
+              <div style="
+                background: #111624; border: 2px dashed rgba(212, 175, 55, 0.4);
+                border-radius: 18px; padding: 48px 24px; text-align: center;
+              ">
+                <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
+                <h2 style="font-family: 'Cinzel', serif; font-size: 26px; color: #f7e07d; margin-bottom: 8px;">
+                  ROUND PREPARATION STANDBY
+                </h2>
+                <p style="color: #94a3b8; font-size: 15px; max-width: 500px; margin: 0 auto;">
+                  The host is preparing the next question. Please remain at your buzzer stations!
+                </p>
+              </div>
+            `;
+          }
+        } else if (state.question) {
           currentQuestion = state.question;
           const container = document.getElementById('live-question-card');
           if (container && window.TriviaUI) {
@@ -49,6 +67,16 @@
           setTimeout(() => { banner.style.display = 'none'; }, 4000);
         }
       });
+
+      if (typeof window.FirebaseRoom.onSound === 'function') {
+        window.FirebaseRoom.onSound((sound) => {
+          if (window.SoundManager && typeof window.SoundManager.play === 'function') {
+            window.SoundManager.play(sound);
+          } else if (window.sounds) {
+            window.sounds.play(sound);
+          }
+        });
+      }
     }
   }
 
@@ -68,18 +96,32 @@
     if (!row || !window.ContestantManager) return;
     const contestants = window.ContestantManager.getContestants();
 
-    row.innerHTML = contestants.map(c => `
-      <div style="
-        background: #111624; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
-        padding: 16px; text-align: center;
-      ">
-        <div style="font-size: 28px; margin-bottom: 6px;">${c.avatar || '👤'}</div>
-        <div style="font-weight: 800; color: #fff; font-size: 15px;">${c.name}</div>
-        <div style="font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; color: #c084fc; margin-top: 4px;">
-          ${(c.roundScore || 0).toLocaleString()} PTS
-        </div>
-      </div>
-    `).join('');
+    contestants.forEach((c, idx) => {
+      let card = document.getElementById(`trivia-live-card-${idx}`);
+      if (!card) {
+        card = document.createElement('div');
+        card.id = `trivia-live-card-${idx}`;
+        card.style.cssText = `
+          background: #111624; border: 1px solid rgba(255,255,255,0.1); border-radius: 12px;
+          padding: 16px; text-align: center;
+        `;
+        card.innerHTML = `
+          <div style="font-size: 28px; margin-bottom: 6px;">${c.avatar || '👤'}</div>
+          <div class="trivia-live-name" style="font-weight: 800; color: #fff; font-size: 15px;">${c.name}</div>
+          <div id="trivia-live-score-${idx}" class="podium-score" style="font-family: 'Cinzel', serif; font-size: 22px; font-weight: 900; color: #c084fc; margin-top: 4px;">
+            ${(c.roundScore || 0).toLocaleString()} PTS
+          </div>
+        `;
+        row.appendChild(card);
+      } else {
+        const nameEl = card.querySelector('.trivia-live-name');
+        const scoreEl = document.getElementById(`trivia-live-score-${idx}`);
+        if (nameEl) nameEl.textContent = c.name;
+        if (scoreEl && window.animateScoreDisplay) {
+          window.animateScoreDisplay(scoreEl, c.roundScore || 0, { prefix: '', suffix: ' PTS' });
+        }
+      }
+    });
   }
 
   window.addEventListener('DOMContentLoaded', init);

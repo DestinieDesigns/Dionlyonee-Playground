@@ -50,6 +50,34 @@
             ⏱️ 15s TIMER
           </button>
         </div>
+
+        <!-- Category & Question Picker -->
+        <div class="dion-card" style="background: rgba(14, 28, 30, 0.85); border: 1px solid rgba(212, 175, 55, 0.4); padding: 18px; border-radius: 12px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <div style="font-family: 'Cinzel', serif; font-size: 15px; font-weight: 900; color: #f7e07d;">
+              📁 CATEGORY & QUESTION PICKER
+            </div>
+            <div id="trivia-question-count" style="font-size: 11px; font-weight: 800; color: #38bdf8;"></div>
+          </div>
+          <div style="display: flex; flex-direction: column; gap: 10px;">
+            <div style="display: flex; gap: 10px; flex-wrap: wrap;">
+              <select id="trivia-category-select" style="flex: 1; min-width: 180px; padding: 10px 12px; border-radius: 8px; background: #070e12; color: #fff; border: 1px solid rgba(212, 175, 55, 0.5); font-weight: 700; outline: none;">
+                <!-- Populated dynamically -->
+              </select>
+              <select id="trivia-question-select" style="flex: 2; min-width: 260px; padding: 10px 12px; border-radius: 8px; background: #070e12; color: #fff; border: 1px solid rgba(212, 175, 55, 0.5); font-weight: 700; outline: none;">
+                <!-- Populated dynamically -->
+              </select>
+            </div>
+            <div style="display: flex; gap: 10px; align-items: center; justify-content: space-between; flex-wrap: wrap;">
+              <button id="btn-trivia-random-cat" type="button" style="padding: 9px 16px; border-radius: 8px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: #fff; font-weight: 800; font-size: 12px; cursor: pointer;">
+                🎲 RANDOM IN CATEGORY
+              </button>
+              <button id="btn-trivia-toggle-waiting" type="button" style="padding: 9px 18px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #000; font-weight: 900; font-size: 12px; cursor: pointer; border: none;">
+                📺 PAST WAITING SCREEN (STAGE LIVE)
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       <!-- Controls & Contestants -->
@@ -60,10 +88,11 @@
           </h3>
           <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
             <button class="tier-btn active" data-tier="all">ALL MIXED</button>
-            <button class="tier-btn" data-tier="easy">EASY (200)</button>
-            <button class="tier-btn" data-tier="medium">MEDIUM (400)</button>
-            <button class="tier-btn" data-tier="hard">HARD (600)</button>
-            <button class="tier-btn" data-tier="expert">EXPERT (1000)</button>
+            <button class="tier-btn" data-tier="easy">EASY (100)</button>
+            <button class="tier-btn" data-tier="medium">MEDIUM (200)</button>
+            <button class="tier-btn" data-tier="hard">HARD (300)</button>
+            <button class="tier-btn" data-tier="expert">EXPERT (500)</button>
+            <button class="tier-btn" data-tier="extreme">EXTREME (1000)</button>
           </div>
         </div>
 
@@ -72,6 +101,27 @@
             CONTESTANT SCORES
           </h3>
           <div id="trivia-contestants-list"></div>
+        </div>
+
+        <div class="dion-card">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+            <h3 style="font-family: 'Cinzel', serif; font-size: 15px; color: #fff; margin: 0;">
+              LIVE SFX SOUNDBOARD
+            </h3>
+            <span style="font-size: 11px; font-weight: 700; color: #38bdf8; background: rgba(56,189,248,0.15); padding: 2px 8px; border-radius: 6px;">
+              📡 STAGE BROADCAST
+            </span>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+            <button class="btn-sfx-trivia" data-sound="correct" style="padding: 10px 6px; background: rgba(16,185,129,0.15); border: 1px solid #10b981; color: #34d399; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">🔔 DING</button>
+            <button class="btn-sfx-trivia" data-sound="buzzer" style="padding: 10px 6px; background: rgba(239,68,68,0.15); border: 1px solid #ef4444; color: #f87171; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">❌ BUZZER</button>
+            <button class="btn-sfx-trivia" data-sound="cheer" style="padding: 10px 6px; background: rgba(245,158,11,0.15); border: 1px solid #f59e0b; color: #fbbf24; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">👏 CHEER</button>
+            <button class="btn-sfx-trivia" data-sound="fanfare" style="padding: 10px 6px; background: rgba(168,85,247,0.15); border: 1px solid #a855f7; color: #c084fc; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">🎺 FANFARE</button>
+            <button class="btn-sfx-trivia" data-sound="reveal" style="padding: 10px 6px; background: rgba(56,189,248,0.15); border: 1px solid #38bdf8; color: #7dd3fc; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">✨ REVEAL</button>
+            <button class="btn-sfx-trivia" data-sound="tick" style="padding: 10px 6px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #e2e8f0; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">⏱️ TICK</button>
+            <button class="btn-sfx-trivia" data-sound="countdown" style="padding: 10px 6px; background: rgba(244,63,94,0.15); border: 1px solid #f43f5e; color: #fb7185; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">⏳ COUNT</button>
+            <button class="btn-sfx-trivia" data-sound="timeup" style="padding: 10px 6px; background: rgba(217,119,6,0.15); border: 1px solid #d97706; color: #fde047; font-weight: 800; font-size: 12px; border-radius: 8px; cursor: pointer;">🚨 TIME UP</button>
+          </div>
         </div>
       </div>
     </div>
@@ -85,10 +135,10 @@
   <script src="../../shared/timer-manager.js"></script>
   <script src="../../shared/used-content-manager.js"></script>
   <script src="../../shared/contestant-manager.js"></script>
-  <script src="../data/easy.js"></script>
-  <script src="../data/medium.js"></script>
-  <script src="../data/hard.js"></script>
-  <script src="../data/expert.js"></script>
+  <script src="../data/trivia-helpers.js"></script>
+  <script src="../data/trivia-categories.js"></script>
+  <script src="../data/education/education-categories.js"></script>
+  <script src="../data/trivia-loader.js"></script>
   <script src="../data/trivia-data.js"></script>
   <script src="../js/trivia-engine.js"></script>
   <script src="../js/trivia-randomizer.js"></script>
