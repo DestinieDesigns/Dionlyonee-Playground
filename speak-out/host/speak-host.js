@@ -10,9 +10,6 @@
     initUI();
     renderModes();
     bindEvents();
-
-    // Initial challenge load
-    engine.nextChallenge(false);
   });
 
   function initUI() {
@@ -66,10 +63,26 @@
 
   function bindEvents() {
     // Stage Actions
+    document.getElementById('btnHostStartRound')?.addEventListener('click', () => {
+      engine.startGame();
+    });
+
+    document.getElementById('btnHostStandby')?.addEventListener('click', () => {
+      engine.setWaiting('Intermission');
+    });
+
     document.getElementById('btnPass')?.addEventListener('click', () => engine.markPass());
     document.getElementById('btnFail')?.addEventListener('click', () => engine.markFail());
     document.getElementById('btnSkip')?.addEventListener('click', () => engine.markSkip());
-    document.getElementById('btnNext')?.addEventListener('click', () => engine.nextChallenge(false));
+    document.getElementById('btnNext')?.addEventListener('click', () => engine.nextChallenge(true));
+
+    // Phone / Separate Device QR Modal
+    document.getElementById('btnHostConnectPhone')?.addEventListener('click', () => {
+      showHostConnectModal();
+    });
+    document.getElementById('btnHostQrStandby')?.addEventListener('click', () => {
+      showHostConnectModal();
+    });
 
     // Timer Controls
     document.getElementById('btnTimerToggle')?.addEventListener('click', () => {
@@ -130,10 +143,10 @@
 
     // Update Stats
     const scoreVal = document.getElementById('scoreVal');
-    if (scoreVal) scoreVal.textContent = state.score.totalScore.toLocaleString();
+    if (scoreVal && state.score) scoreVal.textContent = state.score.totalScore.toLocaleString();
 
     const streakVal = document.getElementById('streakVal');
-    if (streakVal) {
+    if (streakVal && state.streak) {
       streakVal.textContent = state.streak.currentStreak;
       const streakPill = document.getElementById('streakPill');
       if (state.streak.currentStreak >= 3) {
@@ -144,18 +157,43 @@
     }
 
     const passedVal = document.getElementById('passedVal');
-    if (passedVal) passedVal.textContent = state.score.challengesPassed;
+    if (passedVal && state.score) passedVal.textContent = state.score.challengesPassed;
 
     const usedStats = document.getElementById('usedStatsText');
-    if (usedStats) usedStats.textContent = `Challenges Used: ${state.usedCount}`;
+    if (usedStats) usedStats.textContent = `Challenges Used: ${state.usedCount || 0}`;
 
     // Update Mode highlights
     document.querySelectorAll('.mode-btn').forEach(btn => {
       btn.classList.toggle('active', btn.dataset.mode === state.activeMode);
     });
 
-    // Update Challenge Card
-    renderChallenge(state.currentChallenge, state.showAnswer, state.showHint);
+    // Toggle Standby View vs Active Teleprompter
+    const standbyView = document.getElementById('hostStandbyView');
+    const activeView = document.getElementById('hostActivePromptView');
+
+    const isWaiting = (!state.status || state.status === 'waiting' || !state.currentChallenge);
+
+    if (isWaiting) {
+      if (standbyView) standbyView.style.display = 'flex';
+      if (activeView) activeView.style.display = 'none';
+
+      const modeObj = window.SpeakOutData ? window.SpeakOutData.getMode(state.activeMode || engine.activeMode) : null;
+      const modeNameEl = document.getElementById('standbyModeName');
+      if (modeNameEl) {
+        modeNameEl.textContent = modeObj ? `${modeObj.icon} ${modeObj.name}` : 'Tongue Twister';
+      }
+
+      const diffNameEl = document.getElementById('standbyDiffName');
+      if (diffNameEl) {
+        diffNameEl.textContent = (state.selectedDifficulty || 'ALL').toUpperCase();
+      }
+    } else {
+      if (standbyView) standbyView.style.display = 'none';
+      if (activeView) activeView.style.display = 'flex';
+
+      // Update Challenge Card
+      renderChallenge(state.currentChallenge, state.showAnswer, state.showHint);
+    }
 
     // Update Status Action Text
     const actionText = document.getElementById('statusActionText');
@@ -166,8 +204,90 @@
     // Toggle button label
     const timerToggleBtn = document.getElementById('btnTimerToggle');
     if (timerToggleBtn) {
-      timerToggleBtn.textContent = state.timer.running ? '⏸️ PAUSE' : '▶️ START';
+      timerToggleBtn.textContent = (state.timer && state.timer.running) ? '⏸️ PAUSE' : '▶️ START';
     }
+  }
+
+  function showHostConnectModal() {
+    let modal = document.getElementById('host-device-modal');
+    if (modal) modal.remove();
+
+    const roomCode = engine.roomCode || 'DIONLIVE';
+    const hostUrl = `${window.location.origin}/speak-out/host/index.html?room=${encodeURIComponent(roomCode)}`;
+    const qrUrl = `https://api.qrserver.com/v1/create-qr-code/?size=260x260&data=${encodeURIComponent(hostUrl)}`;
+
+    modal = document.createElement('div');
+    modal.id = 'host-device-modal';
+    modal.style.cssText = `
+      position: fixed; inset: 0; z-index: 999999;
+      background: rgba(7, 9, 14, 0.92); backdrop-filter: blur(16px);
+      display: flex; align-items: center; justify-content: center;
+      padding: 20px; font-family: var(--font-body, system-ui, sans-serif);
+    `;
+    modal.innerHTML = `
+      <div style="
+        background: #131622; border: 1px solid rgba(212, 175, 55, 0.5);
+        border-radius: 24px; max-width: 480px; width: 100%; padding: 28px 24px;
+        box-shadow: 0 0 45px rgba(245, 158, 11, 0.3); text-align: center;
+        position: relative; color: #ffffff;
+      ">
+        <button id="btn-close-host-modal" style="
+          position: absolute; top: 16px; right: 16px;
+          background: rgba(255,255,255,0.08); border: none; border-radius: 50%;
+          width: 34px; height: 34px; color: #94a3b8; font-size: 16px; cursor: pointer;
+        ">✕</button>
+
+        <div style="font-size: 38px; margin-bottom: 8px;">📱</div>
+        <h2 style="font-family: var(--font-display, sans-serif); font-size: 1.5rem; font-weight: 900; color: #f59e0b; margin-bottom: 6px;">
+          USE SEPARATE DEVICE (PHONE / TABLET)
+        </h2>
+        <p style="color: #94a3b8; font-size: 0.85rem; line-height: 1.5; margin-bottom: 18px;">
+          Scan with your phone to hold the controller in your hand while streaming! Any action taken on your phone instantly syncs to the Live Screen and Co-Host.
+        </p>
+
+        <div style="
+          display: inline-block; padding: 10px; background: #ffffff;
+          border-radius: 16px; box-shadow: 0 8px 25px rgba(0,0,0,0.6); margin-bottom: 18px;
+        ">
+          <img src="${qrUrl}" alt="Host Phone QR" style="width: 200px; height: 200px; display: block;" />
+        </div>
+
+        <div style="
+          background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.1);
+          border-radius: 12px; padding: 10px 14px; display: flex; align-items: center; justify-content: space-between;
+          margin-bottom: 14px; font-size: 0.8rem; color: #cbd5e1; word-break: break-all; text-align: left;
+        ">
+          <span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; margin-right: 8px;">
+            ${hostUrl}
+          </span>
+          <button id="modal-copy-host-btn" style="
+            background: #f59e0b; color: #000; font-weight: 800; padding: 6px 12px;
+            border: none; border-radius: 6px; font-size: 0.75rem; white-space: nowrap; cursor: pointer;
+          ">COPY</button>
+        </div>
+
+        <p style="font-size: 0.75rem; color: #64748b; margin: 0;">
+          Room: <strong style="color: #38bdf8;">${roomCode}</strong> • Connected wirelessly via Realtime Sync
+        </p>
+      </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    document.getElementById('btn-close-host-modal')?.addEventListener('click', () => modal.remove());
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) modal.remove();
+    });
+
+    document.getElementById('modal-copy-host-btn')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(hostUrl).then(() => {
+        const b = document.getElementById('modal-copy-host-btn');
+        if (b) {
+          b.textContent = 'COPIED!';
+          setTimeout(() => { if (b) b.textContent = 'COPY'; }, 2000);
+        }
+      });
+    });
   }
 
   function renderChallenge(challenge, showAnswer, showHint) {

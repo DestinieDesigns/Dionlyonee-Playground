@@ -52,6 +52,14 @@
       return this.currentRoom || 'DION1';
     }
 
+    getRoomId() {
+      return this.getRoom();
+    }
+
+    setRoomId(code) {
+      this.setRoom(code);
+    }
+
     getJoinUrl(gameType = 'wheel', role = 'cohost') {
       const origin = window.location.origin;
       const roomId = this.getRoom();
@@ -59,6 +67,32 @@
         return `${origin}/${gameType}/cohost/?room=${roomId}`;
       }
       return `${origin}/connections/join.html?room=${roomId}&game=${gameType}`;
+    }
+
+    getControllerUrl(gameType = 'wheel') {
+      const origin = window.location.origin;
+      const roomId = this.getRoom();
+      let rootPath = window.location.pathname;
+      if (rootPath.includes('/host') || rootPath.includes('/live') || rootPath.includes('/cohost') || rootPath.includes('/waiting') || rootPath.includes('/shared')) {
+        rootPath = rootPath.replace(/\/(wheel|trivia|jeopardy|word-reveal|speak-out|games|shared)\/(host|live|cohost|waiting).*$/, '/');
+      } else {
+        rootPath = rootPath.substring(0, rootPath.lastIndexOf('/') + 1);
+      }
+      if (!rootPath.endsWith('/')) rootPath += '/';
+      return `${origin}${rootPath}remote.html?room=${encodeURIComponent(roomId)}&game=${encodeURIComponent(gameType)}`;
+    }
+
+    getCohostJoinUrl(gameType = 'wheel') {
+      const origin = window.location.origin;
+      const roomId = this.getRoom();
+      let rootPath = window.location.pathname;
+      if (rootPath.includes('/host') || rootPath.includes('/live') || rootPath.includes('/cohost') || rootPath.includes('/waiting') || rootPath.includes('/shared')) {
+        rootPath = rootPath.replace(/\/(wheel|trivia|jeopardy|word-reveal|speak-out|games|shared)\/(host|live|cohost|waiting).*$/, '/');
+      } else {
+        rootPath = rootPath.substring(0, rootPath.lastIndexOf('/') + 1);
+      }
+      if (!rootPath.endsWith('/')) rootPath += '/';
+      return `${origin}${rootPath}cohost-join.html?room=${encodeURIComponent(roomId)}`;
     }
   }
 

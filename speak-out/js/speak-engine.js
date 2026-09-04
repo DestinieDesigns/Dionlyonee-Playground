@@ -15,8 +15,8 @@
       this.selectedDifficulty = 'all';
       this.showAnswer = false;
       this.showHint = false;
-      this.status = 'idle'; // 'idle' | 'playing' | 'revealed'
-      this.lastAction = null;
+      this.status = 'waiting'; // 'waiting' | 'playing' | 'revealed'
+      this.lastAction = { type: 'standby', text: 'Standby - Waiting for Host to start', timestamp: Date.now() };
       this.roomCode = null;
 
       this.stateListeners = [];
@@ -50,13 +50,23 @@
     initNetworking() {
       // Resolve room code from URL or room-manager
       const urlParams = new URLSearchParams(window.location.search);
-      this.roomCode = urlParams.get('room') || (window.RoomManager ? window.RoomManager.getRoomId() : 'DIONLIVE');
+      const urlRoom = urlParams.get('room');
+      if (urlRoom && urlRoom.trim()) {
+        this.roomCode = urlRoom.trim().toUpperCase();
+        if (window.RoomManager && typeof window.RoomManager.setRoom === 'function') {
+          window.RoomManager.setRoom(this.roomCode);
+        }
+      } else if (window.RoomManager && typeof window.RoomManager.getRoom === 'function') {
+        this.roomCode = window.RoomManager.getRoom();
+      } else {
+        this.roomCode = 'DIONLIVE';
+      }
 
       // Hook FirebaseRoom
       if (window.FirebaseRoom) {
-        window.FirebaseRoom.init(this.roomCode);
+        window.FirebaseRoom.init(this.roomCode, 'speak-out');
 
-        window.FirebaseRoom.onStateChange((state) => {
+        window.FirebaseRoom.onState((state) => {
           this.applyRemoteState(state);
         });
 
@@ -64,6 +74,23 @@
           this.playLocalSound(soundName);
         });
       }
+
+      // Initial HTTP pull from server
+      this.fetchInitialServerState();
+    }
+
+    async fetchInitialServerState() {
+      try {
+        const res = await fetch(`/api/rooms/${this.roomCode}`);
+        if (!res.ok) return;
+        const json = await res.json();
+        if (json && json.room && json.room.state && json.room.state.gameId === 'speak-out') {
+          this.applyRemoteState(json.room.state);
+        } else if (this.role === 'host') {
+          // Host initializes waiting state in room
+          this.broadcast();
+        }
+      } catch (e) {}
     }
 
     playLocalSound(soundName) {
@@ -177,6 +204,33 @@
     }
 
     // Host & Co-host Actions
+    startGame() {
+      this.status = 'playing';
+      const challenge = this.challenges.getNextChallenge(this.activeMode, this.selectedDifficulty);
+      const modeConfig = window.SpeakOutData ? window.SpeakOutData.getMode(challenge ? challenge.modeId : this.activeMode) : null;
+      const duration = (challenge && challenge.duration) ? challenge.duration : (modeConfig ? modeConfig.defaultTimer : 20);
+      this.timer.reset(duration);
+      this.timer.start();
+      this.showAnswer = false;
+      this.showHint = false;
+      this.lastAction = { type: 'startgame', text: '🚀 GAME LAUNCHED!', timestamp: Date.now() };
+      this.playLocalSound('cheer');
+      if (window.FirebaseRoom) {
+        window.FirebaseRoom.broadcastSound('cheer');
+      }
+      this.broadcast();
+      return challenge;
+    }
+
+    setWaiting(reason = 'Intermission') {
+      this.status = 'waiting';
+      this.timer.pause();
+      this.showAnswer = false;
+      this.showHint = false;
+      this.lastAction = { type: 'waiting', text: `⏸️ ${reason} - Waiting for Host`, timestamp: Date.now() };
+      this.broadcast();
+    }
+
     setMode(modeKey) {
       this.activeMode = modeKey;
       const modeConfig = window.SpeakOutData ? window.SpeakOutData.getMode(modeKey) : null;
@@ -184,8 +238,12 @@
       this.timer.reset(defaultSecs);
       this.showAnswer = false;
       this.showHint = false;
-      this.nextChallenge(false);
-      this.broadcast();
+      if (this.status !== 'waiting') {
+        this.nextChallenge(false);
+      } else {
+        this.lastAction = { type: 'mode', text: `Mode: ${modeConfig ? modeConfig.name : modeKey}`, timestamp: Date.now() };
+        this.broadcast();
+      }
     }
 
     setDifficulty(diff) {
@@ -207,7 +265,7 @@
         this.timer.start();
         this.status = 'playing';
       } else {
-        this.status = 'idle';
+        this.status = 'playing'; // If explicitly calling nextChallenge during a game, it is ready to play
       }
 
       this.lastAction = { type: 'next', text: '🎯 NEXT CHALLENGE READY!', timestamp: Date.now() };
@@ -341,12 +399,13 @@
       this.scoring.reset();
       this.streak.reset();
       this.challenges.clearUsed();
+      this.challenges.currentChallenge = null;
       this.resetTimer();
       this.showAnswer = false;
       this.showHint = false;
-      this.status = 'idle';
-      this.lastAction = { type: 'gamereset', text: '🔄 NEW GAME STARTED', timestamp: Date.now() };
-      this.nextChallenge(false);
+      this.status = 'waiting';
+      this.lastAction = { type: 'gamereset', text: '🔄 STANDBY - WAITING FOR HOST', timestamp: Date.now() };
+      this.broadcast();
     }
   }
 

@@ -39,7 +39,17 @@
         showHint: false
       };
 
-      this.init();
+      // Enforce Host Passcode Protection (Brown123)
+      if (typeof window.HostAuth === 'undefined') {
+        const authScript = document.createElement('script');
+        authScript.src = '../shared/host-auth.js';
+        authScript.onload = () => {
+          if (window.HostAuth) window.HostAuth.requireHostAccess(() => this.init());
+        };
+        document.head.appendChild(authScript);
+      } else {
+        window.HostAuth.requireHostAccess(() => this.init());
+      }
     }
 
     getCategories() {
@@ -87,6 +97,37 @@
         }
       };
 
+      // Connect RoomSync action listener
+      if (window.RoomSync) {
+        window.RoomSync.gameType = this.gameId;
+        window.RoomSync.role = 'host';
+        window.RoomSync.onAction((action, payload) => {
+          if (action === 'START_ROUND' || action === 'NEXT_ROUND' || action === 'NEXT_PROMPT') {
+            this.next();
+          } else if (action === 'PREV_PROMPT') {
+            this.prev();
+          } else if (action === 'RANDOM') {
+            this.random();
+          } else if (action === 'CORRECT' || action === 'PASS') {
+            this.playSound('correct');
+            this.next();
+          } else if (action === 'WRONG' || action === 'FAIL') {
+            this.playSound('wrong');
+          } else if (action === 'START_TIMER') {
+            this.startTimer();
+          } else if (action === 'PAUSE_TIMER') {
+            this.pauseTimer();
+          } else if (action === 'RESET_TIMER') {
+            this.resetTimer();
+          } else if (action === 'HINT') {
+            this.toggleAnswer();
+          } else if (action === 'ENTER_COOLDOWN' || action === 'COOLDOWN') {
+            this.state.isCooldown = true;
+            this.broadcastState();
+          }
+        });
+      }
+
       // Reset on beforeunload
       window.addEventListener('beforeunload', () => {
         try {
@@ -113,6 +154,9 @@
           <div class="host-game">${this.gameMeta.title} • HOST CONTROLLER</div>
         </div>
         <div style="margin-left: auto; display: flex; gap: 8px;">
+          <button type="button" class="time-button" onclick="window.RoomUI ? window.RoomUI.showRoomCreatedModal('${this.gameId}') : (window.location.href='/remote.html?game=${this.gameId}')" style="background: linear-gradient(135deg, #d97706, #b45309); border-color: #facc15; color: #ffffff; font-weight: 800;">
+            📱 PHONE CONTROLLER
+          </button>
           <button type="button" class="time-button" onclick="window.gameHost.openLiveWindow()" style="background: rgba(212,175,55,0.2); border-color: #d4af37;">
             📺 OPEN LIVE STAGE ↗
           </button>

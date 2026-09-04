@@ -14,9 +14,11 @@
       this.buzzerCallbacks = [];
       this.spinCallbacks = [];
       this.soundCallbacks = [];
+      this.actionCallbacks = [];
       this.pollTimer = null;
       this.lastSyncTimestamp = 0;
       this.lastSoundTimestamp = 0;
+      this.lastActionTimestamp = 0;
 
       this.initBroadcastChannel();
       this.initWebSocket();
@@ -89,8 +91,25 @@
             this.lastSoundTimestamp = json.room.lastSound.timestamp;
             this.triggerSoundCallbacks(json.room.lastSound.sound, json.room.lastSound);
           }
+          if (json.room.lastAction && json.room.lastAction.timestamp > this.lastActionTimestamp) {
+            this.lastActionTimestamp = json.room.lastAction.timestamp;
+            this.triggerActionCallbacks(json.room.lastAction);
+          }
         }
       } catch (e) {}
+    }
+
+    init(roomId, gameType = 'wheel') {
+      if (gameType) this.gameType = gameType;
+      if (roomId && roomId.toUpperCase() !== this.roomId) {
+        this.switchRoom(roomId);
+      } else {
+        this.fetchHttpState();
+      }
+    }
+
+    onStateChange(callback) {
+      return this.onState(callback);
     }
 
     switchRoom(newRoomId) {
@@ -130,6 +149,8 @@
         this.buzzerCallbacks.forEach(cb => cb(data));
       } else if (data.type === 'WHEEL_SPIN') {
         this.spinCallbacks.forEach(cb => cb(data));
+      } else if (data.type === 'HOST_ACTION' || data.type === 'ACTION') {
+        this.triggerActionCallbacks(data);
       }
     }
 
@@ -255,6 +276,45 @@
 
     onSpin(callback) {
       this.spinCallbacks.push(callback);
+    }
+
+    onAction(callback) {
+      if (typeof callback === 'function') {
+        this.actionCallbacks.push(callback);
+      }
+      return () => {
+        const idx = this.actionCallbacks.indexOf(callback);
+        if (idx !== -1) this.actionCallbacks.splice(idx, 1);
+      };
+    }
+
+    sendAction(action, payload = {}) {
+      const actionData = {
+        type: 'HOST_ACTION',
+        action,
+        payload,
+        timestamp: Date.now()
+      };
+
+      if (this.channel) {
+        try { this.channel.postMessage(actionData); } catch (e) {}
+      }
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        try { this.ws.send(JSON.stringify(actionData)); } catch (e) {}
+      }
+
+      fetch(`/api/rooms/${this.roomId}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(actionData)
+      }).catch(() => {});
+    }
+
+    triggerActionCallbacks(data) {
+      if (!data) return;
+      this.actionCallbacks.forEach(cb => {
+        try { cb(data); } catch (e) { console.warn(e); }
+      });
     }
 
     triggerStateCallbacks(state) {

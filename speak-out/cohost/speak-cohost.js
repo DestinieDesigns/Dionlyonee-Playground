@@ -89,8 +89,6 @@
   }
 
   function renderJudgeChallenge(challenge, showAnswer, showHint) {
-    if (!challenge) return;
-
     const coModeIcon = document.getElementById('coModeIcon');
     const coModeName = document.getElementById('coModeName');
     const coDiffBadge = document.getElementById('coDiffBadge');
@@ -99,6 +97,15 @@
     const coForbiddenGrid = document.getElementById('coForbiddenGrid');
     const coRapidCounterContainer = document.getElementById('coRapidCounterContainer');
     const coSecretText = document.getElementById('coSecretText');
+
+    if (!challenge) {
+      if (coPromptInstruction) coPromptInstruction.textContent = 'STANDBY • INTERMISSION';
+      if (coPromptMainText) coPromptMainText.textContent = 'Waiting for Host to launch round...';
+      if (coForbiddenGrid) coForbiddenGrid.style.display = 'none';
+      if (coRapidCounterContainer) coRapidCounterContainer.style.display = 'none';
+      if (coSecretText) coSecretText.textContent = 'No active challenge yet. Host controls round launch.';
+      return;
+    }
 
     const mode = window.SpeakOutData.getMode(challenge.modeId);
 

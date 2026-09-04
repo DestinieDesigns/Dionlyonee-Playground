@@ -6,6 +6,7 @@
   <title>Host Console - DIONLYONEE SPEAK OUT!</title>
   <link rel="stylesheet" href="../css/speak-common.css">
   <link rel="stylesheet" href="speak-host.css">
+  <script src="../../shared/host-auth.js"></script>
 </head>
 <body>
   <div class="host-container" id="hostApp">
@@ -32,6 +33,9 @@
           <span class="label">Room Code</span>
           <span class="value" id="roomCodeVal" style="color: #38bdf8;">----</span>
         </div>
+        <button id="btnHostConnectPhone" class="btn-timer-ctrl" style="background: linear-gradient(135deg, rgba(245,158,11,0.2), rgba(236,72,153,0.2)); border: 1px solid var(--gold); color: #ffffff; padding: 0.4rem 0.9rem; font-weight: 800; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 0.4rem;">
+          📱 <span>PHONE REMOTE</span>
+        </button>
       </div>
     </header>
 
@@ -65,42 +69,84 @@
 
       <!-- Center: Stage Teleprompter -->
       <section class="host-stage" id="stageCard">
-        <div class="card-top-bar">
-          <div class="mode-badge-large" id="cardModeBadge">
-            <span id="cardModeIcon">👅</span>
-            <span id="cardModeName">TONGUE TWISTER</span>
+        <!-- 1. STANDBY / WAITING VIEW ON HOST -->
+        <div class="host-standby-container" id="hostStandbyView">
+          <div class="standby-badge">
+            <span class="waiting-radar-dot"></span>
+            <span>BROADCAST STANDBY</span>
           </div>
-          <div id="cardDiffBadge" class="badge-difficulty-medium" style="padding: 0.4rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">
-            MEDIUM (+100 PTS)
+
+          <div style="font-size: 3.5rem; margin: 0.5rem 0;">🎤</div>
+
+          <h2 class="standby-heading">READY TO LAUNCH ROUND</h2>
+          <p class="standby-subtext">
+            Live Stage is currently holding on the <strong>Waiting Screen</strong> with Room Code & QR Code. When you tap Start, the live challenge begins!
+          </p>
+
+          <div class="standby-selected-summary">
+            <div class="summary-item">
+              <span class="summary-label">ACTIVE MODE:</span>
+              <strong id="standbyModeName" style="color: #f59e0b;">👅 Tongue Twisters</strong>
+            </div>
+            <div class="summary-item">
+              <span class="summary-label">DIFFICULTY:</span>
+              <strong id="standbyDiffName" style="color: #38bdf8;">ALL LEVELS</strong>
+            </div>
+          </div>
+
+          <button id="btnHostStartRound" class="btn-launch-game">
+            🚀 START GAME / LAUNCH ROUND
+          </button>
+
+          <div style="margin-top: 1rem; display: flex; gap: 0.75rem; justify-content: center;">
+            <button id="btnHostQrStandby" class="btn-timer-ctrl" style="font-size: 0.8rem; padding: 0.4rem 1rem;">
+              📱 Show Phone Connect QR
+            </button>
           </div>
         </div>
 
-        <!-- Teleprompter Content -->
-        <div class="prompt-display" id="promptDisplay">
-          <div class="prompt-instruction" id="promptInstruction">READ CLEARLY & FAST</div>
-          <div class="prompt-main-text" id="promptMainText">Loading next challenge...</div>
+        <!-- 2. ACTIVE TELEPROMPTER VIEW ON HOST -->
+        <div class="host-active-teleprompter" id="hostActivePromptView" style="display: none; height: 100%; display: flex; flex-direction: column;">
+          <div class="card-top-bar">
+            <div class="mode-badge-large" id="cardModeBadge">
+              <span id="cardModeIcon">👅</span>
+              <span id="cardModeName">TONGUE TWISTER</span>
+            </div>
+            <div id="cardDiffBadge" class="badge-difficulty-medium" style="padding: 0.4rem 1rem; border-radius: 999px; font-weight: 800; font-size: 0.8rem;">
+              MEDIUM (+100 PTS)
+            </div>
+          </div>
 
-          <!-- Forbidden Words Container -->
-          <div class="forbidden-words-grid" id="forbiddenGrid" style="display: none;"></div>
+          <!-- Teleprompter Content -->
+          <div class="prompt-display" id="promptDisplay" style="flex: 1;">
+            <div class="prompt-instruction" id="promptInstruction">READ CLEARLY & FAST</div>
+            <div class="prompt-main-text" id="promptMainText">Loading next challenge...</div>
 
-          <!-- Revealable Answer Banner -->
-          <div class="answer-banner" id="answerBanner" style="display: none;"></div>
-        </div>
+            <!-- Forbidden Words Container -->
+            <div class="forbidden-words-grid" id="forbiddenGrid" style="display: none;"></div>
 
-        <!-- Action Controls -->
-        <div class="host-action-bar">
-          <button class="btn-action btn-pass" id="btnPass">
-            <span>✅</span> PASS
-          </button>
-          <button class="btn-action btn-fail" id="btnFail">
-            <span>❌</span> FAIL
-          </button>
-          <button class="btn-action btn-skip" id="btnSkip">
-            <span>⏭️</span> SKIP
-          </button>
-          <button class="btn-action btn-next" id="btnNext">
-            <span>🎯</span> NEXT
-          </button>
+            <!-- Revealable Answer Banner -->
+            <div class="answer-banner" id="answerBanner" style="display: none;"></div>
+          </div>
+
+          <!-- Action Controls -->
+          <div class="host-action-bar">
+            <button class="btn-action btn-pass" id="btnPass">
+              <span>✅</span> PASS
+            </button>
+            <button class="btn-action btn-fail" id="btnFail">
+              <span>❌</span> FAIL
+            </button>
+            <button class="btn-action btn-skip" id="btnSkip">
+              <span>⏭️</span> SKIP
+            </button>
+            <button class="btn-action btn-next" id="btnNext">
+              <span>🎯</span> NEXT
+            </button>
+            <button class="btn-action btn-standby" id="btnHostStandby" title="Put Live Stage back on Waiting Screen">
+              <span>⏸️</span> INTERMISSION
+            </button>
+          </div>
         </div>
       </section>
 
