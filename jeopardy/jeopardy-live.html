@@ -810,7 +810,10 @@
 
             if (
                 !state.answer ||
-                state.phase === "waiting"
+                state.phase === "waiting" ||
+                state.phase === "cooldown" ||
+                Boolean(state.isCooldown) ||
+                Boolean(state.showWaitingScreen)
             ) {
 
                 showWaiting();

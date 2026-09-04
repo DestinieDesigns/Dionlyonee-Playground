@@ -109,7 +109,39 @@
     elem._scoreAnimRaf = requestAnimationFrame(step);
   };
 
+  let lastPhaseCategory = null;
+
   function renderStage() {
+    const isWaitingOrCooldown = state.phase === 'waiting' || state.phase === 'cooldown' || state.isCooldown;
+    const currentVisualCategory = isWaitingOrCooldown ? 'waiting' : 'active';
+
+    const waitRoomTag = document.getElementById('waiting-room-tag');
+    if (waitRoomTag && window.RoomSync) {
+      waitRoomTag.textContent = `ROOM: ${window.RoomSync.roomId || 'DION1'}`;
+    }
+
+    if (window.GameTransitions) {
+      if (lastPhaseCategory === null) {
+        window.GameTransitions.applyPhase(currentVisualCategory, false);
+      } else if (lastPhaseCategory !== currentVisualCategory) {
+        window.GameTransitions.transitionTo(currentVisualCategory);
+      }
+      lastPhaseCategory = currentVisualCategory;
+    }
+
+    if (isWaitingOrCooldown) {
+      const waitingTitle = document.getElementById('waiting-title');
+      const waitingSubtitle = document.getElementById('waiting-subtitle');
+      if (state.phase === 'cooldown' || state.isCooldown) {
+        if (waitingTitle) waitingTitle.textContent = 'ROUND FINISHED • GET READY!';
+        if (waitingSubtitle) waitingSubtitle.textContent = 'The Host is celebrating the winner and preparing the next question.';
+      } else {
+        if (waitingTitle) waitingTitle.textContent = 'WAITING FOR HOST TO START';
+        if (waitingSubtitle) waitingSubtitle.textContent = 'The Host is preparing the game board and questions. Round 1 starts soon!';
+      }
+      return; // Do NOT render or leak board beneath the wait screen
+    }
+
     if (liveValue) {
       liveValue.textContent = typeof state.currentValue === 'number' ? `$${state.currentValue}` : state.currentValue;
     }
@@ -230,6 +262,14 @@
   }
 
   function init() {
+    if (window.GameTransitions) {
+      window.GameTransitions.initStage({
+        stage: document.getElementById('live-stage'),
+        waitScreen: document.getElementById('wait-screen'),
+        gameScreen: document.getElementById('game-screen')
+      });
+    }
+
     if (window.RoomSync) {
       window.RoomSync.role = 'live';
       window.RoomSync.gameType = 'jeopardy';

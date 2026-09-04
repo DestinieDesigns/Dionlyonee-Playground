@@ -55,6 +55,29 @@
     <!-- SCREEN OPTIONS -->
     <div class="screen-options">
 
+        <!-- SINGLE PLAYER SOLO -->
+        <button
+            type="button"
+            class="screen-card solo-card"
+            onclick="openSolo()"
+            style="border: 2px solid rgba(16,185,129,0.5); background: rgba(6,78,46,0.3);"
+        >
+            <div class="card-icon">
+                👤
+            </div>
+
+            <div class="card-title" style="color: #34d399;">
+                SINGLE PLAYER
+            </div>
+
+            <div class="card-description">
+                Play jeopardy solo! Pick categories, answer clues, and track your winnings.
+            </div>
+
+            <div class="card-action" style="color: #34d399;">
+                PLAY SOLO NOW →
+            </div>
+        </button>
 
         <!-- HOST CONTROL -->
         <button
@@ -146,6 +169,14 @@
 <script>
 
 "use strict";
+
+function openSolo() {
+    window.location.href = "jeopardy-host.html?singleplayer=true";
+}
+
+if (new URLSearchParams(window.location.search).get('singleplayer') === 'true') {
+    openSolo();
+}
 
 function openHost() {
 
