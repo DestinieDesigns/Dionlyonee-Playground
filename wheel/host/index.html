@@ -13,6 +13,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="wheel-host.css" />
+  <script src="../../shared/host-auth.js"></script>
 </head>
 
 <body>
@@ -29,11 +30,11 @@
 
     <!-- QUICK NAVIGATION -->
     <nav class="nav-links">
-      <a href="index.html" class="nav-btn">🏠 Hub</a>
-      <a href="wheel-live.html" target="_blank" rel="noopener noreferrer" class="nav-btn">📺 Live Stage ↗</a>
-      <a href="wheel-cohost.html" target="_blank" rel="noopener noreferrer" class="nav-btn">🎤 Co-Host ↗</a>
-      <a href="jeopardy-host.html" target="_blank" rel="noopener noreferrer" class="nav-btn">🏆 Jeopardy Host ↗</a>
-      <a href="dual-view.html?game=wheel" target="_blank" rel="noopener noreferrer" class="nav-btn" style="color: var(--gold-bright); border-color: var(--border-gold);">🎛️ Split Screen ↗</a>
+      <a href="../../index.html" class="nav-btn">🏠 Hub</a>
+      <a href="../live/index.html" target="_blank" rel="noopener noreferrer" class="nav-btn">📺 Live Stage ↗</a>
+      <a href="../cohost/index.html" target="_blank" rel="noopener noreferrer" class="nav-btn">🎤 Co-Host ↗</a>
+      <a href="../../jeopardy/host/index.html" target="_blank" rel="noopener noreferrer" class="nav-btn">🏆 Jeopardy Host ↗</a>
+      <a href="../../dual-view.html?mode=wheel" target="_blank" rel="noopener noreferrer" class="nav-btn" style="color: var(--gold-bright); border-color: var(--border-gold);">🎛️ Split Screen ↗</a>
     </nav>
   </header>
 
@@ -77,90 +78,45 @@
           <div class="panel-title">
             <span>👥</span> CONTESTANT CALLERS & TURN DESK
           </div>
-          <div id="active-turn-badge" class="badge-status active">TURN: CONTESTANT 1</div>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button id="btn-add-contestant" class="btn btn-secondary" style="padding: 4px 10px; font-size: 11px;">
+              ➕ Add Contestant
+            </button>
+            <div id="active-turn-badge" class="badge-status active">TURN: CONTESTANT 1</div>
+          </div>
         </div>
 
-        <div class="contestants-grid">
-          <!-- Contestant 1 (Red) -->
-          <div id="contestant-card-0" class="contestant-card active" data-index="0">
-            <div class="contestant-header">
-              <span class="contestant-color-dot" style="background: #ef4444;"></span>
-              <input id="contestant-name-0" class="contestant-name-input" type="text" value="Player 1 (Red)" />
-              <button class="btn-select-turn" data-index="0" title="Set Active Turn">🎤 CALL</button>
-            </div>
-            <div class="contestant-score-row">
-              <div class="score-box">
-                <span class="score-label">ROUND</span>
-                <span id="contestant-round-score-0" class="score-val">$0</span>
-              </div>
-              <div class="score-box">
-                <span class="score-label">TOTAL</span>
-                <span id="contestant-total-score-0" class="score-val">$0</span>
-              </div>
-            </div>
-            <div class="score-adjust-row">
-              <button class="btn-score-adjust" data-index="0" data-delta="500">+$500</button>
-              <button class="btn-score-adjust" data-index="0" data-delta="-500">-$500</button>
-              <button class="btn-score-adjust" data-index="0" data-action="bankrupt">💥 Bankrupt</button>
-            </div>
-          </div>
-
-          <!-- Contestant 2 (Yellow) -->
-          <div id="contestant-card-1" class="contestant-card" data-index="1">
-            <div class="contestant-header">
-              <span class="contestant-color-dot" style="background: #eab308;"></span>
-              <input id="contestant-name-1" class="contestant-name-input" type="text" value="Player 2 (Yellow)" />
-              <button class="btn-select-turn" data-index="1" title="Set Active Turn">🎤 CALL</button>
-            </div>
-            <div class="contestant-score-row">
-              <div class="score-box">
-                <span class="score-label">ROUND</span>
-                <span id="contestant-round-score-1" class="score-val">$0</span>
-              </div>
-              <div class="score-box">
-                <span class="score-label">TOTAL</span>
-                <span id="contestant-total-score-1" class="score-val">$0</span>
-              </div>
-            </div>
-            <div class="score-adjust-row">
-              <button class="btn-score-adjust" data-index="1" data-delta="500">+$500</button>
-              <button class="btn-score-adjust" data-index="1" data-delta="-500">-$500</button>
-              <button class="btn-score-adjust" data-index="1" data-action="bankrupt">💥 Bankrupt</button>
-            </div>
-          </div>
-
-          <!-- Contestant 3 (Blue) -->
-          <div id="contestant-card-2" class="contestant-card" data-index="2">
-            <div class="contestant-header">
-              <span class="contestant-color-dot" style="background: #3b82f6;"></span>
-              <input id="contestant-name-2" class="contestant-name-input" type="text" value="Player 3 (Blue)" />
-              <button class="btn-select-turn" data-index="2" title="Set Active Turn">🎤 CALL</button>
-            </div>
-            <div class="contestant-score-row">
-              <div class="score-box">
-                <span class="score-label">ROUND</span>
-                <span id="contestant-round-score-2" class="score-val">$0</span>
-              </div>
-              <div class="score-box">
-                <span class="score-label">TOTAL</span>
-                <span id="contestant-total-score-2" class="score-val">$0</span>
-              </div>
-            </div>
-            <div class="score-adjust-row">
-              <button class="btn-score-adjust" data-index="2" data-delta="500">+$500</button>
-              <button class="btn-score-adjust" data-index="2" data-delta="-500">-$500</button>
-              <button class="btn-score-adjust" data-index="2" data-action="bankrupt">💥 Bankrupt</button>
-            </div>
-          </div>
+        <!-- DYNAMIC CONTESTANTS CONTAINER -->
+        <div id="contestants-container" class="contestants-grid">
+          <!-- Rendered dynamically by wheel-host.js -->
         </div>
 
         <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+          <button id="btn-prev-player" class="btn btn-secondary" style="flex: 1;">
+            ⏪ Previous Turn
+          </button>
           <button id="btn-next-player" class="btn btn-secondary" style="flex: 1;">
             ⏩ Pass Turn to Next Contestant
           </button>
           <button id="btn-bank-scores" class="btn btn-primary" style="flex: 1;">
             💰 Bank Round Cash into Total
           </button>
+        </div>
+
+        <!-- SOLVE REWARD CONFIGURATION -->
+        <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-top: 12px; padding: 10px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(250,204,21,0.3); border-radius: 8px; flex-wrap: wrap;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; font-weight: 800; color: var(--gold-bright);">🏆 SOLVE REWARD:</span>
+            <span style="font-size: 13px; font-weight: 900; color: #fff;">$</span>
+            <input id="input-solve-reward" type="number" value="500" min="0" step="100" style="width: 80px; background: #0f172a; border: 1px solid #ca8a04; color: #facc15; font-weight: 800; font-size: 13px; padding: 4px 8px; border-radius: 6px;" />
+          </div>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; font-weight: 700; color: var(--text-muted);">AWARD MODE:</span>
+            <select id="select-solve-mode" style="background: #0f172a; border: 1px solid #ca8a04; color: #fff; font-size: 11px; font-weight: 700; padding: 4px 8px; border-radius: 6px;">
+              <option value="guaranteed">Guaranteed $500 Cash</option>
+              <option value="bonus_spin">Bonus Wheel Spin</option>
+            </select>
+          </div>
         </div>
       </section>
 
@@ -271,15 +227,28 @@
       <section class="panel">
         <div class="panel-header">
           <div class="panel-title">
-            <span>📂</span> PUZZLE SELECTION
+            <span>📂</span> PUZZLE SELECTION & MASTER DECK
           </div>
+          <span id="deck-stats-tag" style="font-size: 11px; font-weight: 800; color: var(--gold-bright);">DECK: 50+ PUZZLES</span>
         </div>
 
-        <div class="form-group">
-          <label class="form-label" for="select-category">Choose Category</label>
-          <select id="select-category" class="form-select">
-            <!-- Populated from data -->
-          </select>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+          <div class="form-group">
+            <label class="form-label" for="select-difficulty">Difficulty Tier</label>
+            <select id="select-difficulty" class="form-select">
+              <option value="all">All Difficulties</option>
+              <option value="easy">🟢 Easy</option>
+              <option value="medium">🟡 Medium</option>
+              <option value="hard">🔴 Hard</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="select-category">Category (18 Total)</label>
+            <select id="select-category" class="form-select">
+              <!-- Populated from data -->
+            </select>
+          </div>
         </div>
 
         <div class="form-group">
@@ -291,10 +260,10 @@
 
         <div style="display: flex; gap: 8px; margin-bottom: 14px;">
           <button id="btn-load-puzzle" class="btn btn-primary" style="flex: 1;">
-            📥 Load Puzzle
+            📥 Load Selected
           </button>
-          <button id="btn-random-puzzle" class="btn btn-secondary" style="flex: 1;">
-            🎲 Pick Random
+          <button id="btn-random-puzzle" class="btn btn-secondary" style="flex: 1;" title="Picks fresh puzzle with no repeats">
+            🎲 Draw Random
           </button>
         </div>
 
@@ -321,21 +290,35 @@
           <div class="panel-title">
             <span>🎮</span> MASTER STAGE CONTROLS
           </div>
+          <span id="master-phase-indicator" style="font-size: 11px; font-weight: 800; color: #94a3b8;">PHASE: WAITING</span>
         </div>
 
         <div style="display: flex; flex-direction: column; gap: 10px;">
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="btn-start-round" class="btn btn-primary" style="background: #047857; border: 1px solid #10b981; font-weight: 800;">
+              🟢 START ROUND (LIVE)
+            </button>
+            <button id="btn-cooldown-round" class="btn btn-secondary" style="background: #78350f; border: 1px solid #d97706; font-weight: 800; color: #fef08a;">
+              🟡 ROUND COOLDOWN
+            </button>
+          </div>
+
           <button id="btn-toggle-hint" class="btn btn-secondary" style="width: 100%;">
             💡 Show / Hide Clue on Stage
           </button>
+
           <button id="btn-reveal-all" class="btn btn-solve" style="width: 100%;">
-            🏆 SOLVE & REVEAL FULL PUZZLE
+            🏆 SOLVE & AWARD REWARD ($500)
           </button>
-          <button id="btn-next-round" class="btn btn-primary" style="width: 100%;">
-            ⏩ Next Round (+1)
-          </button>
-          <button id="btn-reset-board" class="btn btn-danger" style="width: 100%;">
-            ⚠️ Reset Board to Hidden
-          </button>
+
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+            <button id="btn-next-round" class="btn btn-primary">
+              ⏩ Next Round (+1)
+            </button>
+            <button id="btn-reset-board" class="btn btn-danger">
+              ⚠️ Reset Board
+            </button>
+          </div>
         </div>
       </section>
 
@@ -363,9 +346,53 @@
 
   </main>
 
+  <!-- STICKY QUICK CONTROL DOCK (MOBILE & TABLET ACCESSIBLE) -->
+  <div id="host-quick-dock" class="host-quick-dock">
+    <button id="dock-btn-spin" class="dock-btn btn-dock-spin" title="Spin Wheel">
+      <span class="dock-icon">🎡</span>
+      <span class="dock-label">SPIN</span>
+    </button>
+    <button id="dock-btn-next" class="dock-btn btn-dock-next" title="Next Player Turn">
+      <span class="dock-icon">⏭</span>
+      <span class="dock-label">NEXT TURN</span>
+    </button>
+    <button id="dock-btn-wrong" class="dock-btn btn-dock-wrong" title="Wrong Letter / Advance Turn">
+      <span class="dock-icon">❌</span>
+      <span class="dock-label">WRONG</span>
+    </button>
+    <button id="dock-btn-hint" class="dock-btn btn-dock-hint" title="Hint Status">
+      <span class="dock-icon">🔒</span>
+      <span class="dock-label">LOCKED</span>
+    </button>
+    <button id="dock-btn-solve" class="dock-btn btn-dock-solve" title="Solve Full Puzzle">
+      <span class="dock-icon">🏆</span>
+      <span class="dock-label">SOLVE</span>
+    </button>
+    <button id="dock-btn-pause" class="dock-btn btn-dock-pause" title="Pause / Resume Timer">
+      <span class="dock-icon">⏸</span>
+      <span class="dock-label">PAUSE</span>
+    </button>
+  </div>
+
+  <!-- SAFETY CONFIRMATION MODAL -->
+  <div id="safety-modal-overlay" class="modal-overlay hidden">
+    <div class="safety-modal-box">
+      <div class="safety-modal-icon">⚠️</div>
+      <div id="safety-modal-title" class="safety-modal-title">Confirm Action</div>
+      <div id="safety-modal-desc" class="safety-modal-desc">Are you sure you want to perform this action? This will affect the live game.</div>
+      <div class="safety-modal-actions">
+        <button id="btn-safety-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-safety-confirm" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PURE VANILLA JAVASCRIPT -->
+  <script src="../../shared/hint-validator.js"></script>
+  <script src="../../shared/game-transitions.js"></script>
   <script src="sounds.js"></script>
   <script src="wheel-engine.js"></script>
+  <script src="wheel-puzzles-data.js"></script>
   <script src="jeopardy-data.js"></script>
   <script src="sync-client.js"></script>
   <script src="wheel-host.js"></script>

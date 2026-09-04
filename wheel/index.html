@@ -32,6 +32,18 @@
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+      <a href="host/?singleplayer=true" class="game-card" style="border: 2px solid rgba(16,185,129,0.5); background: linear-gradient(135deg, rgba(6,78,46,0.5), rgba(3,32,18,0.8));">
+        <div class="game-card-header">
+          <div class="game-card-icon">👤</div>
+          <div class="game-card-meta">
+            <div class="game-card-title" style="color: #34d399;">SINGLE PLAYER SOLO</div>
+            <div class="game-card-genre">SOLO ARCADE MODE</div>
+          </div>
+        </div>
+        <p class="game-card-desc">Spin the wheel, call consonants, buy vowels, and solve puzzles entirely on your own without needing room sync or remote devices.</p>
+        <span class="game-btn" style="background: linear-gradient(135deg, #10b981, #059669); color: #000; font-weight: 900;">START SOLO PLAY →</span>
+      </a>
+
       <a href="host/" class="game-card">
         <div class="game-card-header">
           <div class="game-card-icon">👑</div>
@@ -89,6 +101,9 @@
   <script>
     if (window.RoomUI) {
       window.RoomUI.attachHUD('.main-header', 'wheel');
+    }
+    if (new URLSearchParams(window.location.search).get('singleplayer') === 'true') {
+      window.location.replace('host/?singleplayer=true');
     }
   </script>
 </body>
