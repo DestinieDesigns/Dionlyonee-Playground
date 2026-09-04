@@ -14,7 +14,14 @@
   </header>
   <main class="host-main">
     <div class="host-status">HOST CONTROL</div>
-    <div class="host-label">CATEGORY</div>
+    <div class="host-label">CATEGORY & QUESTION SELECTION</div>
+    <div style="display: flex; gap: 8px; margin-bottom: 10px; flex-wrap: wrap;">
+      <select id="categorySelect" style="flex: 1; min-width: 150px; padding: 10px 14px; border-radius: 8px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-weight: 700; font-size: 14px;"></select>
+      <button type="button" id="btnPickCategory" style="padding: 10px 16px; border-radius: 8px; background: linear-gradient(135deg, #10b981, #059669); color: #000; font-weight: 900; border: none; cursor: pointer; font-size: 13px;">📁 PICK CATEGORY</button>
+    </div>
+    <div style="margin-bottom: 14px;">
+      <select id="puzzleSelect" style="width: 100%; padding: 10px 14px; border-radius: 8px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid rgba(255,255,255,0.25); font-weight: 700; font-size: 14px;"></select>
+    </div>
     <div id="hostCategory" class="host-category">READY</div>
     <div class="host-label">ANSWER</div>
     <div id="answer" class="host-answer">—</div>
@@ -116,6 +123,55 @@
   const revealedElement = document.getElementById('revealed');
   const timerElement = document.getElementById('hostTimer');
   const messageElement = document.getElementById('hostMessage');
+  const categorySelect = document.getElementById('categorySelect');
+  const puzzleSelect = document.getElementById('puzzleSelect');
+  const btnPickCategory = document.getElementById('btnPickCategory');
+
+  function initCategories() {
+    const cats = Object.keys(puzzles);
+    categorySelect.innerHTML = cats.map(c => `<option value="${c}">${c} (${puzzles[c].length})</option>`).join('');
+    updatePuzzleSelect();
+
+    categorySelect.onchange = () => {
+      updatePuzzleSelect();
+      category = categorySelect.value;
+      const words = puzzles[category] || [];
+      answer = words[0] || '';
+      revealed = [];
+      hostCategory.textContent = category;
+      answerElement.textContent = answer;
+      sendGame({ category, answer, revealed: [] });
+    };
+
+    puzzleSelect.onchange = () => {
+      category = categorySelect.value;
+      answer = puzzleSelect.value;
+      revealed = [];
+      hostCategory.textContent = category;
+      answerElement.textContent = answer;
+      sendGame({ category, answer, revealed: [] });
+    };
+
+    if (btnPickCategory) {
+      btnPickCategory.onclick = () => {
+        category = categorySelect.value;
+        const words = puzzles[category] || [];
+        answer = words[Math.floor(Math.random() * words.length)];
+        puzzleSelect.value = answer;
+        revealed = [];
+        hostCategory.textContent = category;
+        answerElement.textContent = answer;
+        messageElement.textContent = `SELECTED CATEGORY: ${category}`;
+        sendGame({ category, answer, revealed: [] });
+      };
+    }
+  }
+
+  function updatePuzzleSelect() {
+    const selected = categorySelect.value;
+    const words = puzzles[selected] || [];
+    puzzleSelect.innerHTML = words.map(w => `<option value="${w}">${w}</option>`).join('');
+  }
 
   function sendGame(state = {}) {
     const payload = {
@@ -140,10 +196,20 @@
   };
 
   function choosePuzzle() {
-    const categories = Object.keys(puzzles);
-    category = categories[Math.floor(Math.random() * categories.length)];
-    const words = puzzles[category];
-    answer = words[Math.floor(Math.random() * words.length)];
+    if (categorySelect && categorySelect.value) {
+      category = categorySelect.value;
+    } else {
+      const categories = Object.keys(puzzles);
+      category = categories[Math.floor(Math.random() * categories.length)];
+      if (categorySelect) categorySelect.value = category;
+    }
+    if (puzzleSelect && puzzleSelect.value) {
+      answer = puzzleSelect.value;
+    } else {
+      const words = puzzles[category] || [];
+      answer = words[Math.floor(Math.random() * words.length)];
+      if (puzzleSelect) puzzleSelect.value = answer;
+    }
     revealed = [];
   }
 
@@ -215,6 +281,8 @@
 
   document.getElementById('start').addEventListener('click', startGame);
   document.getElementById('next').addEventListener('click', startGame);
+
+  initCategories();
 
   document.addEventListener('keydown', event => {
     if (event.key === 'Enter' && !running) startGame();

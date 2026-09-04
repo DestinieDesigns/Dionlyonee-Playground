@@ -19,6 +19,11 @@ interface RoomData {
     player: string;
     timestamp: number;
   };
+  lastSound?: {
+    sound: string;
+    meta?: Record<string, unknown>;
+    timestamp: number;
+  };
   lastUpdate: number;
 }
 
@@ -65,6 +70,7 @@ async function startServer() {
       state: state || existing?.state || {},
       lastSpin: existing?.lastSpin,
       lastBuzzer: existing?.lastBuzzer,
+      lastSound: sound ? { sound: String(sound), timestamp: Date.now() } : existing?.lastSound,
       lastUpdate: Date.now(),
     };
 
@@ -81,6 +87,43 @@ async function startServer() {
     });
 
     res.json({ success: true, timestamp: updatedRoom.lastUpdate });
+  });
+
+  // API: Post Sound Event Broadcast
+  app.post("/api/rooms/:roomId/sound", (req, res) => {
+    const roomId = (req.params.roomId || "DION1").toUpperCase();
+    const { sound, meta } = req.body;
+
+    if (!sound) {
+      return res.status(400).json({ error: "Sound name is required" });
+    }
+
+    const existing = rooms.get(roomId) || {
+      id: roomId,
+      gameType: "wheel" as const,
+      state: {},
+      lastUpdate: Date.now(),
+    };
+
+    const soundData = {
+      sound: String(sound),
+      meta: meta || {},
+      timestamp: Date.now(),
+    };
+
+    existing.lastSound = soundData;
+    existing.lastUpdate = Date.now();
+    rooms.set(roomId, existing);
+
+    broadcastToRoom(roomId, {
+      type: "PLAY_SOUND",
+      roomId,
+      sound: soundData.sound,
+      meta: soundData.meta,
+      timestamp: soundData.timestamp,
+    });
+
+    res.json({ success: true, sound: soundData });
   });
 
   // API: Post Wheel Spin Event
@@ -183,6 +226,14 @@ async function startServer() {
     { path: "/split-screen", file: "dual-view.html" },
     { path: "/hub", file: "index.html" },
   ];
+
+  app.get(["/dionlyonee-pon-di-app.png", "*/dionlyonee-pon-di-app.png"], (_req, res) => {
+    res.sendFile(path.join(process.cwd(), "dionlyonee-pon-di-app.png"));
+  });
+
+  app.get(["/dionlyonee-pon-di-app.svg", "*/dionlyonee-pon-di-app.svg"], (_req, res) => {
+    res.sendFile(path.join(process.cwd(), "dionlyonee-pon-di-app.svg"));
+  });
 
   routes.forEach((r) => {
     app.get(r.path, (_req, res) => {
@@ -288,6 +339,39 @@ async function startServer() {
           };
           existing.lastUpdate = Date.now();
           broadcastToRoom(roomId, message, ws);
+        } else if (message.type === "PLAY_SOUND" || message.type === "SOUND") {
+          const roomId = (message.roomId || currentRoomId || "DION1").toUpperCase();
+          const soundName = String(message.sound || message.name || "");
+          if (soundName) {
+            let existing = rooms.get(roomId);
+            if (!existing) {
+              existing = {
+                id: roomId,
+                gameType: "wheel",
+                state: {},
+                lastUpdate: Date.now(),
+              };
+              rooms.set(roomId, existing);
+            }
+            existing.lastSound = {
+              sound: soundName,
+              meta: message.meta || {},
+              timestamp: Date.now(),
+            };
+            existing.lastUpdate = Date.now();
+
+            broadcastToRoom(
+              roomId,
+              {
+                type: "PLAY_SOUND",
+                roomId,
+                sound: soundName,
+                meta: message.meta || {},
+                timestamp: Date.now(),
+              },
+              ws
+            );
+          }
         } else if (message.type === "PING") {
           ws.send(JSON.stringify({ type: "PONG", timestamp: Date.now() }));
         } else {
