@@ -34,6 +34,18 @@
     </div>
 
     <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 20px;">
+      <a href="host/?singleplayer=true" class="game-card" style="border: 2px solid rgba(168,85,247,0.5); background: linear-gradient(135deg, rgba(88,28,135,0.4), rgba(17,24,39,0.8));">
+        <div class="game-card-header">
+          <div class="game-card-icon">👤</div>
+          <div class="game-card-meta">
+            <div class="game-card-title" style="color: #c084fc;">SINGLE PLAYER SOLO</div>
+            <div class="game-card-genre">SOLO QUIZ ARENA</div>
+          </div>
+        </div>
+        <p class="game-card-desc">Test your knowledge solo! Answer questions across all categories and tiers with timers and scoring on one screen.</p>
+        <span class="game-btn" style="background: linear-gradient(135deg, #a855f7, #6366f1); color: #fff; font-weight: 900;">START SOLO QUIZ →</span>
+      </a>
+
       <a href="host/" class="game-card">
         <div class="game-card-header">
           <div class="game-card-icon">👑</div>
@@ -91,6 +103,9 @@
   <script>
     if (window.RoomUI) {
       window.RoomUI.attachHUD('.main-header', 'trivia');
+    }
+    if (new URLSearchParams(window.location.search).get('singleplayer') === 'true') {
+      window.location.replace('host/?singleplayer=true');
     }
   </script>
 </body>

@@ -222,6 +222,83 @@
       });
     }
 
+    // Listen for Phone Controller / Remote Actions
+    const sync = window.RoomSync || window.FirebaseRoom;
+    if (sync && typeof sync.onAction === 'function') {
+      sync.onAction((data) => {
+        const action = data.action;
+        if (action === 'NEXT_QUESTION' || action === 'NEXT_ROUND' || action === 'START_ROUND') {
+          showWaitingScreen = false;
+          updateWaitingButtonUI();
+          loadNext();
+        } else if (action === 'REVEAL_ANSWER' || action === 'REVEAL' || action === 'REVEAL_ALL') {
+          if (activeQuestion && window.TriviaGame) {
+            window.TriviaGame.revealAnswer();
+            document.querySelectorAll('.trivia-opt-btn').forEach(b => {
+              if (b.getAttribute('data-opt') === activeQuestion.answer) {
+                b.style.background = '#10b981';
+                b.style.color = '#07090e';
+              }
+            });
+          }
+        } else if (action === 'START_TIMER' || action === 'TIMER') {
+          const timeSec = (activeQuestion && activeQuestion.timeSec) || 15;
+          if (window.TimerManager) {
+            window.TimerManager.start(timeSec, null, () => {
+              if (window.SoundManager) window.SoundManager.playSound('timeup', true);
+            });
+          }
+          if (window.FirebaseRoom) {
+            window.FirebaseRoom.broadcastState({
+              gameType: 'trivia',
+              phase: 'timer',
+              showWaitingScreen: false,
+              question: activeQuestion,
+              timeSec,
+              timestamp: Date.now()
+            }, 'tick');
+          }
+        } else if (action === 'PAUSE_TIMER' || action === 'PAUSE') {
+          if (window.TimerManager) window.TimerManager.stop();
+        } else if (action === 'ENTER_COOLDOWN' || action === 'COOLDOWN') {
+          showWaitingScreen = true;
+          updateWaitingButtonUI();
+          if (window.FirebaseRoom) {
+            window.FirebaseRoom.broadcastState({
+              gameType: 'trivia',
+              phase: 'cooldown',
+              isCooldown: true,
+              showWaitingScreen: true,
+              timestamp: Date.now()
+            });
+          }
+        } else if (action === 'AWARD_POINTS' || action === 'CORRECT') {
+          const idx = (data.payload && typeof data.payload.contestantIndex === 'number') ? data.payload.contestantIndex : 0;
+          const pts = activeQuestion ? activeQuestion.points : 200;
+          if (window.ContestantManager) {
+            window.ContestantManager.addRoundScore(pts, idx);
+            renderContestants();
+          }
+          if (window.SoundManager && typeof window.SoundManager.playSound === 'function') {
+            window.SoundManager.playSound('correct', true);
+          }
+          if (window.FirebaseRoom) {
+            window.FirebaseRoom.broadcastState({
+              gameType: 'trivia',
+              contestants: window.ContestantManager.getContestants()
+            }, 'correct');
+          }
+        } else if (action === 'BUZZER' || action === 'WRONG') {
+          if (window.SoundManager && typeof window.SoundManager.playSound === 'function') {
+            window.SoundManager.playSound('buzzer', true);
+          }
+          if (window.FirebaseRoom) {
+            window.FirebaseRoom.broadcastSound('buzzer');
+          }
+        }
+      });
+    }
+
     window.addEventListener('trivia-data-loaded', () => {
       populateCategoryControls();
       if (!activeQuestion) {

@@ -10,32 +10,24 @@
     }
 
     renderContestants();
+    showStandbyScreen();
 
     if (window.FirebaseRoom) {
       window.FirebaseRoom.onState((state) => {
+        if (!state) return;
         if (state.contestants && window.ContestantManager) {
           window.ContestantManager.setContestants(state.contestants);
           renderContestants();
         }
 
-        if (state.showWaitingScreen) {
-          const container = document.getElementById('live-question-card');
-          if (container) {
-            container.innerHTML = `
-              <div style="
-                background: #111624; border: 2px dashed rgba(212, 175, 55, 0.4);
-                border-radius: 18px; padding: 48px 24px; text-align: center;
-              ">
-                <div style="font-size: 48px; margin-bottom: 12px;">⏳</div>
-                <h2 style="font-family: 'Cinzel', serif; font-size: 26px; color: #f7e07d; margin-bottom: 8px;">
-                  ROUND PREPARATION STANDBY
-                </h2>
-                <p style="color: #94a3b8; font-size: 15px; max-width: 500px; margin: 0 auto;">
-                  The host is preparing the next question. Please remain at your buzzer stations!
-                </p>
-              </div>
-            `;
-          }
+        const isWaiting = Boolean(state.showWaitingScreen) || 
+                          Boolean(state.isCooldown) || 
+                          state.phase === 'waiting' || 
+                          state.phase === 'cooldown' || 
+                          !state.question;
+
+        if (isWaiting) {
+          showStandbyScreen(state.isCooldown || state.phase === 'cooldown');
         } else if (state.question) {
           currentQuestion = state.question;
           const container = document.getElementById('live-question-card');
@@ -122,6 +114,40 @@
         }
       }
     });
+  }
+
+  function showStandbyScreen(isCooldown) {
+    const container = document.getElementById('live-question-card');
+    if (!container) return;
+    const roomCode = (window.RoomManager && window.RoomManager.getRoom()) || 'DION1';
+
+    container.innerHTML = `
+      <div style="
+        background: rgba(17, 22, 36, 0.95); border: 2px solid rgba(212, 175, 55, 0.4);
+        border-radius: 20px; padding: 40px 24px; text-align: center; max-width: 800px; margin: 0 auto;
+        box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.2);
+      ">
+        <div style="margin-bottom: 16px;">
+          <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #facc15; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.4); padding: 4px 12px; border-radius: 20px;">
+            ${isCooldown ? '🎉 ROUND COOLDOWN • STANDBY' : '🇯🇲 DIONLYONEE STREAM LOBBY'}
+          </span>
+          <span style="margin-left: 10px; font-family: monospace; font-size: 12px; font-weight: 800; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 4px 10px; border-radius: 10px;">
+            ROOM: ${roomCode}
+          </span>
+        </div>
+
+        <div style="max-height: 260px; overflow: hidden; border-radius: 12px; margin: 16px auto; max-width: 500px; border: 1px solid rgba(212,175,55,0.3);">
+          <img src="/dionlyonee-pon-di-app.png" alt="Dionlyonee Pon Di App" style="width: 100%; height: auto; display: block;" onerror="this.src='../../assets/images/dionlyonee-pon-di-app.png'" />
+        </div>
+
+        <h2 style="font-family: 'Cinzel', serif; font-size: 28px; color: #f7e07d; margin: 14px 0 8px 0; text-shadow: 0 0 20px rgba(247,224,125,0.4);">
+          ${isCooldown ? 'ROUND FINISHED • GET READY!' : 'WAITING FOR HOST TO START'}
+        </h2>
+        <p style="color: #94a3b8; font-size: 15px; max-width: 540px; margin: 0 auto; line-height: 1.5;">
+          ${isCooldown ? 'Host is reviewing contestant scores and preparing the next showdown.' : 'Host is setting up the questions. Buzzers are on standby!'}
+        </p>
+      </div>
+    `;
   }
 
   window.addEventListener('DOMContentLoaded', init);

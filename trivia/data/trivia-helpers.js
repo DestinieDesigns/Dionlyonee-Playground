@@ -18,6 +18,12 @@
       if (!Array.isArray(list)) return;
       list.forEach((item, index) => {
         const diff = (item.difficulty || item.tier || 'medium').toLowerCase();
+        let hintText = item.hint || (item.hostHint ? item.hostHint : 'Host Hint: Think carefully about the key details in the question.');
+        if (window.HintValidator && item.answer) {
+          const check = window.HintValidator.validateHint(item.answer, hintText);
+          hintText = check.safeHint;
+        }
+
         const normalized = {
           id: item.id || `q_${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${index}`,
           category: item.category || 'General',
@@ -28,7 +34,7 @@
           question: item.question || '',
           options: Array.isArray(item.options) ? item.options : [],
           answer: item.answer || '',
-          hint: item.hint || (item.hostHint ? item.hostHint : 'Host Hint: Think carefully about the key details in the question.')
+          hint: hintText
         };
         window.TriviaDataStore.push(normalized);
       });
