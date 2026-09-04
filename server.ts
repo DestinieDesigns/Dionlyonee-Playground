@@ -6,7 +6,7 @@ import { createServer as createViteServer } from "vite";
 
 interface RoomData {
   id: string;
-  gameType: "jeopardy" | "most-likely" | "wheel" | "general";
+  gameType: "jeopardy" | "most-likely" | "wheel" | "general" | string;
   state: Record<string, unknown>;
   lastSpin?: {
     startAngle: number;
@@ -22,6 +22,11 @@ interface RoomData {
   lastSound?: {
     sound: string;
     meta?: Record<string, unknown>;
+    timestamp: number;
+  };
+  lastAction?: {
+    action: string;
+    payload?: Record<string, unknown>;
     timestamp: number;
   };
   lastUpdate: number;
@@ -188,8 +193,51 @@ async function startServer() {
     res.json({ success: true, buzzer: buzzData });
   });
 
+  // API: Post Host Phone Controller Action Event
+  app.post("/api/rooms/:roomId/action", (req, res) => {
+    const roomId = (req.params.roomId || "DION1").toUpperCase();
+    const { action, payload } = req.body;
+
+    if (!action) {
+      return res.status(400).json({ error: "Action name is required" });
+    }
+
+    const existing = rooms.get(roomId) || {
+      id: roomId,
+      gameType: "wheel",
+      state: {},
+      lastUpdate: Date.now(),
+    };
+
+    const actionData = {
+      action: String(action),
+      payload: payload || {},
+      timestamp: Date.now(),
+    };
+
+    existing.lastAction = actionData;
+    existing.lastUpdate = Date.now();
+    rooms.set(roomId, existing);
+
+    broadcastToRoom(roomId, {
+      type: "HOST_ACTION",
+      roomId,
+      ...actionData,
+    });
+
+    res.json({ success: true, action: actionData });
+  });
+
   // Clean URL route aliases
   const routes = [
+    { path: "/remote", file: "remote.html" },
+    { path: "/remote.html", file: "remote.html" },
+    { path: "/controller", file: "remote.html" },
+    { path: "/cohost-join", file: "cohost-join.html" },
+    { path: "/cohost-join.html", file: "cohost-join.html" },
+    { path: "/cohost", file: "cohost-join.html" },
+    { path: "/cohost.html", file: "cohost-join.html" },
+
     { path: "/wheel-host", file: "wheel-host.html" },
     { path: "/wheel-live", file: "wheel-live.html" },
     { path: "/wheel-cohost", file: "wheel-cohost.html" },
@@ -219,6 +267,12 @@ async function startServer() {
     { path: "/word-reveal/cohost", file: "word-reveal/cohost/index.html" },
     { path: "/word-reveal/waiting", file: "word-reveal/waiting/index.html" },
     { path: "/word-reveal", file: "word-reveal/index.html" },
+
+    { path: "/speak-out/host", file: "speak-out/host/index.html" },
+    { path: "/speak-out/live", file: "speak-out/live/index.html" },
+    { path: "/speak-out/cohost", file: "speak-out/cohost/index.html" },
+    { path: "/speak-out/waiting", file: "speak-out/waiting/index.html" },
+    { path: "/speak-out", file: "speak-out/index.html" },
 
     { path: "/most-likely-host", file: "most-likely-host.html" },
     { path: "/most-likely-live", file: "most-likely-live.html" },
@@ -372,6 +426,25 @@ async function startServer() {
               ws
             );
           }
+        } else if (message.type === "HOST_ACTION") {
+          const roomId = (message.roomId || currentRoomId || "DION1").toUpperCase();
+          let existing = rooms.get(roomId);
+          if (!existing) {
+            existing = {
+              id: roomId,
+              gameType: "wheel",
+              state: {},
+              lastUpdate: Date.now(),
+            };
+            rooms.set(roomId, existing);
+          }
+          existing.lastAction = {
+            action: String(message.action),
+            payload: message.payload || {},
+            timestamp: Date.now(),
+          };
+          existing.lastUpdate = Date.now();
+          broadcastToRoom(roomId, message, ws);
         } else if (message.type === "PING") {
           ws.send(JSON.stringify({ type: "PONG", timestamp: Date.now() }));
         } else {

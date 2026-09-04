@@ -14,10 +14,12 @@
       this.spinListeners = [];
       this.buzzerListeners = [];
       this.soundListeners = [];
+      this.actionListeners = [];
       this.lastTimestamp = 0;
       this.lastSpinTimestamp = 0;
       this.lastBuzzerTimestamp = 0;
       this.lastSoundTimestamp = 0;
+      this.lastActionTimestamp = 0;
       this.pollInterval = null;
       this.heartbeatInterval = null;
       this.broadcastChannel = null;
@@ -105,6 +107,8 @@
               this.notifyWheelSpin(data);
             } else if (data.type === 'COHOST_BUZZ') {
               this.notifyBuzzer(data);
+            } else if (data.type === 'HOST_ACTION') {
+              this.notifyAction(data.action, data.payload, data.timestamp);
             }
           };
         }
@@ -177,6 +181,8 @@
               this.notifyWheelSpin(data);
             } else if (data.type === 'COHOST_BUZZ' && (data.roomId === this.roomId || !data.roomId)) {
               this.notifyBuzzer(data);
+            } else if (data.type === 'HOST_ACTION' && (data.roomId === this.roomId || !data.roomId)) {
+              this.notifyAction(data.action, data.payload, data.timestamp);
             } else if (data.type === 'PONG') {
               this.isOnline = true;
               this.updateConnectionStatusUI();
@@ -258,6 +264,14 @@
             if (r.lastSound && r.lastSound.timestamp && r.lastSound.timestamp > this.lastSoundTimestamp) {
               this.lastSoundTimestamp = r.lastSound.timestamp;
               this.notifySound(r.lastSound.sound, r.lastSound);
+            }
+
+            // 5. Sync Host Action (Phone controller triggers)
+            if (r.lastAction && r.lastAction.timestamp && r.lastAction.timestamp > this.lastActionTimestamp) {
+              this.lastActionTimestamp = r.lastAction.timestamp;
+              if (Date.now() - r.lastAction.timestamp < 10000) {
+                this.notifyAction(r.lastAction.action, r.lastAction.payload, r.lastAction.timestamp);
+              }
             }
           }
         }
@@ -480,18 +494,98 @@
       });
     }
 
+    onAction(fn) {
+      if (typeof fn === 'function') {
+        this.actionListeners.push(fn);
+      }
+      return () => {
+        const idx = this.actionListeners.indexOf(fn);
+        if (idx !== -1) this.actionListeners.splice(idx, 1);
+      };
+    }
+
+    notifyAction(action, payload, timestamp) {
+      this.actionListeners.forEach((fn) => {
+        try {
+          fn(action, payload, timestamp);
+        } catch (e) {
+          console.error('[Sync] action listener error:', e);
+        }
+      });
+    }
+
+    sendAction(action, payload = {}) {
+      if (!action) return;
+      const now = Date.now();
+      this.lastActionTimestamp = now;
+
+      const packet = {
+        type: 'HOST_ACTION',
+        roomId: this.roomId,
+        gameType: this.gameType,
+        action,
+        payload,
+        timestamp: now
+      };
+
+      if (this.ws && this.ws.readyState === WebSocket.OPEN) {
+        try { this.ws.send(JSON.stringify(packet)); } catch (e) {}
+      }
+
+      if (this.broadcastChannel) {
+        try { this.broadcastChannel.postMessage(packet); } catch (e) {}
+      }
+
+      fetch(`/api/rooms/${this.roomId}/action`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action, payload })
+      }).catch((e) => console.warn('[Sync] HTTP action error:', e));
+    }
+
     // --- HOST SECURITY ---
 
     isHostUnlocked() {
-      return true;
+      try {
+        const isSolo = typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('singleplayer') === 'true';
+        if (isSolo) return true;
+      } catch (e) {}
+      if (typeof window !== 'undefined' && window.HostAuth) {
+        return window.HostAuth.isUnlocked();
+      }
+      try {
+        return sessionStorage.getItem('dion_host_authorized_v2') === 'Brown123' ||
+               localStorage.getItem('dion_host_authorized_v2') === 'Brown123';
+      } catch (e) {
+        return false;
+      }
     }
 
-    async verifyHostPasscode(_passcode) {
-      return true;
+    async verifyHostPasscode(passcode) {
+      if (!passcode) return false;
+      const clean = passcode.trim();
+      if (clean === 'Brown123') {
+        try {
+          sessionStorage.setItem('dion_host_authorized_v2', 'Brown123');
+          localStorage.setItem('dion_host_authorized_v2', 'Brown123');
+        } catch (e) {}
+        if (typeof window !== 'undefined' && window.HostAuth) {
+          window.HostAuth.unlock(clean, true);
+        }
+        return true;
+      }
+      return false;
     }
 
     lockHost() {
-      // Host controls remain accessible
+      if (typeof window !== 'undefined' && window.HostAuth) {
+        window.HostAuth.lock();
+      } else {
+        try {
+          sessionStorage.removeItem('dion_host_authorized_v2');
+          localStorage.removeItem('dion_host_authorized_v2');
+        } catch (e) {}
+      }
     }
 
     // --- UI HELPER: ROOM HUD & PHONE CONNECT MODAL ---
@@ -564,8 +658,19 @@
     updateConnectionStatusUI() {
       const dot = document.getElementById('dion-status-dot');
       if (dot) {
-        dot.style.background = this.isOnline ? '#22c55e' : '#eab308';
-        dot.style.boxShadow = this.isOnline ? '0 0 8px #22c55e' : '0 0 8px #eab308';
+        if (!navigator.onLine) {
+          dot.style.background = '#ef4444';
+          dot.style.boxShadow = '0 0 8px #ef4444';
+          dot.title = '🔴 OFFLINE - Network Disconnected';
+        } else if (this.isOnline) {
+          dot.style.background = '#22c55e';
+          dot.style.boxShadow = '0 0 8px #22c55e';
+          dot.title = '🟢 ONLINE - Realtime Firebase / Live Sync Connected';
+        } else {
+          dot.style.background = '#eab308';
+          dot.style.boxShadow = '0 0 8px #eab308';
+          dot.title = '🟡 STANDBY - Local BroadcastChannel / Polling Active';
+        }
       }
     }
 
@@ -708,9 +813,14 @@
     }
 
     ensureHostPasscodeUnlocked(onUnlocked) {
-      if (onUnlocked) onUnlocked();
-      return;
-    }
+      if (typeof window !== 'undefined' && window.HostAuth) {
+        window.HostAuth.requireHostAccess(onUnlocked);
+        return;
+      }
+      if (this.isHostUnlocked()) {
+        if (onUnlocked) onUnlocked();
+        return;
+      }
 
       const existingModal = document.getElementById('host-passcode-modal');
       if (existingModal) existingModal.remove();

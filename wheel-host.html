@@ -13,6 +13,7 @@
 
   <!-- CSS -->
   <link rel="stylesheet" href="wheel-host.css" />
+  <script src="shared/host-auth.js"></script>
 </head>
 
 <body>
@@ -363,9 +364,53 @@
 
   </main>
 
+  <!-- STICKY QUICK CONTROL DOCK (MOBILE & TABLET ACCESSIBLE) -->
+  <div id="host-quick-dock" class="host-quick-dock">
+    <button id="dock-btn-spin" class="dock-btn btn-dock-spin" title="Spin Wheel">
+      <span class="dock-icon">🎡</span>
+      <span class="dock-label">SPIN</span>
+    </button>
+    <button id="dock-btn-next" class="dock-btn btn-dock-next" title="Next Player Turn">
+      <span class="dock-icon">⏭</span>
+      <span class="dock-label">NEXT TURN</span>
+    </button>
+    <button id="dock-btn-wrong" class="dock-btn btn-dock-wrong" title="Wrong Letter / Advance Turn">
+      <span class="dock-icon">❌</span>
+      <span class="dock-label">WRONG</span>
+    </button>
+    <button id="dock-btn-hint" class="dock-btn btn-dock-hint" title="Hint Status">
+      <span class="dock-icon">🔒</span>
+      <span class="dock-label">LOCKED</span>
+    </button>
+    <button id="dock-btn-solve" class="dock-btn btn-dock-solve" title="Solve Full Puzzle">
+      <span class="dock-icon">🏆</span>
+      <span class="dock-label">SOLVE</span>
+    </button>
+    <button id="dock-btn-pause" class="dock-btn btn-dock-pause" title="Pause / Resume Timer">
+      <span class="dock-icon">⏸</span>
+      <span class="dock-label">PAUSE</span>
+    </button>
+  </div>
+
+  <!-- SAFETY CONFIRMATION MODAL -->
+  <div id="safety-modal-overlay" class="modal-overlay hidden">
+    <div class="safety-modal-box">
+      <div class="safety-modal-icon">⚠️</div>
+      <div id="safety-modal-title" class="safety-modal-title">Confirm Action</div>
+      <div id="safety-modal-desc" class="safety-modal-desc">Are you sure you want to perform this action? This will affect the live game.</div>
+      <div class="safety-modal-actions">
+        <button id="btn-safety-cancel" class="btn btn-secondary">Cancel</button>
+        <button id="btn-safety-confirm" class="btn btn-danger">Confirm</button>
+      </div>
+    </div>
+  </div>
+
   <!-- PURE VANILLA JAVASCRIPT -->
+  <script src="shared/hint-validator.js"></script>
+  <script src="shared/game-transitions.js"></script>
   <script src="sounds.js"></script>
   <script src="wheel-engine.js"></script>
+  <script src="wheel-puzzles-data.js"></script>
   <script src="jeopardy-data.js"></script>
   <script src="sync-client.js"></script>
   <script src="wheel-host.js"></script>
