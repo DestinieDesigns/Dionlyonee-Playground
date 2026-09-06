@@ -104,8 +104,22 @@
     updateConnectionStatus();
   }
 
+  let lastActionTime = 0;
+  let isActionLocked = false;
+
   // --- ACTION SENDER ---
   function sendAction(action, payload = {}) {
+    const now = Date.now();
+    // Debounce fast double-taps to prevent duplicate skips or state collisions
+    if (isActionLocked || (now - lastActionTime < 450 && (action === 'WRONG' || action === 'NEXT_TURN' || action === 'SPIN' || action === 'SOLVE' || action === 'HINT'))) {
+      return;
+    }
+    isActionLocked = true;
+    lastActionTime = now;
+    setTimeout(() => {
+      isActionLocked = false;
+    }, 400);
+
     recordHeartbeat();
     if (window.sounds) window.sounds.play('click');
 

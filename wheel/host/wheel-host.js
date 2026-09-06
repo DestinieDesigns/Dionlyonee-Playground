@@ -4,6 +4,9 @@
 (function () {
   'use strict';
 
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSolo = urlParams.get('singleplayer') === 'true' || urlParams.get('solo') === 'true';
+
   const CHANNEL_NAME = 'dionlyonee-wheel-game';
   const STORAGE_KEY = 'dionlyonee_wheel_state';
   const channel = new BroadcastChannel(CHANNEL_NAME);
@@ -509,11 +512,16 @@
     // 1. Increment completed turns
     state.completedTurns = (state.completedTurns || 0) + 1;
 
-    // 2. Unlock hint after specified turns (default 3)
+    // 2. Unlock hint after specified turns (default 3) and automatically show on live screen
     const unlockTurns = state.hintUnlockTurns || 3;
-    if (state.completedTurns >= unlockTurns && !state.hintUnlocked) {
+    if (state.completedTurns >= unlockTurns) {
+      const wasHidden = !state.hintUnlocked || !state.hintVisible;
       state.hintUnlocked = true;
-      if (window.sounds) window.sounds.play('reveal');
+      state.hintVisible = true;
+      if (wasHidden) {
+        if (window.sounds) window.sounds.play('reveal');
+        broadcast('reveal');
+      }
     }
 
     // 3. Move to next player in contestants list
@@ -698,7 +706,24 @@
           state.phase = 'timeup';
           clearInterval(timerInterval);
           if (window.sounds) window.sounds.play('timeup');
+
+          const activeIdx = state.activePlayerIndex ?? 0;
+          const activeName = (state.contestants && state.contestants[activeIdx])
+            ? state.contestants[activeIdx].name
+            : `Player ${activeIdx + 1}`;
+          if (wheelStatusTag) {
+            wheelStatusTag.textContent = `⏰ TIME'S UP FOR ${activeName.toUpperCase()}! PASSING TO NEXT PLAYER...`;
+          }
           broadcast('timeup');
+          updateUI();
+
+          // Automatically pass to next player when time runs out
+          setTimeout(() => {
+            if (state.phase === 'timeup') {
+              advanceToNextTurn('timeup');
+            }
+          }, 1200);
+          return;
         }
         updateUI();
         broadcast();
@@ -785,11 +810,25 @@
     if (puzzles.length === 0 && window.WHEEL_PUZZLES_MASTER) {
       puzzles = window.WHEEL_PUZZLES_MASTER.filter(p => (cat === 'all' || p.category === cat)).map(p => p.answer);
     }
-    selectPuz.innerHTML = puzzles.map((p) => `<option value="${p}">${p}</option>`).join('');
+    selectPuz.innerHTML = puzzles.map((p, idx) => {
+      const label = isSolo ? `Puzzle #${idx + 1} (${p.replace(/[^A-Za-z0-9]/g, '').length} Letters)` : p;
+      return `<option value="${p}">${label}</option>`;
+    }).join('');
+  }
+
+  function resetSoloFeedback() {
+    const input = document.getElementById('solo-wheel-guess-input');
+    if (input) input.value = '';
+    const feedbackEl = document.getElementById('solo-wheel-guess-feedback');
+    if (feedbackEl) {
+      feedbackEl.style.display = 'none';
+      feedbackEl.textContent = '';
+    }
   }
 
   function loadSelectedPuzzle() {
     initPuzzleDeck();
+    resetSoloFeedback();
     const cat = selectCat ? selectCat.value : 'Jamaican Phrases';
     const puz = selectPuz ? selectPuz.value : 'WAH GWAAN';
     let hint = '';
@@ -828,6 +867,7 @@
 
   function pickRandomPuzzle() {
     initPuzzleDeck();
+    resetSoloFeedback();
     const cat = selectCat ? selectCat.value : 'all';
     const diffElem = document.getElementById('select-difficulty');
     const difficulty = diffElem ? diffElem.value : 'all';
@@ -1442,6 +1482,94 @@
         }
       }
     } catch (e) {}
+
+    function checkSoloWheelGuess() {
+      const input = document.getElementById('solo-wheel-guess-input');
+      const feedbackEl = document.getElementById('solo-wheel-guess-feedback');
+      if (!input) return;
+      const guess = input.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      const target = (state.answer || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (!guess) return;
+
+      if (guess === target) {
+        if (feedbackEl) {
+          feedbackEl.style.display = 'block';
+          feedbackEl.style.background = 'rgba(16,185,129,0.2)';
+          feedbackEl.style.border = '1px solid #10b981';
+          feedbackEl.style.color = '#34d399';
+          feedbackEl.textContent = `🎉 SOLVED! "${state.answer}" is correct!`;
+        }
+        solveFullPuzzle();
+      } else {
+        if (feedbackEl) {
+          feedbackEl.style.display = 'block';
+          feedbackEl.style.background = 'rgba(239,68,68,0.2)';
+          feedbackEl.style.border = '1px solid #ef4444';
+          feedbackEl.style.color = '#f87171';
+          feedbackEl.textContent = `❌ "${input.value.trim()}" is not correct. Keep spinning!`;
+        }
+        if (window.sounds) window.sounds.play('buzzer');
+        advanceToNextTurn('wrong');
+      }
+    }
+
+    if (isSolo) {
+      const boardWrapper = document.getElementById('wheel-board-host-preview');
+      if (boardWrapper && !document.getElementById('solo-wheel-solve-card')) {
+        const solveCard = document.createElement('div');
+        solveCard.id = 'solo-wheel-solve-card';
+        solveCard.style.cssText = 'margin-top: 14px; padding: 12px 16px; background: rgba(0,0,0,0.4); border: 1px solid rgba(250,204,21,0.4); border-radius: 10px;';
+        solveCard.innerHTML = `
+          <div style="font-size: 11px; font-weight: 800; color: #facc15; letter-spacing: 1px; margin-bottom: 6px; text-transform: uppercase;">
+            🎯 SOLO SOLVE: GUESS THE FULL PHRASE
+          </div>
+          <div style="display: flex; gap: 8px;">
+            <input id="solo-wheel-guess-input" type="text" placeholder="Type your solve guess..." style="flex: 1; background: #0f172a; border: 1px solid #ca8a04; color: #fff; padding: 8px 12px; border-radius: 6px; font-weight: 700; font-size: 14px;" />
+            <button id="btn-solo-wheel-guess" class="btn btn-solve" style="padding: 0 16px;">
+              SOLVE
+            </button>
+          </div>
+          <div id="solo-wheel-guess-feedback" style="display: none; margin-top: 8px; padding: 6px 10px; border-radius: 6px; font-size: 12px; font-weight: 800;"></div>
+        `;
+        boardWrapper.parentNode.insertBefore(solveCard, boardWrapper.nextSibling);
+
+        const btnGuess = document.getElementById('btn-solo-wheel-guess');
+        if (btnGuess) btnGuess.addEventListener('click', checkSoloWheelGuess);
+        const inputGuess = document.getElementById('solo-wheel-guess-input');
+        if (inputGuess) {
+          inputGuess.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') checkSoloWheelGuess();
+          });
+        }
+      }
+
+      // Hide custom puzzle box in solo mode so answers aren't shown
+      const customDivider = document.querySelector('.divider');
+      if (customDivider) customDivider.style.display = 'none';
+      const customInputs = document.querySelectorAll('#input-custom-answer, #input-custom-hint, #btn-apply-custom');
+      customInputs.forEach(el => {
+        const group = el.closest('.form-group') || el;
+        if (group) group.style.display = 'none';
+      });
+
+      // Add solo mode badge to header
+      const headerTitle = document.querySelector('.header-title');
+      if (headerTitle && !document.getElementById('solo-mode-badge')) {
+        const badge = document.createElement('span');
+        badge.id = 'solo-mode-badge';
+        badge.style.cssText = 'font-size: 11px; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid #10b981; padding: 2px 8px; border-radius: 6px; margin-left: 8px; vertical-align: middle;';
+        badge.textContent = 'SOLO PLAYER MODE';
+        headerTitle.appendChild(badge);
+      }
+
+      // If no session state was cached, automatically draw a random puzzle so it's not the predictable default
+      try {
+        const roomKey = window.RoomSync ? `dion_wheel_state_${window.RoomSync.roomId}` : STORAGE_KEY;
+        if (!sessionStorage.getItem(roomKey) && !sessionStorage.getItem(STORAGE_KEY)) {
+          pickRandomPuzzle();
+        }
+      } catch (e) {}
+    }
 
     updateUI();
     broadcast();
