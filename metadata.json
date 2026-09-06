@@ -1,6 +1,6 @@
 {
   "name": "Dionlyonee Game Show Playground",
-  "description": "Interactive live stream gaming hub featuring Wheel of Fortune, Jeopardy trivia, Dionlyonee Speak Out live speaking challenge, Most Likely To, Charades with host acting cues, Hangman with PG-13 Slime Dunk visual, and synchronized multi-device Host and Live Stage consoles in pure Vanilla JavaScript.",
+  "description": "Interactive live stream gaming hub featuring Wheel of Fortune, Jeopardy trivia, Dionlyonee Speak Out live speaking challenge, Guess the Lyrics (R&B, Reggae, Dancehall, Love Songs & Gospel), Most Likely To, Charades with host acting cues, Hangman with PG-13 Slime Dunk visual, and synchronized multi-device Host and Live Stage consoles in pure Vanilla JavaScript.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }

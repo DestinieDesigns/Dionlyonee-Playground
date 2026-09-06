@@ -309,7 +309,7 @@
     <section class="catalog-section">
         <div class="section-heading">
             <span>🎮 ALL GAMES & ACTIVITIES</span>
-            <small id="catalogHeaderStats">16 GAMES AVAILABLE</small>
+            <small id="catalogHeaderStats">17 GAMES AVAILABLE</small>
         </div>
 
         <!-- Catalog Toolbar: Search, Filters, View Switcher -->
@@ -346,7 +346,7 @@
             <!-- Category Filter Pills -->
             <div class="filter-pills" id="filterPillsContainer">
                 <button type="button" class="filter-pill active" onclick="setCategoryFilter('all')">
-                    🌟 All Games <span class="filter-count-badge" id="countAll">16</span>
+                    🌟 All Games <span class="filter-count-badge" id="countAll">17</span>
                 </button>
                 <button type="button" class="filter-pill" onclick="setCategoryFilter('main')">
                     🏆 Main Events <span class="filter-count-badge" id="countMain">5</span>
@@ -355,7 +355,7 @@
                     🧠 Knowledge & Quiz <span class="filter-count-badge" id="countKnowledge">3</span>
                 </button>
                 <button type="button" class="filter-pill" onclick="setCategoryFilter('words')">
-                    🔤 Word & Guessing <span class="filter-count-badge" id="countWords">4</span>
+                    🔤 Word & Guessing <span class="filter-count-badge" id="countWords">5</span>
                 </button>
                 <button type="button" class="filter-pill" onclick="setCategoryFilter('chat')">
                     💬 Chat & Interactive <span class="filter-count-badge" id="countChat">6</span>
@@ -369,7 +369,7 @@
         <!-- Status / Results Summary Bar -->
         <div class="catalog-status-bar">
             <div>
-                Showing <b id="resultsCount">16</b> of <b>16</b> games
+                Showing <b id="resultsCount">17</b> of <b id="totalGamesCount">17</b> games
             </div>
             <div id="activeFilterLabel" style="color:#d4af37;">
                 All Categories
@@ -426,7 +426,7 @@
             <a id="btnHost" href="#" target="_blank" class="modal-btn">
                 <div class="modal-btn-icon">🎤</div>
                 <div class="modal-btn-title">HOST CONTROL</div>
-                <div class="modal-btn-sub">Primary broadcast control (Passcode: Brown123)</div>
+                <div class="modal-btn-sub">Primary broadcast control (Locked 🔒)</div>
             </a>
             <a id="btnRemote" href="#" target="_blank" class="modal-btn" style="border-color: rgba(245, 158, 11, 0.4); background: rgba(245, 158, 11, 0.08);">
                 <div class="modal-btn-icon">📱</div>
@@ -734,6 +734,21 @@ const GAME_DIRECTORY = {
     direct: 'who-dis/index.html',
     featured: false,
     sortOrder: 15
+  },
+  'guess-lyrics': {
+    id: 'guess-lyrics',
+    title: 'GUESS THE LYRICS',
+    badge: 'R&B • REGGAE • LOVE • GOSPEL',
+    desc: 'Sing the missing line! Test your music soul across 90s & 2000s R&B, timeless Love Songs & Slow Jams, Reggae & Jamaican vibes, Dancehall party bangers, and Gospel!',
+    category: 'words',
+    icon: '🎤',
+    tags: ['🎵 R&B Classics', '🇯🇲 Reggae & Jamaican', '💃 Dancehall Anthems', '❤️ Love Songs', '🙌 Gospel & Praise', '👤 Solo Mode'],
+    host: 'guess-lyrics/host.html',
+    live: 'guess-lyrics/live.html',
+    split: 'dual-view.html?mode=lyrics',
+    direct: 'guess-lyrics/index.html',
+    featured: true,
+    sortOrder: 4.5
   }
 };
 

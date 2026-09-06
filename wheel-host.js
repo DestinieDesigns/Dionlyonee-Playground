@@ -509,11 +509,16 @@
     // 1. Increment completed turns
     state.completedTurns = (state.completedTurns || 0) + 1;
 
-    // 2. Unlock hint after specified turns (default 3)
+    // 2. Unlock hint after specified turns (default 3) and automatically show on live screen
     const unlockTurns = state.hintUnlockTurns || 3;
-    if (state.completedTurns >= unlockTurns && !state.hintUnlocked) {
+    if (state.completedTurns >= unlockTurns) {
+      const wasHidden = !state.hintUnlocked || !state.hintVisible;
       state.hintUnlocked = true;
-      if (window.sounds) window.sounds.play('reveal');
+      state.hintVisible = true;
+      if (wasHidden) {
+        if (window.sounds) window.sounds.play('reveal');
+        broadcast('reveal');
+      }
     }
 
     // 3. Move to next player in contestants list
@@ -698,7 +703,24 @@
           state.phase = 'timeup';
           clearInterval(timerInterval);
           if (window.sounds) window.sounds.play('timeup');
+
+          const activeIdx = state.activePlayerIndex ?? 0;
+          const activeName = (state.contestants && state.contestants[activeIdx])
+            ? state.contestants[activeIdx].name
+            : `Player ${activeIdx + 1}`;
+          if (wheelStatusTag) {
+            wheelStatusTag.textContent = `⏰ TIME'S UP FOR ${activeName.toUpperCase()}! PASSING TO NEXT PLAYER...`;
+          }
           broadcast('timeup');
+          updateUI();
+
+          // Automatically pass to next player when time runs out
+          setTimeout(() => {
+            if (state.phase === 'timeup') {
+              advanceToNextTurn('timeup');
+            }
+          }, 1200);
+          return;
         }
         updateUI();
         broadcast();

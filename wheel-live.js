@@ -269,22 +269,36 @@
 
     // Action banner
     if (liveActionBanner) {
-      if (state.phase === 'active') {
+      if (state.phase === 'active' || state.phase === 'pick_letter' || state.phase === 'timeup') {
         liveActionBanner.classList.remove('hidden');
         if (liveActionText) {
-          liveActionText.textContent = `${activeContestant.name.toUpperCase()}'S TURN — SPIN THE WHEEL OR SOLVE!`;
+          if (state.phase === 'timeup') {
+            liveActionText.textContent = `⏰ TIME'S UP FOR ${activeContestant.name.toUpperCase()}! PASSING TO NEXT PLAYER...`;
+          } else if (state.phase === 'pick_letter') {
+            const wedgeLabel = state.lastWedge && state.lastWedge.label ? ` (${state.lastWedge.label})` : '';
+            liveActionText.textContent = `🎯 ${activeContestant.name.toUpperCase()} — PICK A LETTER${wedgeLabel}!`;
+          } else {
+            liveActionText.textContent = `${activeContestant.name.toUpperCase()}'S TURN — SPIN THE WHEEL OR SOLVE!`;
+          }
         }
         if (liveActionTimer) {
           liveActionTimer.textContent = `${state.seconds || 0}s`;
+          if (state.seconds <= 5 && state.seconds > 0) {
+            liveActionTimer.style.color = '#ef4444';
+          } else {
+            liveActionTimer.style.color = 'var(--gold-bright)';
+          }
         }
       } else {
         liveActionBanner.classList.add('hidden');
       }
     }
 
-    // Secret Clue
+    // Secret Clue / Hint - Automatically shows on the live screen after 3 turns
     if (liveHintCard && liveHintText) {
-      if (state.hintVisible && state.hint) {
+      const isAutoUnlocked = ((state.completedTurns || 0) >= (state.hintUnlockTurns || 3));
+      const shouldShowHint = Boolean((state.hintVisible || isAutoUnlocked) && state.hint);
+      if (shouldShowHint) {
         liveHintCard.classList.remove('hidden');
         liveHintText.textContent = state.hint;
       } else {

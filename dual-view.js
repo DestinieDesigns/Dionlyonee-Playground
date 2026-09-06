@@ -5,6 +5,7 @@
   const btnWheel = document.getElementById('btn-mode-wheel');
   const btnSpeakOut = document.getElementById('btn-mode-speakout');
   const btnJeopardy = document.getElementById('btn-mode-jeopardy');
+  const btnLyrics = document.getElementById('btn-mode-lyrics');
   const btnMostLikely = document.getElementById('btn-mode-mostlikely');
   const hostFrame = document.getElementById('host-frame');
   const liveFrame = document.getElementById('live-frame');
@@ -26,9 +27,18 @@
     btnWheel?.classList.remove('active');
     btnSpeakOut?.classList.remove('active');
     btnJeopardy?.classList.remove('active');
+    btnLyrics?.classList.remove('active');
     btnMostLikely?.classList.remove('active');
 
-    if (mode === 'speakout') {
+    if (mode === 'lyrics' || mode === 'guesslyrics' || mode === 'guess-lyrics') {
+      btnLyrics?.classList.add('active');
+      if (hostFrame) hostFrame.src = `guess-lyrics/host.html${query}`;
+      if (liveFrame) liveFrame.src = `guess-lyrics/live.html${query}`;
+      if (hostPopout) hostPopout.href = `guess-lyrics/host.html${query}`;
+      if (livePopout) livePopout.href = `guess-lyrics/live.html${query}`;
+      if (hostPaneTitle) hostPaneTitle.textContent = 'GUESS THE LYRICS HOST CONSOLE';
+      if (livePaneTitle) livePaneTitle.textContent = 'GUESS THE LYRICS LIVE AUDIENCE STAGE';
+    } else if (mode === 'speakout') {
       btnSpeakOut?.classList.add('active');
       if (hostFrame) hostFrame.src = `speak-out/host/index.html${query}`;
       if (liveFrame) liveFrame.src = `speak-out/live/index.html${query}`;
@@ -66,6 +76,7 @@
   btnWheel?.addEventListener('click', () => setMode('wheel'));
   btnSpeakOut?.addEventListener('click', () => setMode('speakout'));
   btnJeopardy?.addEventListener('click', () => setMode('jeopardy'));
+  btnLyrics?.addEventListener('click', () => setMode('lyrics'));
   btnMostLikely?.addEventListener('click', () => setMode('mostlikely'));
 
   if (window.RoomSync) {
@@ -75,6 +86,7 @@
       let currentMode = 'wheel';
       if (activeBtn === btnSpeakOut) currentMode = 'speakout';
       else if (activeBtn === btnJeopardy) currentMode = 'jeopardy';
+      else if (activeBtn === btnLyrics) currentMode = 'lyrics';
       else if (activeBtn === btnMostLikely) currentMode = 'mostlikely';
       setMode(currentMode);
     });
@@ -85,6 +97,8 @@
   const paramMode = urlParams.get('game') || urlParams.get('mode');
   if (paramMode === 'speakout' || paramMode === 'speak-out') {
     setMode('speakout');
+  } else if (paramMode === 'lyrics' || paramMode === 'guesslyrics' || paramMode === 'guess-lyrics') {
+    setMode('lyrics');
   } else if (paramMode === 'mostlikely') {
     setMode('mostlikely');
   } else if (paramMode === 'jeopardy') {
