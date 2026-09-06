@@ -2,10 +2,13 @@
  * Trivia Host Desk Controller
  */
 (function () {
+  const urlParams = new URLSearchParams(window.location.search);
+  const isSolo = urlParams.get('singleplayer') === 'true' || urlParams.get('solo') === 'true';
   let currentTier = 'all';
   let selectedCategory = 'all';
   let activeQuestion = null;
   let showWaitingScreen = false;
+  let soloAnswered = false;
 
   function init() {
     if (window.FirebaseRoom) {
@@ -149,6 +152,19 @@
   function setupDesk() {
     if (window.RoomUI) {
       window.RoomUI.attachHUD('.main-header', 'trivia');
+    }
+
+    if (isSolo) {
+      const revealBtn = document.getElementById('btn-reveal-answer');
+      if (revealBtn) revealBtn.textContent = '👁️ GIVE UP & REVEAL';
+      const mainHeader = document.querySelector('.main-header');
+      if (mainHeader && !document.getElementById('solo-trivia-badge')) {
+        const badge = document.createElement('div');
+        badge.id = 'solo-trivia-badge';
+        badge.style.cssText = 'font-size: 12px; font-weight: 800; color: #10b981; background: rgba(16,185,129,0.15); border: 1px solid #10b981; padding: 4px 12px; border-radius: 8px; margin-top: 6px; display: inline-block;';
+        badge.textContent = '🎯 SOLO MODE: Click an option to lock in your answer!';
+        mainHeader.appendChild(badge);
+      }
     }
 
     renderContestants();
@@ -320,9 +336,58 @@
 
   function loadSpecificQuestion(q) {
     activeQuestion = q;
+    soloAnswered = false;
     const container = document.getElementById('trivia-active-card');
     if (container && window.TriviaUI) {
-      window.TriviaUI.renderQuestionCard(container, activeQuestion, true);
+      window.TriviaUI.renderQuestionCard(container, activeQuestion, isSolo ? false : true);
+      if (isSolo) {
+        container.querySelectorAll('.trivia-opt-btn').forEach(btn => {
+          btn.style.cursor = 'pointer';
+          btn.addEventListener('mouseenter', () => {
+            if (!soloAnswered) btn.style.background = 'rgba(255,255,255,0.15)';
+          });
+          btn.addEventListener('mouseleave', () => {
+            if (!soloAnswered) btn.style.background = 'rgba(255,255,255,0.05)';
+          });
+          btn.addEventListener('click', () => {
+            if (soloAnswered) return;
+            soloAnswered = true;
+            const chosen = btn.getAttribute('data-opt');
+            const isCorrect = chosen === activeQuestion.answer;
+            container.querySelectorAll('.trivia-opt-btn').forEach(b => {
+              b.style.pointerEvents = 'none';
+              if (b.getAttribute('data-opt') === activeQuestion.answer) {
+                b.style.background = '#10b981';
+                b.style.color = '#07090e';
+                b.style.borderColor = '#34d399';
+                b.style.fontWeight = '900';
+                b.innerHTML += ' <span style="float: right; font-weight: 900; color: #07090e;">✓ (CORRECT)</span>';
+              }
+            });
+            if (isCorrect) {
+              if (window.SoundManager && typeof window.SoundManager.playSound === 'function') {
+                window.SoundManager.playSound('correct', true);
+              } else if (window.sounds) {
+                window.sounds.play('correct');
+              }
+              if (window.ContestantManager) {
+                window.ContestantManager.addRoundScore(activeQuestion.points || 200, 0);
+                renderContestants();
+              }
+            } else {
+              btn.style.background = '#ef4444';
+              btn.style.color = '#fff';
+              btn.style.borderColor = '#f87171';
+              btn.innerHTML += ' <span style="float: right; font-weight: 900; color: #fff;">❌ (YOUR GUESS)</span>';
+              if (window.SoundManager && typeof window.SoundManager.playSound === 'function') {
+                window.SoundManager.playSound('buzzer', true);
+              } else if (window.sounds) {
+                window.sounds.play('wrong');
+              }
+            }
+          });
+        });
+      }
     }
     populateQuestionSelect();
     if (window.TriviaGame) {

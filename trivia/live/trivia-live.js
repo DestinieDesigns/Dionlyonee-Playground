@@ -3,14 +3,25 @@
  */
 (function () {
   let currentQuestion = null;
+  let lastPhaseCategory = null;
 
   function init() {
     if (window.RoomUI) {
       window.RoomUI.attachHUD('.main-header', 'trivia');
     }
 
+    if (window.GameTransitions) {
+      window.GameTransitions.initStage({
+        stage: document.getElementById('live-stage'),
+        waitScreen: document.getElementById('wait-screen'),
+        gameScreen: document.getElementById('game-screen'),
+        rotatingMessageElem: document.getElementById('wait-rotating-message'),
+        initialPhase: 'waiting'
+      });
+    }
+
     renderContestants();
-    showStandbyScreen();
+    updateStandbyTexts(false);
 
     if (window.FirebaseRoom) {
       window.FirebaseRoom.onState((state) => {
@@ -26,8 +37,19 @@
                           state.phase === 'cooldown' || 
                           !state.question;
 
+        const currentVisualCategory = isWaiting ? 'waiting' : 'active';
+
+        if (window.GameTransitions && lastPhaseCategory !== currentVisualCategory) {
+          if (lastPhaseCategory === null) {
+            window.GameTransitions.applyPhase(currentVisualCategory, false);
+          } else {
+            window.GameTransitions.transitionTo(currentVisualCategory);
+          }
+          lastPhaseCategory = currentVisualCategory;
+        }
+
         if (isWaiting) {
-          showStandbyScreen(state.isCooldown || state.phase === 'cooldown');
+          updateStandbyTexts(state.isCooldown || state.phase === 'cooldown');
         } else if (state.question) {
           currentQuestion = state.question;
           const container = document.getElementById('live-question-card');
@@ -116,38 +138,21 @@
     });
   }
 
-  function showStandbyScreen(isCooldown) {
-    const container = document.getElementById('live-question-card');
-    if (!container) return;
+  function updateStandbyTexts(isCooldown) {
     const roomCode = (window.RoomManager && window.RoomManager.getRoom()) || 'DION1';
+    const roomTag = document.getElementById('waiting-room-tag');
+    if (roomTag) roomTag.textContent = `ROOM: ${roomCode}`;
 
-    container.innerHTML = `
-      <div style="
-        background: rgba(17, 22, 36, 0.95); border: 2px solid rgba(212, 175, 55, 0.4);
-        border-radius: 20px; padding: 40px 24px; text-align: center; max-width: 800px; margin: 0 auto;
-        box-shadow: 0 20px 60px rgba(0,0,0,0.7), 0 0 30px rgba(168, 85, 247, 0.2);
-      ">
-        <div style="margin-bottom: 16px;">
-          <span style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #facc15; background: rgba(250,204,21,0.15); border: 1px solid rgba(250,204,21,0.4); padding: 4px 12px; border-radius: 20px;">
-            ${isCooldown ? '🎉 ROUND COOLDOWN • STANDBY' : '🇯🇲 DIONLYONEE STREAM LOBBY'}
-          </span>
-          <span style="margin-left: 10px; font-family: monospace; font-size: 12px; font-weight: 800; color: #38bdf8; background: rgba(56,189,248,0.15); border: 1px solid rgba(56,189,248,0.4); padding: 4px 10px; border-radius: 10px;">
-            ROOM: ${roomCode}
-          </span>
-        </div>
-
-        <div style="max-height: 260px; overflow: hidden; border-radius: 12px; margin: 16px auto; max-width: 500px; border: 1px solid rgba(212,175,55,0.3);">
-          <img src="/dionlyonee-pon-di-app.png" alt="Dionlyonee Pon Di App" style="width: 100%; height: auto; display: block;" onerror="this.src='../../assets/images/dionlyonee-pon-di-app.png'" />
-        </div>
-
-        <h2 style="font-family: 'Cinzel', serif; font-size: 28px; color: #f7e07d; margin: 14px 0 8px 0; text-shadow: 0 0 20px rgba(247,224,125,0.4);">
-          ${isCooldown ? 'ROUND FINISHED • GET READY!' : 'WAITING FOR HOST TO START'}
-        </h2>
-        <p style="color: #94a3b8; font-size: 15px; max-width: 540px; margin: 0 auto; line-height: 1.5;">
-          ${isCooldown ? 'Host is reviewing contestant scores and preparing the next showdown.' : 'Host is setting up the questions. Buzzers are on standby!'}
-        </p>
-      </div>
-    `;
+    const titleEl = document.getElementById('waiting-title');
+    const subEl = document.getElementById('waiting-subtitle');
+    if (titleEl) {
+      titleEl.textContent = isCooldown ? 'ROUND FINISHED • GET READY!' : 'WAITING FOR HOST TO START';
+    }
+    if (subEl) {
+      subEl.textContent = isCooldown
+        ? 'Host is reviewing contestant scores and preparing the next showdown.'
+        : 'The Host is preparing the quiz board and contestants. Buzzers are on standby!';
+    }
   }
 
   window.addEventListener('DOMContentLoaded', init);
