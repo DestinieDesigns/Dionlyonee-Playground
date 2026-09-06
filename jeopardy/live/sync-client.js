@@ -771,7 +771,7 @@
               background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.12);
               padding: 9px 12px; border-radius: 8px; text-decoration: none; color: #ffffff; font-size: 12px; font-weight: 700;
             ">
-              <span>🎮 Host Controls (Passcode: Brown123)</span>
+              <span>🔒 Host Controls (Locked)</span>
               <span style="color: #facc15; font-size: 11px;">Open ↗</span>
             </a>
           </div>

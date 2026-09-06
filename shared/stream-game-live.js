@@ -129,19 +129,44 @@
           <div style="font-size: 38px; font-weight: 900; line-height: 1.35; color: #ffffff; max-width: 900px; margin: 0 auto; text-shadow: 0 4px 20px rgba(0,0,0,0.8);">
             "${p.setup || 'Waiting for host...'}"
           </div>
-          <div style="margin-top: 30px; font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
-            COMPLETE THE PUNCHLINE IN CHAT 💬
-          </div>
+          ${this.state.chatWinner ? `
+            <div style="margin-top: 30px; animation: fadeIn 0.4s ease-out; background: linear-gradient(135deg, rgba(212,175,55,0.25), rgba(16,185,129,0.2)); border: 2.5px solid #d4af37; border-radius: 18px; padding: 20px 28px; max-width: 780px; margin-left: auto; margin-right: auto; box-shadow: 0 0 35px rgba(212,175,55,0.6);">
+              <div style="font-size: 13px; font-weight: 900; letter-spacing: 3px; color: #f7e07d; text-transform: uppercase;">
+                👑 CHAT WINNER SPOTLIGHT
+              </div>
+              <div style="font-size: 28px; font-weight: 900; color: #ffffff; margin-top: 8px;">
+                "${this.state.chatWinner}"
+              </div>
+            </div>
+          ` : `
+            <div style="margin-top: 30px; font-size: 17px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
+              COMPLETE THE PUNCHLINE IN CHAT 💬
+            </div>
+          `}
         `;
       } else if (this.gameId === 'what-would-you-do') {
-        const opts = (p.options || []).map((opt, i) => `
-          <div style="background: rgba(14, 28, 30, 0.85); border: 1px solid rgba(212, 175, 55, 0.35); padding: 18px 24px; border-radius: 14px; text-align: left; display: flex; align-items: center; gap: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.4);">
-            <div style="width: 40px; height: 40px; border-radius: 10px; background: #d4af37; color: #000; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center;">
-              ${String.fromCharCode(65 + i)}
+        const votes = this.state.scenarioVotes || { A: 0, B: 0, C: 0, D: 0 };
+        const total = (votes.A + votes.B + votes.C + votes.D) || 1;
+        const opts = (p.options || []).map((opt, i) => {
+          const key = String.fromCharCode(65 + i);
+          const count = votes[key] || 0;
+          const pct = Math.round((count / total) * 100);
+          return `
+            <div style="position: relative; overflow: hidden; background: rgba(14, 28, 30, 0.85); border: 1.5px solid rgba(212, 175, 55, 0.35); padding: 18px 24px; border-radius: 14px; text-align: left; display: flex; align-items: center; justify-content: space-between; gap: 16px; box-shadow: 0 6px 20px rgba(0,0,0,0.4);">
+              <div style="position: absolute; left: 0; top: 0; bottom: 0; width: ${pct}%; background: rgba(56,189,248,0.12); z-index: 0; transition: width 0.3s ease;"></div>
+              <div style="position: relative; z-index: 1; display: flex; align-items: center; gap: 16px;">
+                <div style="width: 42px; height: 42px; border-radius: 10px; background: #d4af37; color: #000; font-size: 20px; font-weight: 900; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                  ${key}
+                </div>
+                <div style="font-size: 22px; font-weight: 800; color: #fff;">${opt}</div>
+              </div>
+              <div style="position: relative; z-index: 1; display: flex; flex-direction: column; align-items: flex-end;">
+                <span style="font-size: 22px; font-weight: 900; color: #38bdf8;">${pct}%</span>
+                <span style="font-size: 11px; font-weight: 800; color: #94a3b8;">${count} votes</span>
+              </div>
             </div>
-            <div style="font-size: 20px; font-weight: 800; color: #fff;">${opt}</div>
-          </div>
-        `).join('');
+          `;
+        }).join('');
 
         contentEl.innerHTML = `
           <div style="font-size: 30px; font-weight: 900; line-height: 1.35; color: #f7e07d; max-width: 920px; margin: 0 auto 35px; text-shadow: 0 4px 20px rgba(0,0,0,0.8);">
@@ -152,11 +177,15 @@
           </div>
         `;
       } else if (this.gameId === 'who-would-you-pick') {
-        const choices = (p.choices || []).map((c) => `
-          <div style="background: rgba(14, 28, 30, 0.9); border: 2px solid #d4af37; padding: 22px 28px; border-radius: 16px; font-size: 24px; font-weight: 900; color: #ffffff; box-shadow: 0 8px 25px rgba(212,175,55,0.2); text-align: center;">
-            ${c}
-          </div>
-        `).join('');
+        const choices = (p.choices || []).map((c) => {
+          const isSelected = this.state.selectedPick === c;
+          return `
+            <div style="background: ${isSelected ? 'linear-gradient(135deg, rgba(212,175,55,0.35), rgba(14,28,30,0.95))' : 'rgba(14, 28, 30, 0.9)'}; border: 2.5px solid ${isSelected ? '#d4af37' : 'rgba(212,175,55,0.4)'}; padding: 24px 28px; border-radius: 18px; font-size: 24px; font-weight: 900; color: #ffffff; box-shadow: ${isSelected ? '0 0 35px rgba(212,175,55,0.7)' : '0 8px 25px rgba(0,0,0,0.3)'}; text-align: center; transform: ${isSelected ? 'scale(1.04)' : 'scale(1)'}; transition: all 0.3s ease;">
+              ${isSelected ? '<div style="font-size: 11px; font-weight: 900; letter-spacing: 2px; color: #f7e07d; margin-bottom: 6px;">👑 WINNING DRAFT PICK</div>' : ''}
+              ${c}
+            </div>
+          `;
+        }).join('');
 
         contentEl.innerHTML = `
           <div style="font-size: 34px; font-weight: 900; line-height: 1.35; color: #ffffff; max-width: 900px; margin: 0 auto 35px;">
@@ -167,36 +196,52 @@
           </div>
         `;
       } else if (this.gameId === 'emoji-guess') {
+        const rawAns = (p.answer || '').toUpperCase();
+        const hintCount = this.state.emojiLetterHintCount || 0;
+        const letterBoxes = rawAns.split('').map((ch, idx) => {
+          if (ch === ' ') return '<span style="display:inline-block; width:14px;"></span>';
+          const isFirstLetterOfWord = idx === 0 || rawAns[idx - 1] === ' ';
+          const showThisLetter = this.state.revealedAnswer || (hintCount >= 1 && isFirstLetterOfWord) || (hintCount >= 2 && (idx % 2 === 0));
+          return `
+            <div style="width: 48px; height: 58px; background: rgba(14,28,30,0.85); border-bottom: 4px solid ${showThisLetter ? '#10b981' : '#d4af37'}; border-radius: 8px 8px 0 0; display: inline-flex; align-items: center; justify-content: center; font-size: 30px; font-weight: 900; color: ${showThisLetter ? '#ffffff' : 'rgba(255,255,255,0.1)'}; margin: 0 4px; box-shadow: 0 4px 15px rgba(0,0,0,0.4);">
+              ${showThisLetter ? ch : ''}
+            </div>
+          `;
+        }).join('');
+
         contentEl.innerHTML = `
-          <div style="font-size: 80px; letter-spacing: 12px; margin: 20px 0; filter: drop-shadow(0 8px 25px rgba(0,0,0,0.6));">
+          <div style="font-size: 84px; letter-spacing: 12px; margin: 15px 0; filter: drop-shadow(0 8px 25px rgba(0,0,0,0.6));">
             ${p.emojis || ''}
           </div>
-          <div style="font-size: 20px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; margin-top: 15px;">
+          <div style="display: flex; justify-content: center; flex-wrap: wrap; margin: 20px 0;">
+            ${letterBoxes}
+          </div>
+          <div style="font-size: 20px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; margin-top: 10px;">
             HINT: ${p.hint || ''}
           </div>
           ${this.state.revealedAnswer ? `
-            <div style="margin-top: 25px; padding: 14px 30px; background: #d4af37; color: #020303; font-size: 28px; font-weight: 900; letter-spacing: 4px; border-radius: 12px; display: inline-block; box-shadow: 0 0 30px rgba(212,175,55,0.6);">
-              ANSWER: ${p.answer}
+            <div style="margin-top: 25px; padding: 16px 36px; background: linear-gradient(135deg, #d4af37, #f7e07d); color: #020303; font-size: 30px; font-weight: 900; letter-spacing: 4px; border-radius: 14px; display: inline-block; box-shadow: 0 0 35px rgba(212,175,55,0.7);">
+              ANSWER: ${p.answer} 🎉
             </div>
           ` : ''}
         `;
       } else if (this.gameId === 'unscramble-it') {
         const letters = (p.scrambled || '').split(' ').map((l) => `
-          <div style="width: 56px; height: 68px; background: rgba(14,28,30,0.9); border: 2px solid #38bdf8; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 32px; font-weight: 900; color: #38bdf8; box-shadow: 0 0 15px rgba(56,189,248,0.3);">
+          <div style="width: 58px; height: 70px; background: rgba(14,28,30,0.9); border: 2.5px solid #38bdf8; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 34px; font-weight: 900; color: #38bdf8; box-shadow: 0 0 20px rgba(56,189,248,0.4);">
             ${l}
           </div>
         `).join('');
 
         contentEl.innerHTML = `
-          <div style="display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px;">
+          <div style="display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; margin-bottom: 25px;">
             ${letters}
           </div>
           <div style="font-size: 20px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
             HINT: ${p.hint || ''}
           </div>
           ${this.state.revealedAnswer ? `
-            <div style="margin-top: 25px; padding: 14px 30px; background: #10b981; color: #ffffff; font-size: 28px; font-weight: 900; letter-spacing: 4px; border-radius: 12px; display: inline-block; box-shadow: 0 0 30px rgba(16,185,129,0.5);">
-              UNSCRAMBLED: ${p.answer}
+            <div style="margin-top: 25px; padding: 16px 36px; background: #10b981; color: #ffffff; font-size: 30px; font-weight: 900; letter-spacing: 4px; border-radius: 14px; display: inline-block; box-shadow: 0 0 35px rgba(16,185,129,0.7);">
+              UNSCRAMBLED: ${p.answer} 🎉
             </div>
           ` : ''}
         `;
@@ -523,6 +568,126 @@
                 <div style="font-size: 48px; font-weight: 900; color: #f43f5e;">${pctB}%</div>
                 <div style="font-size: 11px; font-weight: 800; letter-spacing: 2px; color: #94a3b8;">${this.state.votes.optionB || 0} VOTES</div>
               </div>
+            </div>
+          </div>
+        `;
+      } else if (this.gameId === 'guess-the-lyrics') {
+        const rawAns = (p.missingLyrics || '').toUpperCase();
+        const isRevealed = this.state.revealedAnswer;
+        const showMeta = this.state.showLyricsSongArtist || isRevealed;
+        const showEra = this.state.showLyricsEra;
+        const showFirstLetter = this.state.showLyricsFirstLetter;
+
+        let blanksHtml = '';
+        if (isRevealed) {
+          blanksHtml = `
+            <div style="margin-top: 30px; padding: 22px 36px; background: linear-gradient(135deg, rgba(16,185,129,0.3), rgba(212,175,55,0.35)); border: 3px solid #10b981; border-radius: 20px; color: #ffffff; font-size: 36px; font-weight: 900; letter-spacing: 3px; text-shadow: 0 0 30px rgba(16,185,129,0.9); display: inline-block; box-shadow: 0 0 50px rgba(16,185,129,0.6);">
+              🎶 "${p.missingLyrics}" 🎶
+            </div>
+            <div style="margin-top: 14px; font-size: 22px; font-weight: 800; color: #f7e07d; letter-spacing: 2px;">
+              From <span style="color:#fff;">"${p.song}"</span> by <span style="color:#38bdf8;">${p.artist}</span> ${p.year ? `(${p.year})` : ''}
+            </div>
+          `;
+        } else if (showFirstLetter) {
+          const letterHints = rawAns.split(' ').map(w => {
+            if (!w) return '';
+            const first = w[0];
+            const rest = '_'.repeat(Math.max(1, w.length - 1));
+            return `<span style="display:inline-block; margin:0 8px; font-family:monospace; letter-spacing:4px; font-size:32px; color:#38bdf8; font-weight:900; text-shadow:0 0 15px rgba(56,189,248,0.7);">${first}${rest}</span>`;
+          }).join(' ');
+          blanksHtml = `
+            <div style="margin-top: 26px; padding: 18px 28px; background: rgba(0,0,0,0.55); border: 2.5px dashed #38bdf8; border-radius: 18px; display: inline-block; box-shadow: 0 0 30px rgba(56,189,248,0.3);">
+              <div style="font-size: 13px; font-weight: 900; color: #38bdf8; letter-spacing: 3px; margin-bottom: 8px;">🔤 FIRST LETTER HINTS:</div>
+              <div>${letterHints}</div>
+            </div>
+            <div style="margin-top: 16px; font-size: 16px; font-weight: 800; letter-spacing: 3px; color: #d4af37;">
+              💬 GUESS THE MISSING LYRIC IN STREAM CHAT!
+            </div>
+          `;
+        } else {
+          blanksHtml = `
+            <div style="margin-top: 28px; padding: 20px 36px; background: rgba(0,0,0,0.5); border: 2.5px dashed rgba(212,175,55,0.6); border-radius: 20px; color: #f7e07d; font-size: 28px; font-weight: 900; letter-spacing: 4px; display: inline-block; box-shadow: 0 0 35px rgba(212,175,55,0.25);">
+              [ 🎵 ___________________________________ ? ]
+            </div>
+            <div style="margin-top: 18px; font-size: 18px; font-weight: 800; letter-spacing: 3px; color: #38bdf8; text-shadow: 0 0 15px rgba(56,189,248,0.5);">
+              💬 FINISH THE LYRIC IN STREAM CHAT!
+            </div>
+          `;
+        }
+
+        contentEl.innerHTML = `
+          <div style="max-width: 950px; width: 100%; margin: 0 auto; text-align: center;">
+            <!-- Category & Genre Badges -->
+            <div style="display: flex; justify-content: center; gap: 12px; align-items: center; margin-bottom: 20px; flex-wrap: wrap;">
+              <span style="background: linear-gradient(135deg, rgba(212,175,55,0.3), rgba(247,224,125,0.15)); border: 1.5px solid #d4af37; color: #f7e07d; padding: 6px 18px; border-radius: 9999px; font-size: 13px; font-weight: 900; letter-spacing: 2.5px;">
+                🎵 ${p.category || 'R&B TO GOSPEL'}
+              </span>
+              <span style="background: rgba(56,189,248,0.18); border: 1.5px solid #38bdf8; color: #7dd3fc; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 2px;">
+                ${p.genre || 'Soul'}
+              </span>
+              ${(showEra && !showMeta) ? `
+                <span style="background: rgba(167,243,208,0.18); border: 1.5px solid #10b981; color: #a7f3d0; padding: 6px 16px; border-radius: 9999px; font-size: 12px; font-weight: 800; letter-spacing: 2px;">
+                  📅 ${p.year || 'Classic Era'}
+                </span>
+              ` : ''}
+            </div>
+
+            <!-- Song & Artist Revealed Header (if unlocked by host) -->
+            ${showMeta ? `
+              <div style="margin-bottom: 22px; padding: 14px 24px; background: rgba(14,28,30,0.9); border: 2px solid #d4af37; border-radius: 16px; display: inline-flex; align-items: center; gap: 14px; box-shadow: 0 0 30px rgba(212,175,55,0.35);">
+                <span style="font-size: 28px;">🎤</span>
+                <span style="font-size: 24px; font-weight: 900; color: #f7e07d; letter-spacing: 1px;">"${p.song}"</span>
+                <span style="font-size: 20px; font-weight: 800; color: #ffffff;">by ${p.artist}</span>
+                ${p.year ? `<span style="font-size: 14px; color: #94a3b8; background: rgba(0,0,0,0.4); padding: 4px 10px; border-radius: 8px;">${p.year}</span>` : ''}
+              </div>
+            ` : ''}
+
+            <!-- Main Lyrics Snippet Box -->
+            <div style="background: radial-gradient(circle at center, rgba(18,36,40,0.95), rgba(7,16,18,0.98)); border: 2.5px solid rgba(212,175,55,0.45); border-radius: 24px; padding: 40px 36px; box-shadow: 0 15px 50px rgba(0,0,0,0.7), inset 0 0 60px rgba(212,175,55,0.06);">
+              <div style="font-size: 13px; font-weight: 900; letter-spacing: 4px; color: #d4af37; margin-bottom: 16px; text-transform: uppercase;">
+                SING THE NEXT LINE:
+              </div>
+              <div style="font-size: 34px; font-weight: 900; line-height: 1.45; color: #ffffff; font-style: italic; text-shadow: 0 2px 10px rgba(0,0,0,0.8); max-width: 820px; margin: 0 auto;">
+                "${p.lyricsSnippet}"
+              </div>
+              ${blanksHtml}
+            </div>
+
+            <!-- Hint if available -->
+            ${(p.hint && this.state.showChatClue) ? `
+              <div style="margin-top: 20px; font-size: 18px; font-weight: 800; color: #facc15; letter-spacing: 2px;">
+                💡 CLUE: ${p.hint}
+              </div>
+            ` : ''}
+          </div>
+        `;
+      }
+
+      // Contestant Scoreboard Podium Dock (shown across all stream games when toggled by host)
+      if (this.state.showScoreboard && this.state.contestants && this.state.contestants.length) {
+        const sorted = [...this.state.contestants].sort((a, b) => b.score - a.score);
+        const topScore = sorted[0]?.score || 0;
+        const scorePodiumsHtml = this.state.contestants.map((c) => {
+          const isLeader = topScore > 0 && c.score === topScore;
+          return `
+            <div style="background: rgba(14,28,30,0.92); border: 2px solid ${isLeader ? '#d4af37' : 'rgba(212,175,55,0.3)'}; border-radius: 14px; padding: 10px 20px; min-width: 150px; text-align: center; box-shadow: ${isLeader ? '0 0 25px rgba(212,175,55,0.45)' : '0 4px 15px rgba(0,0,0,0.5)'};">
+              <div style="font-size: 11px; font-weight: 900; color: ${isLeader ? '#f7e07d' : '#94a3b8'}; letter-spacing: 1.5px;">
+                ${isLeader ? '👑 ' : ''}${c.name.toUpperCase()}
+              </div>
+              <div style="font-size: 28px; font-weight: 900; color: #ffffff; line-height: 1.1; margin-top: 4px;">
+                ${c.score} <span style="font-size: 11px; color: #d4af37; font-weight: 800;">PTS</span>
+              </div>
+            </div>
+          `;
+        }).join('');
+
+        contentEl.innerHTML += `
+          <div style="margin-top: 40px; display: flex; flex-direction: column; align-items: center; gap: 10px; width: 100%;">
+            <div style="font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #d4af37; text-transform: uppercase;">
+              🏆 AUDIENCE PODIUM SCOREBOARD
+            </div>
+            <div style="display: flex; gap: 14px; justify-content: center; flex-wrap: wrap;">
+              ${scorePodiumsHtml}
             </div>
           </div>
         `;

@@ -26,11 +26,40 @@
       this.isRunning = false;
       this.revealedClues = 1; // for who-dis
       this.revealedAnswer = false;
+
+      // Detect Solo / Single Player mode from URL
+      const urlParams = new URLSearchParams(window.location.search);
+      this.isSolo = urlParams.get('singleplayer') === 'true' || urlParams.get('solo') === 'true';
+      this.soloFeedback = null;
+
       this.votes = { optionA: 0, optionB: 0 };
       this.showWordCount = false;
       this.showChatClue = false;
       this.charadesReaction = null;
       this.charadesReactionTimer = null;
+      this.chatWinner = '';
+      this.emojiLetterHintCount = 0;
+      this.selectedPick = null;
+      this.scenarioVotes = { A: 0, B: 0, C: 0, D: 0 };
+      this.showLyricsSongArtist = false;
+      this.showLyricsFirstLetter = false;
+      this.showLyricsEra = false;
+      this.showScoreboard = true;
+
+      // Contestants Scoreboard (persisted in session)
+      this.contestants = [
+        { id: 1, name: 'Player 1', score: 0 },
+        { id: 2, name: 'Player 2', score: 0 },
+        { id: 3, name: 'Player 3', score: 0 }
+      ];
+      try {
+        const savedContestants = sessionStorage.getItem('dion_stream_contestants');
+        if (savedContestants) {
+          const parsed = JSON.parse(savedContestants);
+          if (Array.isArray(parsed) && parsed.length) this.contestants = parsed;
+        }
+      } catch (e) {}
+
       this.hangmanState = {
         guessedLetters: [],
         strikes: 0,
@@ -73,6 +102,15 @@
 
     getPromptTitle(p, index) {
       if (!p) return `Question ${index + 1}`;
+      if (this.isSolo) {
+        if (this.gameId === 'emoji-guess') return p.emojis ? `${p.emojis} (Emoji Puzzle #${index + 1})` : `Emoji Puzzle #${index + 1}`;
+        if (this.gameId === 'unscramble-it') return p.scrambled ? `${p.scrambled} (Puzzle #${index + 1})` : `Puzzle #${index + 1}`;
+        if (this.gameId === 'who-dis') return `Mystery Target #${index + 1}`;
+        if (this.gameId === 'hangman') return `Mystery Word #${index + 1} (${(p.word || '').length} letters)`;
+        if (this.gameId === 'charades') return `Acting Challenge #${index + 1}`;
+        if (this.gameId === 'guess-the-lyrics') return `Lyric Challenge #${index + 1} (${p.genre || p.category || 'Song'})`;
+      }
+      if (p.song) return `"${p.song}" - ${p.artist || ''}`;
       if (p.setup) return p.setup;
       if (p.scenario) return p.scenario.length > 55 ? p.scenario.substring(0, 52) + '...' : p.scenario;
       if (p.question) return p.question.length > 55 ? p.question.substring(0, 52) + '...' : p.question;
@@ -148,18 +186,24 @@
       const header = document.getElementById('host-header');
       if (!header) return;
       header.innerHTML = `
-        <div class="host-logo">D</div>
+        <div class="host-logo">${this.isSolo ? '👤' : 'D'}</div>
         <div>
           <div class="host-title">DIONLYONEE PLAYGROUND</div>
-          <div class="host-game">${this.gameMeta.title} • HOST CONTROLLER</div>
+          <div class="host-game">${this.gameMeta.title} • ${this.isSolo ? 'SOLO PLAYER MODE' : 'HOST CONTROLLER'}</div>
         </div>
-        <div style="margin-left: auto; display: flex; gap: 8px;">
-          <button type="button" class="time-button" onclick="window.RoomUI ? window.RoomUI.showRoomCreatedModal('${this.gameId}') : (window.location.href='/remote.html?game=${this.gameId}')" style="background: linear-gradient(135deg, #d97706, #b45309); border-color: #facc15; color: #ffffff; font-weight: 800;">
-            📱 PHONE CONTROLLER
-          </button>
-          <button type="button" class="time-button" onclick="window.gameHost.openLiveWindow()" style="background: rgba(212,175,55,0.2); border-color: #d4af37;">
-            📺 OPEN LIVE STAGE ↗
-          </button>
+        <div style="margin-left: auto; display: flex; gap: 8px; align-items: center;">
+          ${this.isSolo ? `
+            <span style="background: rgba(16,185,129,0.2); border: 1px solid #10b981; color: #34d399; padding: 6px 14px; border-radius: 8px; font-size: 11px; font-weight: 800; display: inline-flex; align-items: center; gap: 4px;">
+              👤 SOLO PLAY ACTIVE (ANSWERS HIDDEN)
+            </span>
+          ` : `
+            <button type="button" class="time-button" onclick="window.RoomUI ? window.RoomUI.showRoomCreatedModal('${this.gameId}') : (window.location.href='/remote.html?game=${this.gameId}')" style="background: linear-gradient(135deg, #d97706, #b45309); border-color: #facc15; color: #ffffff; font-weight: 800;">
+              📱 PHONE CONTROLLER
+            </button>
+            <button type="button" class="time-button" onclick="window.gameHost.openLiveWindow()" style="background: rgba(212,175,55,0.2); border-color: #d4af37;">
+              📺 OPEN LIVE STAGE ↗
+            </button>
+          `}
         </div>
       `;
     }
@@ -244,12 +288,98 @@
             <button type="button" class="cooldown-button" onclick="window.gameHost.playSound('solve')">🎉 SOLVE</button>
           </div>
         </div>
+        ${this.renderScoreDockHtml()}
       `;
+    }
+
+    renderScoreDockHtml() {
+      return `
+        <div class="host-category-bar" style="border-color: rgba(212,175,55,0.4); background: rgba(14,28,30,0.92); margin-top: 15px; border-radius: 12px; padding: 12px 14px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; flex-wrap: wrap; gap: 8px;">
+            <div class="host-label" style="margin-bottom: 0; color: #f7e07d; font-size: 11px; letter-spacing: 2px;">
+              👥 CONTESTANT PODIUMS & LIVE SCORES
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button type="button" class="time-button" style="font-size: 11px; padding: 4px 10px;" onclick="window.gameHost.toggleScoreboard()">
+                ${this.showScoreboard ? '📺 SCOREBOARD: VISIBLE' : '📺 SCOREBOARD: HIDDEN'}
+              </button>
+              <button type="button" class="time-button" style="font-size: 11px; padding: 4px 10px; background: rgba(239,68,68,0.15); border-color: #ef4444; color: #fca5a5;" onclick="window.gameHost.resetScores()">
+                🔄 RESET
+              </button>
+            </div>
+          </div>
+          <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 10px;">
+            ${this.contestants.map(c => `
+              <div style="background: rgba(0,0,0,0.45); border: 1.5px solid rgba(212,175,55,0.3); border-radius: 10px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <input type="text" value="${c.name}" style="background: transparent; border: none; border-bottom: 1px dashed rgba(212,175,55,0.5); color: #fff; font-weight: 800; font-size: 13px; width: 110px; padding: 2px 4px;" onchange="window.gameHost.updateContestantName(${c.id}, this.value)" title="Click to rename player" />
+                  <span style="font-size: 20px; font-weight: 900; color: #d4af37;">${c.score} <small style="font-size: 10px; color: #94a3b8;">PTS</small></span>
+                </div>
+                <div style="display: flex; gap: 4px; flex-wrap: wrap; align-items: center;">
+                  <button type="button" class="time-button" style="padding: 4px 7px; font-size: 11px; font-weight: 900; background: rgba(16,185,129,0.2); border-color: #10b981; color: #6ee7b7;" onclick="window.gameHost.addContestantScore(${c.id}, 100)">+100</button>
+                  <button type="button" class="time-button" style="padding: 4px 7px; font-size: 11px; font-weight: 900; background: rgba(16,185,129,0.3); border-color: #10b981; color: #34d399;" onclick="window.gameHost.addContestantScore(${c.id}, 500)">+500</button>
+                  <button type="button" class="time-button" style="padding: 4px 7px; font-size: 11px; font-weight: 900; background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #7dd3fc;" onclick="window.gameHost.addContestantScore(${c.id}, 1)">+1 Pt</button>
+                  <button type="button" class="time-button" style="padding: 4px 7px; font-size: 11px; font-weight: 900; background: rgba(239,68,68,0.2); border-color: #ef4444; color: #fca5a5;" onclick="window.gameHost.addContestantScore(${c.id}, -100)">-100</button>
+                  <button type="button" class="time-button" style="padding: 4px 8px; font-size: 10px; font-weight: 900; background: linear-gradient(135deg, #d4af37, #b89628); color: #000; margin-left: auto;" onclick="window.gameHost.awardAndNext(${c.id}, 100)" title="Award +100 and advance to next question">🏆 WIN & NEXT</button>
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    updateContestantName(id, newName) {
+      const c = this.contestants.find(item => item.id === id);
+      if (c && newName.trim()) {
+        c.name = newName.trim();
+        this.saveContestants();
+        this.broadcastState();
+      }
+    }
+
+    addContestantScore(id, amount) {
+      const c = this.contestants.find(item => item.id === id);
+      if (c) {
+        c.score = Math.max(0, c.score + amount);
+        this.saveContestants();
+        this.renderControls();
+        if (amount > 0) this.playSound('correct');
+        this.broadcastState();
+      }
+    }
+
+    awardAndNext(id, amount = 100) {
+      this.addContestantScore(id, amount);
+      this.playSound('solve');
+      setTimeout(() => {
+        this.nextPrompt();
+      }, 700);
+    }
+
+    resetScores() {
+      this.contestants.forEach(c => c.score = 0);
+      this.saveContestants();
+      this.renderControls();
+      this.broadcastState();
+    }
+
+    toggleScoreboard() {
+      this.showScoreboard = !this.showScoreboard;
+      this.renderControls();
+      this.broadcastState();
+    }
+
+    saveContestants() {
+      try {
+        sessionStorage.setItem('dion_stream_contestants', JSON.stringify(this.contestants));
+      } catch (e) {}
     }
 
     onCategoryChange(cat) {
       this.selectedCategory = cat;
       const filtered = this.getFilteredIndices();
+      this.soloFeedback = null;
       if (!filtered.includes(this.currentIndex)) {
         this.currentIndex = filtered[0] || 0;
         this.remainingSeconds = this.timerSeconds;
@@ -260,6 +390,9 @@
         this.showChatClue = false;
         this.charadesReaction = null;
         if (this.charadesReactionTimer) clearTimeout(this.charadesReactionTimer);
+        this.showLyricsSongArtist = false;
+        this.showLyricsFirstLetter = false;
+        this.showLyricsEra = false;
       }
       if (this.gameId === 'hangman') {
         this.hangmanState = {
@@ -279,6 +412,7 @@
       const idx = parseInt(indexStr, 10);
       if (isNaN(idx) || idx < 0 || idx >= this.prompts.length) return;
       this.currentIndex = idx;
+      this.soloFeedback = null;
       this.showWaitingScreen = false;
       this.remainingSeconds = this.timerSeconds;
       this.revealedClues = 1;
@@ -288,6 +422,9 @@
       this.showChatClue = false;
       this.charadesReaction = null;
       if (this.charadesReactionTimer) clearTimeout(this.charadesReactionTimer);
+      this.showLyricsSongArtist = false;
+      this.showLyricsFirstLetter = false;
+      this.showLyricsEra = false;
       if (this.gameId === 'hangman') {
         this.hangmanState = {
           guessedLetters: [],
@@ -334,80 +471,251 @@
 
       if (this.gameId === 'finish-the-sentence') {
         html = `
-          <div class="host-status">
-            <div>
-              <div class="host-label">CATEGORY: ${p.category || 'GENERAL'} (${this.currentIndex + 1}/${this.prompts.length})</div>
-              <div class="host-category" style="font-size: 24px; color: #f7e07d;">"${p.setup}"</div>
+          <div class="host-status" style="flex-direction: column; align-items: stretch; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px;">
+              <div>
+                <div class="host-label">CATEGORY: ${p.category || 'GENERAL'} (${this.currentIndex + 1}/${this.prompts.length})</div>
+                <div class="host-category" style="font-size: 26px; color: #f7e07d; margin-top: 4px;">"${p.setup}"</div>
+              </div>
+              <div style="text-align: right;">
+                <div class="host-label">TIMER</div>
+                <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+              </div>
             </div>
-            <div style="text-align: right;">
-              <div class="host-label">TIMER</div>
-              <div class="host-timer" id="timer-display">${this.remainingSeconds}</div>
+            
+            <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 14px 18px;">
+              <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 2px; margin-bottom: 8px;">
+                🏆 SPOTLIGHT WINNING CHAT PUNCHLINE:
+              </div>
+              <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+                <input type="text" id="input-chat-winner" placeholder="Enter winning chat punchline or username..." value="${this.chatWinner || ''}" style="flex: 1; min-width: 200px; background: rgba(255,255,255,0.08); border: 1px solid rgba(212,175,55,0.4); border-radius: 8px; color: #fff; padding: 8px 12px; font-weight: 700; font-size: 14px;" />
+                <button type="button" class="time-button" onclick="window.gameHost.setChatWinner(document.getElementById('input-chat-winner').value)" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; padding: 8px 16px;">🏆 CROWN WINNER</button>
+                <button type="button" class="time-button" onclick="window.gameHost.clearChatWinner()" style="background: rgba(255,255,255,0.08); font-size: 11px;">✕ Clear</button>
+              </div>
             </div>
           </div>
         `;
       } else if (this.gameId === 'what-would-you-do') {
-        const opts = (p.options || []).map((opt, i) => `<li style="margin: 6px 0; color: #fff;"><b>${String.fromCharCode(65 + i)}:</b> ${opt}</li>`).join('');
+        const votes = this.scenarioVotes || { A: 0, B: 0, C: 0, D: 0 };
+        const total = (votes.A + votes.B + votes.C + votes.D) || 1;
+        const opts = (p.options || []).map((opt, i) => {
+          const key = String.fromCharCode(65 + i);
+          const count = votes[key] || 0;
+          const pct = Math.round((count / total) * 100);
+          return `
+            <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(255,255,255,0.04); border: 1px solid rgba(212,175,55,0.25); border-radius: 10px; padding: 10px 14px; margin: 6px 0; gap: 10px; flex-wrap: wrap;">
+              <div>
+                <b style="color: #d4af37; margin-right: 8px; font-size: 16px;">${key}:</b> <span style="color: #fff; font-weight: 700;">${opt}</span>
+              </div>
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 12px; color: #38bdf8; font-weight: 800;">${count} votes (${pct}%)</span>
+                <button type="button" class="time-button" style="padding: 3px 8px; font-size: 11px;" onclick="window.gameHost.voteScenario('${key}', 1)">+1</button>
+                <button type="button" class="time-button" style="padding: 3px 8px; font-size: 11px;" onclick="window.gameHost.voteScenario('${key}', 5)">+5</button>
+              </div>
+            </div>
+          `;
+        }).join('');
+
         html = `
-          <div class="host-status" style="flex-direction: column; align-items: flex-start;">
-            <div class="host-label">SCENARIO (${this.currentIndex + 1}/${this.prompts.length})</div>
-            <div class="host-category" style="font-size: 20px; line-height: 1.4; margin: 8px 0;">"${p.scenario}"</div>
-            <ul style="padding-left: 20px; margin-top: 10px;">${opts}</ul>
+          <div class="host-status" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div class="host-label">SCENARIO (${this.currentIndex + 1}/${this.prompts.length})</div>
+              <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+            </div>
+            <div class="host-category" style="font-size: 22px; line-height: 1.4; color: #f7e07d;">"${p.scenario}"</div>
+            <div style="width: 100%; margin-top: 6px;">${opts}</div>
+            <button type="button" class="time-button" style="font-size: 11px; padding: 4px 10px;" onclick="window.gameHost.resetScenarioVotes()">🔄 RESET SCENARIO VOTES</button>
           </div>
         `;
       } else if (this.gameId === 'who-would-you-pick') {
-        const choices = (p.choices || []).map((c, i) => `<span style="background: rgba(212,175,55,0.15); border: 1px solid #d4af37; padding: 6px 14px; border-radius: 20px; font-weight: 800; margin: 4px; display: inline-block;">${c}</span>`).join(' ');
+        const choices = (p.choices || []).map((c) => {
+          const isSelected = this.selectedPick === c;
+          return `
+            <button type="button" class="time-button" onclick="window.gameHost.selectPickChoice('${c.replace(/'/g, "\\'")}')" style="background: ${isSelected ? 'linear-gradient(135deg, #d4af37, #f7e07d)' : 'rgba(212,175,55,0.15)'}; border: 2px solid #d4af37; color: ${isSelected ? '#000' : '#fff'}; font-size: 15px; font-weight: 900; padding: 10px 18px; border-radius: 20px; margin: 4px; box-shadow: ${isSelected ? '0 0 20px rgba(212,175,55,0.6)' : 'none'}; cursor: pointer;">
+              ${isSelected ? '👑 ' : ''}${c}
+            </button>
+          `;
+        }).join('');
+
         html = `
-          <div class="host-status" style="flex-direction: column; align-items: flex-start;">
-            <div class="host-label">DRAFT DILEMMA (${this.currentIndex + 1}/${this.prompts.length})</div>
-            <div class="host-category" style="font-size: 22px; margin: 8px 0;">${p.question}</div>
-            <div style="margin-top: 12px;">${choices}</div>
+          <div class="host-status" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div class="host-label">DRAFT DILEMMA (${this.currentIndex + 1}/${this.prompts.length})</div>
+              <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+            </div>
+            <div class="host-category" style="font-size: 24px; color: #f7e07d;">${p.question}</div>
+            <div style="font-size: 11px; font-weight: 800; color: #94a3b8; margin-top: 4px;">CLICK A CHOICE TO CROWN THE WINNING PICK ON AUDIENCE STAGE:</div>
+            <div style="margin-top: 8px; display: flex; flex-wrap: wrap;">${choices}</div>
           </div>
         `;
       } else if (this.gameId === 'emoji-guess') {
-        html = `
-          <div class="host-status">
-            <div>
-              <div class="host-label">EMOJIS (${this.currentIndex + 1}/${this.prompts.length})</div>
-              <div style="font-size: 48px; margin: 10px 0;">${p.emojis}</div>
-              <div class="host-revealed">HINT: ${p.hint || ''}</div>
-              <div class="host-answer" style="margin-top: 8px;">ANSWER: ${p.answer}</div>
+        const rawAns = (p.answer || '').toUpperCase();
+        const hintCount = this.emojiLetterHintCount || 0;
+        const isSolvedOrRevealed = this.revealedAnswer;
+        const letterBoxes = rawAns.split('').map((ch, idx) => {
+          if (ch === ' ') return '<span style="display:inline-block; width:12px;"></span>';
+          const isFirstLetterOfWord = idx === 0 || rawAns[idx - 1] === ' ';
+          const showThisLetter = isSolvedOrRevealed || (hintCount >= 1 && isFirstLetterOfWord) || (hintCount >= 2 && (idx % 2 === 0));
+          return `<span style="display:inline-flex; width:28px; height:34px; border-bottom:3px solid ${showThisLetter ? '#10b981' : '#d4af37'}; align-items:center; justify-content:center; font-weight:900; font-size:18px; color:${showThisLetter ? '#fff' : 'rgba(255,255,255,0.2)'}; background:rgba(0,0,0,0.35); border-radius:6px; margin:0 2px;">${showThisLetter ? ch : '_'}</span>`;
+        }).join('');
+
+        const answerSection = this.isSolo ? `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid ${isSolvedOrRevealed ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.3)'}; border-radius: 12px; padding: 16px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: ${isSolvedOrRevealed ? '#10b981' : '#38bdf8'}; letter-spacing: 2px;">
+              ${isSolvedOrRevealed ? '🎉 ANSWER REVEALED:' : '🔒 GUESS THE EMOJIS (SOLO MODE):'}
             </div>
-            <div style="text-align: right;">
-              <div class="host-label">TIMER</div>
-              <div class="host-timer" id="timer-display">${this.remainingSeconds}</div>
+            ${isSolvedOrRevealed ? `
+              <div style="font-size: 26px; font-weight: 900; color: #10b981; margin-top: 4px;">${p.answer}</div>
+            ` : `
+              <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <input id="solo-guess-input" type="text" placeholder="Type your guess here..." style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px;" onkeydown="if(event.key==='Enter') window.gameHost.checkSoloGuess()" />
+                <button type="button" class="time-button" onclick="window.gameHost.checkSoloGuess()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; border: none; padding: 0 16px;">
+                  🎯 SUBMIT
+                </button>
+              </div>
+            `}
+            ${this.soloFeedback ? `
+              <div style="margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; background: ${this.soloFeedback.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${this.soloFeedback.success ? '#34d399' : '#f87171'}; border: 1px solid ${this.soloFeedback.success ? '#10b981' : '#ef4444'};">
+                ${this.soloFeedback.message}
+              </div>
+            ` : ''}
+            <div style="margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center;">${letterBoxes}</div>
+            <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 10px;">💡 CLUE: ${p.hint || 'Decode the emojis!'}</div>
+          </div>
+        ` : `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 14px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: #f59e0b; letter-spacing: 2px;">SECRET ANSWER (HOST ONLY):</div>
+            <div style="font-size: 24px; font-weight: 900; color: #ffffff; margin-top: 4px;">${p.answer}</div>
+            <div style="margin-top: 10px; display: flex; flex-wrap: wrap; align-items: center;">${letterBoxes}</div>
+            <div style="font-size: 13px; color: #38bdf8; font-weight: 700; margin-top: 8px;">💡 CLUE: ${p.hint || ''}</div>
+          </div>
+        `;
+
+        html = `
+          <div class="host-status" style="flex-direction: column; align-items: stretch; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="host-label">EMOJIS (${this.currentIndex + 1}/${this.prompts.length})</div>
+                <div style="font-size: 52px; margin: 6px 0;">${p.emojis}</div>
+              </div>
+              <div style="text-align: right;">
+                <div class="host-label">TIMER</div>
+                <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+              </div>
+            </div>
+            ${answerSection}
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="time-button" onclick="window.gameHost.revealEmojiLetter()" style="background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #7dd3fc; font-weight: 800;">
+                💡 REVEAL 1ST LETTER (${hintCount >= 1 ? 'ACTIVE' : 'OFF'})
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.toggleAnswerReveal()" style="background: ${this.revealedAnswer ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #d4af37, #b89628)'}; color: #000; font-weight: 900;">
+                ${this.revealedAnswer ? '🎉 ANSWER REVEALED (HIDE)' : (this.isSolo ? '👁️ GIVE UP & REVEAL ANSWER' : '🏆 REVEAL FULL ANSWER')}
+              </button>
             </div>
           </div>
         `;
       } else if (this.gameId === 'unscramble-it') {
-        html = `
-          <div class="host-status">
-            <div>
-              <div class="host-label">SCRAMBLED LETTERS (${this.currentIndex + 1}/${this.prompts.length})</div>
-              <div style="font-size: 36px; font-weight: 900; letter-spacing: 6px; color: #38bdf8; margin: 10px 0;">${p.scrambled}</div>
-              <div class="host-revealed">HINT: ${p.hint || ''}</div>
-              <div class="host-answer" style="margin-top: 8px;">UNSCRAMBLED: ${p.answer}</div>
+        const rawAns = (p.answer || '').toUpperCase();
+        const firstLetter = rawAns[0] || '';
+        const isSolvedOrRevealed = this.revealedAnswer;
+
+        const answerSection = this.isSolo ? `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid ${isSolvedOrRevealed ? 'rgba(16,185,129,0.5)' : 'rgba(56,189,248,0.3)'}; border-radius: 12px; padding: 16px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: ${isSolvedOrRevealed ? '#10b981' : '#38bdf8'}; letter-spacing: 2px;">
+              ${isSolvedOrRevealed ? '🎉 UNSCRAMBLED WORD REVEALED:' : '🔒 UNSCRAMBLE THE WORD (SOLO MODE):'}
             </div>
-            <div style="text-align: right;">
-              <div class="host-label">TIMER</div>
-              <div class="host-timer" id="timer-display">${this.remainingSeconds}</div>
+            ${isSolvedOrRevealed ? `
+              <div style="font-size: 28px; font-weight: 900; color: #10b981; margin-top: 4px;">${p.answer}</div>
+            ` : `
+              <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <input id="solo-guess-input" type="text" placeholder="Type unscrambled word..." style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(56,189,248,0.4); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px;" onkeydown="if(event.key==='Enter') window.gameHost.checkSoloGuess()" />
+                <button type="button" class="time-button" onclick="window.gameHost.checkSoloGuess()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; border: none; padding: 0 16px;">
+                  🎯 CHECK
+                </button>
+              </div>
+            `}
+            ${this.soloFeedback ? `
+              <div style="margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; background: ${this.soloFeedback.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${this.soloFeedback.success ? '#34d399' : '#f87171'}; border: 1px solid ${this.soloFeedback.success ? '#10b981' : '#ef4444'};">
+                ${this.soloFeedback.message}
+              </div>
+            ` : ''}
+            <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 10px;">💡 CLUE: ${p.hint || 'Unscramble the letters!'}</div>
+          </div>
+        ` : `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(56,189,248,0.3); border-radius: 12px; padding: 14px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: #10b981; letter-spacing: 2px;">UNSCRAMBLED SOLUTION:</div>
+            <div style="font-size: 26px; font-weight: 900; color: #ffffff; margin-top: 4px;">${p.answer}</div>
+            <div style="font-size: 13px; color: #d4af37; font-weight: 700; margin-top: 8px;">💡 CLUE: ${p.hint || ''}</div>
+          </div>
+        `;
+
+        html = `
+          <div class="host-status" style="flex-direction: column; align-items: stretch; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center;">
+              <div>
+                <div class="host-label">SCRAMBLED LETTERS (${this.currentIndex + 1}/${this.prompts.length})</div>
+                <div style="font-size: 38px; font-weight: 900; letter-spacing: 8px; color: #38bdf8; margin: 6px 0;">${p.scrambled}</div>
+              </div>
+              <div style="text-align: right;">
+                <div class="host-label">TIMER</div>
+                <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+              </div>
+            </div>
+            ${answerSection}
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="time-button" onclick="window.gameHost.revealEmojiLetter()" style="background: rgba(56,189,248,0.2); border-color: #38bdf8; color: #7dd3fc; font-weight: 800;">
+                💡 REVEAL 1ST LETTER [${firstLetter}]
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.toggleAnswerReveal()" style="background: ${this.revealedAnswer ? '#10b981' : '#d4af37'}; color: #000; font-weight: 900;">
+                ${this.revealedAnswer ? '🎉 REVEALED (HIDE)' : (this.isSolo ? '👁️ GIVE UP & REVEAL' : '🏆 REVEAL UNSCRAMBLE')}
+              </button>
             </div>
           </div>
         `;
       } else if (this.gameId === 'who-dis') {
+        const isSolvedOrRevealed = this.revealedAnswer;
         html = `
-          <div class="host-status" style="flex-direction: column; align-items: flex-start;">
-            <div class="host-label">MYSTERY TARGET (${this.currentIndex + 1}/${this.prompts.length})</div>
-            <div class="host-answer" style="color: #d4af37; margin: 6px 0;">TARGET: ${p.name}</div>
-            <div style="margin-top: 10px; width: 100%;">
-              <div style="padding: 8px; background: rgba(255,255,255,0.05); margin: 4px 0; border-radius: 6px;"><b>CLUE 1:</b> ${p.clue1}</div>
-              <div style="padding: 8px; background: rgba(255,255,255,0.05); margin: 4px 0; border-radius: 6px;"><b>CLUE 2:</b> ${p.clue2}</div>
-              <div style="padding: 8px; background: rgba(255,255,255,0.05); margin: 4px 0; border-radius: 6px;"><b>CLUE 3:</b> ${p.clue3}</div>
+          <div class="host-status" style="flex-direction: column; align-items: flex-start; gap: 12px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div class="host-label">MYSTERY TARGET (${this.currentIndex + 1}/${this.prompts.length})</div>
+              <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
             </div>
-            <div style="margin-top: 14px; display: flex; gap: 8px;">
+            ${this.isSolo ? `
+              <div style="width: 100%; background: rgba(0,0,0,0.35); border: 1px solid ${isSolvedOrRevealed ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.3)'}; border-radius: 12px; padding: 14px 18px;">
+                <div style="font-size: 11px; font-weight: 800; color: ${isSolvedOrRevealed ? '#10b981' : '#d4af37'}; letter-spacing: 2px;">
+                  ${isSolvedOrRevealed ? '🎉 IDENTITY REVEALED:' : '🕵️ MYSTERY IDENTITY (GUESS USING CLUES):'}
+                </div>
+                ${isSolvedOrRevealed ? `
+                  <div style="font-size: 26px; font-weight: 900; color: #facc15; margin-top: 4px;">${p.name}</div>
+                ` : `
+                  <div style="margin-top: 10px; display: flex; gap: 8px;">
+                    <input id="solo-guess-input" type="text" placeholder="Who is this? Type name..." style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px;" onkeydown="if(event.key==='Enter') window.gameHost.checkSoloGuess()" />
+                    <button type="button" class="time-button" onclick="window.gameHost.checkSoloGuess()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; border: none; padding: 0 16px;">
+                      🎯 CHECK
+                    </button>
+                  </div>
+                `}
+                ${this.soloFeedback ? `
+                  <div style="margin-top: 10px; padding: 8px 12px; border-radius: 8px; font-weight: 800; font-size: 13px; background: ${this.soloFeedback.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${this.soloFeedback.success ? '#34d399' : '#f87171'}; border: 1px solid ${this.soloFeedback.success ? '#10b981' : '#ef4444'};">
+                    ${this.soloFeedback.message}
+                  </div>
+                ` : ''}
+              </div>
+            ` : `
+              <div class="host-answer" style="color: #d4af37; font-size: 24px; font-weight: 900;">TARGET: ${p.name}</div>
+            `}
+            <div style="width: 100%;">
+              <div style="padding: 10px 14px; background: ${this.revealedClues >= 1 ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)'}; margin: 4px 0; border-radius: 8px; border-left: 3px solid ${this.revealedClues >= 1 ? '#d4af37' : 'transparent'};"><b>CLUE 1 ($300):</b> ${p.clue1}</div>
+              <div style="padding: 10px 14px; background: ${this.revealedClues >= 2 ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)'}; margin: 4px 0; border-radius: 8px; border-left: 3px solid ${this.revealedClues >= 2 ? '#d4af37' : 'transparent'};"><b>CLUE 2 ($200):</b> ${p.clue2}</div>
+              <div style="padding: 10px 14px; background: ${this.revealedClues >= 3 ? 'rgba(212,175,55,0.15)' : 'rgba(255,255,255,0.05)'}; margin: 4px 0; border-radius: 8px; border-left: 3px solid ${this.revealedClues >= 3 ? '#d4af37' : 'transparent'};"><b>CLUE 3 ($100):</b> ${p.clue3}</div>
+            </div>
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
               <button type="button" class="time-button" onclick="window.gameHost.setRevealedClues(1)">Show Clue 1</button>
               <button type="button" class="time-button" onclick="window.gameHost.setRevealedClues(2)">Show Clue 2</button>
               <button type="button" class="time-button" onclick="window.gameHost.setRevealedClues(3)">Show Clue 3</button>
-              <button type="button" class="time-button" style="background:#d4af37; color:#000;" onclick="window.gameHost.toggleAnswerReveal()">Reveal Identity</button>
+              <button type="button" class="time-button" style="background:#d4af37; color:#000; font-weight:900;" onclick="window.gameHost.toggleAnswerReveal()">
+                ${this.revealedAnswer ? 'Hide Identity' : (this.isSolo ? '👁️ Give Up & Reveal' : 'Reveal Identity')}
+              </button>
             </div>
           </div>
         `;
@@ -662,25 +970,51 @@
               </div>
             </div>
 
-            <!-- Secret Answer Card for Host -->
-            <div style="display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 16px 20px;">
-              <div style="font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #f59e0b; margin-bottom: 6px;">
-                🔒 SECRET WORD (HOST ONLY • CHAT SEES BLANKS)
-              </div>
-              <div style="font-size: 32px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-shadow: 0 0 20px rgba(212,175,55,0.5);">
-                "${rawWord}"
-              </div>
-              ${hint ? `
-                <div style="margin-top: 8px; font-size: 14px; font-weight: 700; color: #f7e07d;">
-                  💡 <b>Clue / Hint:</b> ${hint}
+            <!-- Secret Answer Card for Host / Solo Blanks Card -->
+            ${this.isSolo ? `
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(0,0,0,0.35); border: 1px solid ${status === 'WON' ? 'rgba(16,185,129,0.6)' : (status === 'LOST' || this.revealedAnswer ? 'rgba(239,68,68,0.6)' : 'rgba(212,175,55,0.3)')}; border-radius: 14px; padding: 16px 20px;">
+                <div style="font-size: 11px; font-weight: 900; letter-spacing: 3px; color: ${status === 'WON' ? '#10b981' : (status === 'LOST' || this.revealedAnswer ? '#ef4444' : '#34d399')}; margin-bottom: 6px;">
+                  ${status === 'WON' ? '🏆 YOU WON! WORD SOLVED!' : (status === 'LOST' ? '💀 GAME OVER! THE WORD WAS:' : (this.revealedAnswer ? '👁️ WORD REVEALED:' : '👤 SOLO HANGMAN • GUESS LETTERS BELOW TO SOLVE'))}
                 </div>
-              ` : ''}
-              
-              <!-- Word Blanks Preview -->
-              <div style="margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
-                ${blanksHtml}
+                ${(status === 'WON' || status === 'LOST' || this.revealedAnswer) ? `
+                  <div style="font-size: 32px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-shadow: 0 0 20px rgba(212,175,55,0.5);">
+                    "${rawWord}"
+                  </div>
+                ` : ''}
+                ${hint ? `
+                  <div style="margin-top: 8px; font-size: 14px; font-weight: 700; color: #f7e07d;">
+                    💡 <b>Clue / Hint:</b> ${hint}
+                  </div>
+                ` : ''}
+                <div style="margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+                  ${blanksHtml}
+                </div>
+                ${(status === 'PLAYING' && !this.revealedAnswer) ? `
+                  <button type="button" class="time-button" onclick="window.gameHost.toggleAnswerReveal()" style="margin-top: 12px; font-size: 11px; padding: 6px 12px; background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.2); color: #94a3b8;">
+                    👁️ Give Up & Reveal Word
+                  </button>
+                ` : ''}
               </div>
-            </div>
+            ` : `
+              <div style="display: flex; flex-direction: column; align-items: center; text-align: center; background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.3); border-radius: 14px; padding: 16px 20px;">
+                <div style="font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #f59e0b; margin-bottom: 6px;">
+                  🔒 SECRET WORD (HOST ONLY • CHAT SEES BLANKS)
+                </div>
+                <div style="font-size: 32px; font-weight: 900; color: #ffffff; letter-spacing: 2px; text-shadow: 0 0 20px rgba(212,175,55,0.5);">
+                  "${rawWord}"
+                </div>
+                ${hint ? `
+                  <div style="margin-top: 8px; font-size: 14px; font-weight: 700; color: #f7e07d;">
+                    💡 <b>Clue / Hint:</b> ${hint}
+                  </div>
+                ` : ''}
+                
+                <!-- Word Blanks Preview -->
+                <div style="margin-top: 16px; display: flex; flex-wrap: wrap; justify-content: center; gap: 6px;">
+                  ${blanksHtml}
+                </div>
+              </div>
+            `}
 
             <!-- Visual Stage Preview & Strike Meter -->
             <div style="display: grid; grid-template-columns: 280px 1fr; gap: 20px; align-items: center; background: rgba(0,0,0,0.28); border-radius: 14px; padding: 14px 18px;">
@@ -742,20 +1076,170 @@
           </div>
         `;
       } else if (this.gameId === 'would-you-rather') {
+        const total = (this.votes.optionA || 0) + (this.votes.optionB || 0);
+        const pctA = total > 0 ? Math.round((this.votes.optionA / total) * 100) : 50;
+        const pctB = total > 0 ? 100 - pctA : 50;
         html = `
-          <div class="host-status" style="flex-direction: column; align-items: flex-start;">
-            <div class="host-label">WOULD YOU RATHER (${this.currentIndex + 1}/${this.prompts.length})</div>
-            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin: 14px 0;">
-              <div style="background: rgba(56,189,248,0.1); border: 1px solid #38bdf8; padding: 16px; border-radius: 12px;">
-                <div style="font-size: 11px; font-weight: 900; color: #38bdf8;">OPTION A</div>
-                <div style="font-size: 18px; font-weight: 800; margin-top: 6px; color: #fff;">${p.optionA}</div>
-                <button type="button" class="time-button" style="margin-top: 10px;" onclick="window.gameHost.addVote('A')">+1 Vote A (${this.votes.optionA})</button>
+          <div class="host-status" style="flex-direction: column; align-items: flex-start; gap: 10px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+              <div class="host-label">WOULD YOU RATHER (${this.currentIndex + 1}/${this.prompts.length})</div>
+              <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px; width: 100%; margin: 8px 0;">
+              <div style="background: rgba(56,189,248,0.12); border: 2px solid #38bdf8; padding: 16px; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div style="font-size: 11px; font-weight: 900; color: #38bdf8;">OPTION A</div>
+                  <div style="font-size: 20px; font-weight: 900; color: #38bdf8;">${pctA}%</div>
+                </div>
+                <div style="font-size: 18px; font-weight: 800; margin: 8px 0; color: #fff;">${p.optionA}</div>
+                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                  <button type="button" class="time-button" onclick="window.gameHost.addVote('A', 1)">+1 (${this.votes.optionA})</button>
+                  <button type="button" class="time-button" onclick="window.gameHost.addVote('A', 5)">+5 Votes</button>
+                </div>
               </div>
-              <div style="background: rgba(244,63,94,0.1); border: 1px solid #f43f5e; padding: 16px; border-radius: 12px;">
-                <div style="font-size: 11px; font-weight: 900; color: #f43f5e;">OPTION B</div>
-                <div style="font-size: 18px; font-weight: 800; margin-top: 6px; color: #fff;">${p.optionB}</div>
-                <button type="button" class="time-button" style="margin-top: 10px;" onclick="window.gameHost.addVote('B')">+1 Vote B (${this.votes.optionB})</button>
+              <div style="background: rgba(244,63,94,0.12); border: 2px solid #f43f5e; padding: 16px; border-radius: 12px;">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                  <div style="font-size: 11px; font-weight: 900; color: #f43f5e;">OPTION B</div>
+                  <div style="font-size: 20px; font-weight: 900; color: #f43f5e;">${pctB}%</div>
+                </div>
+                <div style="font-size: 18px; font-weight: 800; margin: 8px 0; color: #fff;">${p.optionB}</div>
+                <div style="display: flex; gap: 6px; margin-top: 10px;">
+                  <button type="button" class="time-button" onclick="window.gameHost.addVote('B', 1)">+1 (${this.votes.optionB})</button>
+                  <button type="button" class="time-button" onclick="window.gameHost.addVote('B', 5)">+5 Votes</button>
+                </div>
               </div>
+            </div>
+            <button type="button" class="time-button" style="font-size: 11px; padding: 4px 10px;" onclick="window.gameHost.resetVotes()">🔄 RESET VOTES</button>
+          </div>
+        `;
+      } else if (this.gameId === 'guess-the-lyrics') {
+        const rawAns = (p.missingLyrics || '').toUpperCase();
+        const isSolvedOrRevealed = this.revealedAnswer;
+
+        // Formatted missing lyric blanks
+        let blanksDisplay = '';
+        if (isSolvedOrRevealed) {
+          blanksDisplay = `
+            <div style="margin-top: 15px; padding: 16px 20px; background: linear-gradient(135deg, rgba(16,185,129,0.25), rgba(212,175,55,0.2)); border: 2.5px solid #10b981; border-radius: 14px; color: #ffffff; font-size: 26px; font-weight: 900; letter-spacing: 2px; text-shadow: 0 0 25px rgba(16,185,129,0.8); text-align: center;">
+              🎶 "${p.missingLyrics}" 🎶
+            </div>
+          `;
+        } else if (this.showLyricsFirstLetter) {
+          const letterHints = rawAns.split(' ').map(w => {
+            if (!w) return '';
+            const first = w[0];
+            const rest = '_'.repeat(Math.max(1, w.length - 1));
+            return `<span style="display:inline-block; margin:0 5px; font-family:monospace; letter-spacing:2px; font-size:22px; color:#38bdf8; font-weight:900;">${first}${rest}</span>`;
+          }).join(' ');
+          blanksDisplay = `
+            <div style="margin-top: 15px; padding: 14px 18px; background: rgba(0,0,0,0.5); border: 2px dashed #38bdf8; border-radius: 12px; text-align: center;">
+              <div style="font-size: 11px; font-weight: 800; color: #38bdf8; letter-spacing: 2px; margin-bottom: 8px;">🔤 1ST LETTER HINTS:</div>
+              <div>${letterHints}</div>
+            </div>
+          `;
+        } else {
+          blanksDisplay = `
+            <div style="margin-top: 15px; padding: 16px 20px; background: rgba(0,0,0,0.4); border: 2px dashed rgba(212,175,55,0.5); border-radius: 12px; color: #f7e07d; font-size: 20px; font-weight: 800; letter-spacing: 3px; text-align: center;">
+              [ 🎵 ___________________________________ ? ]
+            </div>
+          `;
+        }
+
+        const songMetaDisplay = (this.showLyricsSongArtist || isSolvedOrRevealed) ? `
+          <div style="margin-top: 12px; padding: 12px 18px; background: rgba(212,175,55,0.15); border: 1.5px solid #d4af37; border-radius: 10px; font-size: 16px; font-weight: 900; color: #f7e07d; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px;">
+            <span>🎵 "${p.song}" — <span style="color:#ffffff;">${p.artist}</span></span>
+            <span style="font-size: 12px; color: #94a3b8; background: rgba(0,0,0,0.4); padding: 3px 8px; border-radius: 6px;">${p.year || ''}</span>
+          </div>
+        ` : (this.showLyricsEra ? `
+          <div style="margin-top: 12px; padding: 10px 16px; background: rgba(56,189,248,0.15); border: 1.5px solid #38bdf8; border-radius: 10px; font-size: 13px; font-weight: 800; color: #38bdf8;">
+            📅 ERA / GENRE: ${p.year || ''} • ${p.genre || p.category}
+          </div>
+        ` : '');
+
+        const answerSection = this.isSolo ? `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid ${isSolvedOrRevealed ? 'rgba(16,185,129,0.5)' : 'rgba(212,175,55,0.3)'}; border-radius: 12px; padding: 16px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: ${isSolvedOrRevealed ? '#10b981' : '#38bdf8'}; letter-spacing: 2px;">
+              ${isSolvedOrRevealed ? '🎉 LYRICS SOLVED / REVEALED:' : '🎤 FINISH THE LYRIC (SOLO GUESS):'}
+            </div>
+            ${isSolvedOrRevealed ? `
+              <div style="font-size: 24px; font-weight: 900; color: #10b981; margin-top: 4px;">"${p.missingLyrics}"</div>
+              <div style="font-size: 15px; font-weight: 800; color: #f7e07d; margin-top: 4px;">From "${p.song}" by ${p.artist} (${p.year || ''})</div>
+            ` : `
+              <div style="margin-top: 10px; display: flex; gap: 8px;">
+                <input id="solo-guess-input" type="text" placeholder="Type the missing lyric line here..." style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4); color: #fff; padding: 10px 14px; border-radius: 8px; font-weight: 700; font-size: 15px;" onkeydown="if(event.key==='Enter') window.gameHost.checkSoloGuess()" />
+                <button type="button" class="time-button" onclick="window.gameHost.checkSoloGuess()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 900; border: none; padding: 0 16px;">
+                  🎤 SUBMIT
+                </button>
+              </div>
+            `}
+            ${this.soloFeedback ? `
+              <div style="margin-top: 10px; padding: 10px 14px; border-radius: 8px; font-weight: 800; font-size: 13px; background: ${this.soloFeedback.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${this.soloFeedback.success ? '#34d399' : '#f87171'}; border: 1px solid ${this.soloFeedback.success ? '#10b981' : '#ef4444'};">
+                ${this.soloFeedback.message}
+              </div>
+            ` : ''}
+            ${songMetaDisplay}
+            <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 10px;">💡 CLUE: ${p.hint || ''}</div>
+          </div>
+        ` : `
+          <div style="background: rgba(0,0,0,0.35); border: 1px solid rgba(212,175,55,0.3); border-radius: 12px; padding: 16px 18px;">
+            <div style="font-size: 11px; font-weight: 800; color: #f59e0b; letter-spacing: 2px;">SECRET ANSWER & TRACK INFO (HOST ONLY):</div>
+            <div style="font-size: 22px; font-weight: 900; color: #ffffff; margin-top: 4px;">
+              🎵 "${p.song}" — <span style="color: #38bdf8;">${p.artist}</span> <span style="font-size: 14px; color: #94a3b8;">(${p.year || ''})</span>
+            </div>
+            <div style="margin-top: 10px; font-size: 18px; font-weight: 900; color: #10b981; background: rgba(16,185,129,0.15); padding: 10px 14px; border-radius: 8px; border: 1px solid rgba(16,185,129,0.3);">
+              🔑 MISSING LYRIC: "${p.missingLyrics}"
+            </div>
+            <div style="font-size: 13px; color: #facc15; font-weight: 700; margin-top: 10px;">💡 HOST / TRIVIA TIP: ${p.hint || ''}</div>
+          </div>
+        `;
+
+        html = `
+          <div class="host-status" style="flex-direction: column; align-items: stretch; gap: 14px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(212,175,55,0.2); padding-bottom: 8px;">
+              <div style="display: flex; align-items: center; gap: 10px;">
+                <span style="font-size: 24px;">🎤</span>
+                <div>
+                  <div class="host-label">${p.category || 'R&B TO GOSPEL'} (${this.currentIndex + 1}/${this.prompts.length})</div>
+                  <div style="font-size: 13px; font-weight: 800; color: #38bdf8;">${p.genre || 'Soul'} • <span style="color: #a7f3d0;">${p.difficulty || 'MEDIUM'}</span></div>
+                </div>
+              </div>
+              <div style="text-align: right;">
+                <div class="host-label">TIMER</div>
+                <div class="host-timer" id="timer-display">${this.remainingSeconds}s</div>
+              </div>
+            </div>
+
+            <!-- Verse Lyric Snippet Card -->
+            <div style="background: rgba(14,28,30,0.85); border: 2px solid rgba(212,175,55,0.4); border-radius: 14px; padding: 22px; box-shadow: 0 8px 30px rgba(0,0,0,0.5);">
+              <div style="font-size: 11px; font-weight: 900; letter-spacing: 3px; color: #d4af37; margin-bottom: 8px;">SING THE NEXT LINE:</div>
+              <div style="font-size: 24px; font-weight: 900; line-height: 1.4; color: #ffffff; font-style: italic;">
+                "${p.lyricsSnippet}"
+              </div>
+              ${blanksDisplay}
+            </div>
+
+            ${answerSection}
+
+            <!-- Host Action Controls -->
+            <div style="display: flex; gap: 8px; flex-wrap: wrap;">
+              <button type="button" class="time-button" onclick="window.gameHost.toggleLyricsSongArtist()" style="background: ${this.showLyricsSongArtist ? 'rgba(16,185,129,0.3)' : 'rgba(56,189,248,0.2)'}; border-color: ${this.showLyricsSongArtist ? '#10b981' : '#38bdf8'}; color: ${this.showLyricsSongArtist ? '#6ee7b7' : '#7dd3fc'}; font-weight: 800;">
+                🎵 ${this.showLyricsSongArtist ? 'HIDE ARTIST & SONG' : 'REVEAL ARTIST & SONG'}
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.toggleLyricsFirstLetter()" style="background: ${this.showLyricsFirstLetter ? 'rgba(212,175,55,0.3)' : 'rgba(255,255,255,0.08)'}; border-color: ${this.showLyricsFirstLetter ? '#d4af37' : 'rgba(255,255,255,0.2)'}; color: ${this.showLyricsFirstLetter ? '#f7e07d' : '#fff'}; font-weight: 800;">
+                🔤 1ST LETTER HINTS (${this.showLyricsFirstLetter ? 'ON' : 'OFF'})
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.toggleLyricsEra()" style="background: ${this.showLyricsEra ? 'rgba(56,189,248,0.3)' : 'rgba(255,255,255,0.08)'}; border-color: ${this.showLyricsEra ? '#38bdf8' : 'rgba(255,255,255,0.2)'}; color: ${this.showLyricsEra ? '#7dd3fc' : '#94a3b8'}; font-weight: 800;">
+                📅 ERA & GENRE (${this.showLyricsEra ? 'ON' : 'OFF'})
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.toggleAnswerReveal()" style="background: ${this.revealedAnswer ? 'linear-gradient(135deg, #10b981, #059669)' : 'linear-gradient(135deg, #d4af37, #b89628)'}; color: #000; font-weight: 900;">
+                ${this.revealedAnswer ? '🎉 ANSWER REVEALED (HIDE)' : (this.isSolo ? '👁️ GIVE UP & REVEAL ANSWER' : '🏆 REVEAL MISSING LYRIC')}
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.addExtraTime(15)" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #fff;">
+                ⏱️ +15S
+              </button>
+              <button type="button" class="time-button" onclick="window.gameHost.easySwapPrompt()" style="background: rgba(255,255,255,0.08); border-color: rgba(255,255,255,0.2); color: #fff;">
+                🎲 SWAP SONG
+              </button>
             </div>
           </div>
         `;
@@ -829,7 +1313,15 @@
       this.remainingSeconds = this.timerSeconds;
       this.revealedClues = 1;
       this.revealedAnswer = false;
+      this.soloFeedback = null;
       this.votes = { optionA: 0, optionB: 0 };
+      this.scenarioVotes = { A: 0, B: 0, C: 0, D: 0 };
+      this.chatWinner = '';
+      this.emojiLetterHintCount = 0;
+      this.selectedPick = null;
+      this.showLyricsSongArtist = false;
+      this.showLyricsFirstLetter = false;
+      this.showLyricsEra = false;
       this.showWordCount = false;
       this.showChatClue = false;
       this.charadesReaction = null;
@@ -859,7 +1351,15 @@
       this.remainingSeconds = this.timerSeconds;
       this.revealedClues = 1;
       this.revealedAnswer = false;
+      this.soloFeedback = null;
       this.votes = { optionA: 0, optionB: 0 };
+      this.scenarioVotes = { A: 0, B: 0, C: 0, D: 0 };
+      this.chatWinner = '';
+      this.emojiLetterHintCount = 0;
+      this.selectedPick = null;
+      this.showLyricsSongArtist = false;
+      this.showLyricsFirstLetter = false;
+      this.showLyricsEra = false;
       this.showWordCount = false;
       this.showChatClue = false;
       this.charadesReaction = null;
@@ -878,7 +1378,62 @@
       this.broadcastState();
     }
 
+    checkSoloGuess() {
+      const input = document.getElementById('solo-guess-input');
+      if (!input) return;
+      const guess = input.value.trim().toLowerCase();
+      if (!guess) return;
+
+      const p = this.prompts[this.currentIndex];
+      if (!p) return;
+
+      let target = '';
+      if (this.gameId === 'emoji-guess') target = (p.answer || '').toLowerCase();
+      else if (this.gameId === 'unscramble-it') target = (p.answer || '').toLowerCase();
+      else if (this.gameId === 'who-dis') target = (p.name || '').toLowerCase();
+      else if (this.gameId === 'guess-the-lyrics') {
+        const cleanGuess = guess.replace(/[^a-z0-9]/g, '');
+        const cleanTarget = (p.missingLyrics || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+        const acceptable = (p.acceptableAnswers || []).map(a => a.toLowerCase().replace(/[^a-z0-9]/g, ''));
+
+        const isMatch = (cleanGuess && cleanTarget && (
+          cleanGuess === cleanTarget ||
+          acceptable.includes(cleanGuess) ||
+          (cleanGuess.length >= 6 && cleanTarget.includes(cleanGuess)) ||
+          (cleanTarget.length >= 6 && cleanGuess.includes(cleanTarget))
+        ));
+
+        if (isMatch) {
+          this.revealedAnswer = true;
+          this.showLyricsSongArtist = true;
+          this.soloFeedback = { success: true, message: `🎉 SANG IT PERFECTLY! "${p.missingLyrics}" from "${p.song}" by ${p.artist}!` };
+          this.playSound('solve');
+        } else {
+          this.soloFeedback = { success: false, message: `❌ Not quite! You guessed "${input.value.trim()}". Check the rhythm and try again!` };
+          this.playSound('wrong');
+        }
+        this.renderPrompt();
+        this.broadcastState();
+        return;
+      }
+
+      const cleanGuess = guess.replace(/[^a-z0-9]/g, '');
+      const cleanTarget = target.replace(/[^a-z0-9]/g, '');
+
+      if (cleanGuess && cleanTarget && cleanGuess === cleanTarget) {
+        this.revealedAnswer = true;
+        this.soloFeedback = { success: true, message: `🎉 CORRECT! The answer is "${p.answer || p.name}"!` };
+        this.playSound('solve');
+      } else {
+        this.soloFeedback = { success: false, message: `❌ Not quite! You guessed "${input.value.trim()}". Try again!` };
+        this.playSound('wrong');
+      }
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
     easySwapPrompt() {
+      this.soloFeedback = null;
       this.pickRandomInCategory();
     }
 
@@ -958,10 +1513,86 @@
       this.broadcastState();
     }
 
-    addVote(option) {
-      if (option === 'A') this.votes.optionA++;
-      if (option === 'B') this.votes.optionB++;
+    addVote(option, count = 1) {
+      if (option === 'A') this.votes.optionA += count;
+      if (option === 'B') this.votes.optionB += count;
+      this.playSound('tick');
       this.renderPrompt();
+      this.broadcastState();
+    }
+
+    resetVotes() {
+      this.votes = { optionA: 0, optionB: 0 };
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    setChatWinner(name) {
+      if (!name) return;
+      this.chatWinner = name;
+      this.playSound('solve');
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    clearChatWinner() {
+      this.chatWinner = '';
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    revealEmojiLetter() {
+      this.emojiLetterHintCount = (this.emojiLetterHintCount || 0) + 1;
+      this.playSound('correct');
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    resetEmojiHint() {
+      this.emojiLetterHintCount = 0;
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    selectPickChoice(choice) {
+      this.selectedPick = (this.selectedPick === choice ? null : choice);
+      if (this.selectedPick) this.playSound('solve');
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    voteScenario(key, count = 1) {
+      if (!this.scenarioVotes) this.scenarioVotes = { A: 0, B: 0, C: 0, D: 0 };
+      this.scenarioVotes[key] = (this.scenarioVotes[key] || 0) + count;
+      this.playSound('tick');
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    resetScenarioVotes() {
+      this.scenarioVotes = { A: 0, B: 0, C: 0, D: 0 };
+      this.renderPrompt();
+      this.broadcastState();
+    }
+
+    toggleLyricsSongArtist() {
+      this.showLyricsSongArtist = !this.showLyricsSongArtist;
+      this.renderPrompt();
+      this.playSound('correct');
+      this.broadcastState();
+    }
+
+    toggleLyricsFirstLetter() {
+      this.showLyricsFirstLetter = !this.showLyricsFirstLetter;
+      this.renderPrompt();
+      this.playSound('tick');
+      this.broadcastState();
+    }
+
+    toggleLyricsEra() {
+      this.showLyricsEra = !this.showLyricsEra;
+      this.renderPrompt();
+      this.playSound('tick');
       this.broadcastState();
     }
 
@@ -1118,6 +1749,15 @@
         revealedClues: this.revealedClues,
         revealedAnswer: this.revealedAnswer,
         votes: this.votes,
+        scenarioVotes: this.scenarioVotes || { A: 0, B: 0, C: 0, D: 0 },
+        chatWinner: this.chatWinner,
+        emojiLetterHintCount: this.emojiLetterHintCount || 0,
+        selectedPick: this.selectedPick,
+        showLyricsSongArtist: this.showLyricsSongArtist,
+        showLyricsFirstLetter: this.showLyricsFirstLetter,
+        showLyricsEra: this.showLyricsEra,
+        contestants: this.contestants,
+        showScoreboard: this.showScoreboard,
         showWordCount: this.showWordCount,
         showChatClue: this.showChatClue,
         charadesReaction: this.charadesReaction,

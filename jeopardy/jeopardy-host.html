@@ -940,6 +940,12 @@
        GAME STATE
     ===================================================== */
 
+    const urlParams = new URLSearchParams(window.location.search);
+    const isSolo = urlParams.get("singleplayer") === "true" || urlParams.get("solo") === "true";
+    let soloAnswerRevealed = false;
+    let soloFeedback = null;
+    let soloScore = 0;
+
     let revealTime = 30;
 
     let answer = "";
@@ -1078,6 +1084,8 @@
             ];
 
         revealed = [];
+        soloAnswerRevealed = false;
+        soloFeedback = null;
 
     }
 
@@ -1097,6 +1105,9 @@
         running = true;
 
         paused = false;
+
+        soloAnswerRevealed = false;
+        soloFeedback = null;
 
         updateDisplay();
 
@@ -1348,6 +1359,9 @@
 
         revealed = [];
 
+        soloAnswerRevealed = false;
+        soloFeedback = null;
+
         seconds = revealTime;
 
         running = false;
@@ -1380,6 +1394,35 @@
        DISPLAY
     ===================================================== */
 
+    window.checkSoloJeopardyGuess = function() {
+        const input = document.getElementById("soloJeopardyInput");
+        if (!input || !answer) return;
+        const guess = input.value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        const target = (answer || '').trim().toLowerCase().replace(/[^a-z0-9]/g, '');
+        if (!guess) return;
+
+        if (guess === target) {
+            soloAnswerRevealed = true;
+            soloScore += 200;
+            soloFeedback = { success: true, message: `🎉 CORRECT! "${answer}" (+200 PTS)` };
+        } else {
+            soloFeedback = { success: false, message: `❌ "${input.value.trim()}" is not correct. Try again or wait for a letter!` };
+        }
+        updateDisplay();
+    };
+
+    window.revealSoloJeopardyAnswer = function() {
+        soloAnswerRevealed = true;
+        soloFeedback = null;
+        updateDisplay();
+    };
+
+    window.hideSoloJeopardyAnswer = function() {
+        soloAnswerRevealed = false;
+        soloFeedback = null;
+        updateDisplay();
+    };
+
     function updateDisplay() {
 
         selectedCategoryDisplay.textContent =
@@ -1392,8 +1435,57 @@
                 ? category.toUpperCase()
                 : "READY";
 
-        answerElement.textContent =
-            answer || "—";
+        if (isSolo) {
+            if (!answer || !running) {
+                answerElement.innerHTML = `<span style="color: #94a3b8; font-size: 16px;">— START GAME TO BEGIN —</span>`;
+            } else if (!soloAnswerRevealed) {
+                const rawUpper = (answer || "").toUpperCase();
+                const blanksHtml = rawUpper.split("").map(ch => {
+                    if (ch === " ") return '<span style="display:inline-block; width:14px;"></span>';
+                    const isRev = revealed.includes(ch);
+                    return `<span style="display:inline-flex; width:26px; height:32px; border-bottom:3px solid ${isRev ? '#10b981' : '#d4af37'}; align-items:center; justify-content:center; font-weight:900; font-size:18px; color:${isRev ? '#34d399' : 'rgba(255,255,255,0.2)'}; background:rgba(0,0,0,0.4); border-radius:4px; margin:0 2px;">${isRev ? ch : '_'}</span>`;
+                }).join("");
+
+                answerElement.innerHTML = `
+                    <div style="margin-bottom: 12px; display: flex; flex-wrap: wrap; justify-content: center; align-items: center;">
+                        ${blanksHtml}
+                    </div>
+                    <div style="display: flex; gap: 8px; max-width: 440px; margin: 0 auto;">
+                        <input id="soloJeopardyInput" type="text" placeholder="Type your guess here..." style="flex: 1; background: rgba(0,0,0,0.6); border: 1px solid rgba(212,175,55,0.4); color: #fff; padding: 8px 12px; border-radius: 8px; font-weight: 700; font-size: 14px;" onkeydown="if(event.key==='Enter') window.checkSoloJeopardyGuess()" />
+                        <button type="button" onclick="window.checkSoloJeopardyGuess()" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 800; border: none; border-radius: 8px; padding: 0 16px; cursor: pointer;">
+                            🎯 CHECK
+                        </button>
+                    </div>
+                    ${soloFeedback ? `
+                        <div style="margin-top: 10px; padding: 6px 12px; border-radius: 8px; font-size: 13px; font-weight: 800; background: ${soloFeedback.success ? 'rgba(16,185,129,0.2)' : 'rgba(239,68,68,0.2)'}; color: ${soloFeedback.success ? '#34d399' : '#f87171'}; border: 1px solid ${soloFeedback.success ? '#10b981' : '#ef4444'};">
+                            ${soloFeedback.message}
+                        </div>
+                    ` : ''}
+                    <div style="margin-top: 10px; display: flex; justify-content: center; gap: 10px;">
+                        <button type="button" onclick="window.revealSoloJeopardyAnswer()" style="background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; font-size: 11px; font-weight: 700; padding: 4px 12px; border-radius: 6px; cursor: pointer;">
+                            👁️ Give Up & Reveal Answer
+                        </button>
+                    </div>
+                `;
+            } else {
+                answerElement.innerHTML = `
+                    <div style="font-size: 26px; font-weight: 900; color: #10b981; letter-spacing: 1px; margin-bottom: 6px;">
+                        ${answer}
+                    </div>
+                    ${soloFeedback ? `
+                        <div style="font-size: 13px; font-weight: 800; color: #34d399; margin-bottom: 6px;">
+                            ${soloFeedback.message}
+                        </div>
+                    ` : ''}
+                    <button type="button" onclick="window.hideSoloJeopardyAnswer()" style="background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.2); color: #94a3b8; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 6px; cursor: pointer;">
+                        Hide Answer
+                    </button>
+                `;
+            }
+        } else {
+            answerElement.textContent =
+                answer || "—";
+        }
 
         revealedElement.textContent =
             revealed.length
@@ -1605,6 +1697,15 @@
     /* =====================================================
        INITIALIZE
     ===================================================== */
+
+    if (isSolo) {
+        const lbl = document.querySelector(".jeopardy-answer-label");
+        if (lbl) lbl.textContent = "SOLO PUZZLE GUESS";
+        const wrn = document.querySelector(".jeopardy-answer-warning");
+        if (wrn) wrn.innerHTML = "🎯 SOLO MODE ACTIVE • GUESS OR REVEAL LETTERS WITH TIMER";
+        const titleEl = document.querySelector(".jeopardy-host-title");
+        if (titleEl) titleEl.innerHTML = `JEOPARDY <span style="font-size:14px; color:#10b981; background:rgba(16,185,129,0.15); border:1px solid #10b981; padding:2px 8px; border-radius:6px; margin-left:8px; vertical-align:middle;">SOLO MODE</span>`;
+    }
 
     updateDisplay();
 

@@ -207,7 +207,7 @@
       document.body.appendChild(indicator);
 
       indicator.querySelector('button')?.addEventListener('click', () => {
-        if (confirm('Lock the host console now? Passcode "Brown123" will be required to re-enter.')) {
+        if (confirm('Lock the host console now? Host passcode will be required to re-enter.')) {
           this.lock();
         }
       });

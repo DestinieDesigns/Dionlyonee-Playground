@@ -774,6 +774,891 @@
         { optionA: "Have your browser history made public right now", optionB: "Let your ex read every text you sent in the past 6 months", category: "DRAMA" },
         { optionA: "Win $5,000,000 but you can never leave your hometown", optionB: "Win $250,000 and travel freely anywhere worldwide", category: "FINANCIAL" }
       ]
+    },
+
+    'guess-the-lyrics': {
+      title: 'GUESS THE LYRICS',
+      badge: '🎵 R&B • REGGAE • LOVE • GOSPEL',
+      icon: '🎤',
+      type: 'GUESSING',
+      description: 'Sing along and finish the missing lyric! Spanning nostalgic R&B, Reggae & Jamaican classics, Dancehall party anthems, romantic Love songs, and uplifting Gospel!',
+      prompts: [
+        // ==========================================
+        // 90S R&B CLASSICS
+        // ==========================================
+        {
+          song: "No Scrubs",
+          artist: "TLC",
+          year: "1999",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "A scrub is a guy that thinks he's fly, and is also known as a busta. Always talkin' about what he wants, and...",
+          missingLyrics: "JUST SITS ON HIS BROKE ASS",
+          acceptableAnswers: ["just sits on his broke ass", "sits on his broke ass", "sitting on his broke ass"],
+          hint: "Iconic TLC anthem from 'FanMail'. What does Chilli say that scrub is doing all day?"
+        },
+        {
+          song: "End of the Road",
+          artist: "Boyz II Men",
+          year: "1992",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Although we've come to the end of the road, still I can't let go. It's unnatural, you belong to me, I belong to you. Come to the end of the road...",
+          missingLyrics: "STILL I CAN'T LET GO",
+          acceptableAnswers: ["still i can't let go", "still i cant let go", "i can't let go", "i cant let go"],
+          hint: "Record-breaking Motown ballad from the 'Boomerang' soundtrack."
+        },
+        {
+          song: "I Will Always Love You",
+          artist: "Whitney Houston",
+          year: "1992",
+          genre: "90s R&B / Soul",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "If I should stay, I would only be in your way. So I'll go, but I know I'll think of you each step of the way. And I...",
+          missingLyrics: "WILL ALWAYS LOVE YOU",
+          acceptableAnswers: ["will always love you", "i will always love you", "always love you"],
+          hint: "The legendary, soaring key-change ballad from 'The Bodyguard'."
+        },
+        {
+          song: "Doo Wop (That Thing)",
+          artist: "Lauryn Hill",
+          year: "1998",
+          genre: "90s R&B / Neo-Soul",
+          category: "90S R&B CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Guys, you know you'd better watch out. Some girls, some girls are only about that thing, that thing, that thing! Girls, you know you'd better watch out...",
+          missingLyrics: "SOME GUYS ARE ONLY ABOUT THAT THING",
+          acceptableAnswers: ["some guys are only about that thing", "some guys only about that thing", "some guys are about that thing"],
+          hint: "Classic from 'The Miseducation of Lauryn Hill' warning both brothers and sisters."
+        },
+        {
+          song: "Pony",
+          artist: "Ginuwine",
+          year: "1996",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "I'm just a bachelor, I'm looking for a partner. Someone who knows how to ride, without even falling off. If you're horny, let's do it...",
+          missingLyrics: "RIDE IT MY PONY",
+          acceptableAnswers: ["ride it my pony", "ride it pony", "ride my pony"],
+          hint: "Timbaland-produced bassline masterpiece from Ginuwine's debut."
+        },
+        {
+          song: "Back at One",
+          artist: "Brian McKnight",
+          year: "1999",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "One, you're like a dream come true. Two, just wanna be with you. Three, girl, it's plain to see that you're the only one for me. And four, repeat steps one through three. Five, make you fall in love with me. If ever I believe my work is done...",
+          missingLyrics: "THEN I'LL START BACK AT ONE",
+          acceptableAnswers: ["then i'll start back at one", "then ill start back at one", "start back at one", "i'll start back at one"],
+          hint: "The countdown love song that every couple slow danced to in 1999."
+        },
+        {
+          song: "Say My Name",
+          artist: "Destiny's Child",
+          year: "1999",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Say my name, say my name. If no one is around you, say 'Baby I love you', if you ain't runnin' game. Say my name, say my name, you actin' kinda shady...",
+          missingLyrics: "AIN'T CALLIN' ME BABY",
+          acceptableAnswers: ["ain't callin me baby", "aint callin me baby", "not callin me baby", "ain't calling me baby", "aint calling me baby"],
+          hint: "Darkchild produced signature anthem checking an unfaithful partner."
+        },
+        {
+          song: "This Is How We Do It",
+          artist: "Montell Jordan",
+          year: "1995",
+          genre: "90s R&B / Party",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "This is how we do it, it's Friday night and I feel alright. The party's here on the West side. So I reach for my 40 and I turn it up...",
+          missingLyrics: "DESIGNATED DRIVER TAKE THE KEYS TO MY TRUCK",
+          acceptableAnswers: ["designated driver take the keys to my truck", "take the keys to my truck", "designated driver take the keys"],
+          hint: "The ultimate Friday night party anthem responsible for safe driving."
+        },
+        {
+          song: "I'll Make Love to You",
+          artist: "Boyz II Men",
+          year: "1994",
+          genre: "90s R&B",
+          category: "90S R&B CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "I'll make love to you, like you want me to. And I'll hold you tight, baby, all through the night. I'll make love to you, when you want me to...",
+          missingLyrics: "AND I WILL NOT LET GO 'TIL YOU TELL ME TO",
+          acceptableAnswers: ["and i will not let go till you tell me to", "and i will not let go until you tell me to", "and i will not let go"],
+          hint: "Babyface-written smash hit that spent 14 weeks at number one on the Billboard Hot 100."
+        },
+
+        // ==========================================
+        // 2000S R&B ANTHEMS
+        // ==========================================
+        {
+          song: "Yeah!",
+          artist: "Usher ft. Lil Jon & Ludacris",
+          year: "2004",
+          genre: "2000s R&B / Crunk",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Peace up, A-Town down! Up in the club with my homies, tryin' to get a lil' V-I. Next thing I knew, she was all up on me, screaming...",
+          missingLyrics: "YEAH YEAH YEAH YEAH YEAH",
+          acceptableAnswers: ["yeah yeah yeah yeah yeah", "yeah yeah yeah", "yeah", "shawty got down low said come and get me"],
+          hint: "The synth-brass crunk anthem that owned the entire summer of 2004."
+        },
+        {
+          song: "Burn",
+          artist: "Usher",
+          year: "2004",
+          genre: "2000s R&B",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "I don't understand why I sleep at night, but I can't sleep. I've been thinking about the way things used to be between you and me. Deep down you know it's best for yourself, but you...",
+          missingLyrics: "HATE THE THOUGHT OF HER WITH SOMEBODY ELSE",
+          acceptableAnswers: ["hate the thought of her with somebody else", "hate the thought of him with somebody else", "with somebody else"],
+          hint: "Jermaine Dupri and Bryan-Michael Cox production on the 'Confessions' album."
+        },
+        {
+          song: "Fallin'",
+          artist: "Alicia Keys",
+          year: "2001",
+          genre: "2000s R&B / Soul",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "I keep on fallin' in and out of love with you. Sometimes I love ya, sometimes you make me blue. Sometimes I feel good, at times I feel used. Lovin' you darling...",
+          missingLyrics: "MAKES ME SO CONFUSED",
+          acceptableAnswers: ["makes me so confused", "so confused", "confused"],
+          hint: "Alicia's soulful piano debut that took home multiple Grammy Awards."
+        },
+        {
+          song: "If I Ain't Got You",
+          artist: "Alicia Keys",
+          year: "2003",
+          genre: "2000s R&B / Soul",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Some people live for the fortune, some people live just for the fame. Some people live for the power, yeah, some people live just to play the game. Some people want it all, but I don't want nothing at all...",
+          missingLyrics: "IF I AIN'T GOT YOU BABY",
+          acceptableAnswers: ["if i ain't got you baby", "if i aint got you baby", "if i ain't got you", "if i aint got you"],
+          hint: "Classic ballad inspired by the tragic passing of singer Aaliyah."
+        },
+        {
+          song: "Family Affair",
+          artist: "Mary J. Blige",
+          year: "2001",
+          genre: "2000s R&B / Hip Hop",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Let's get it crunk upon, have fun upon on up in this dancery. We got ya hollerin', we pimpin' everybody jumpin'. See, we don't need no...",
+          missingLyrics: "HATERATION HOLLERATIN IN THIS DANCERY",
+          acceptableAnswers: ["hateration holleratin in this dancery", "hateration holleratin", "hateration in this dancery", "no hateration"],
+          hint: "Dr. Dre produced beat that introduced 'hateration' and 'dancery' to the culture."
+        },
+        {
+          song: "Let Me Love You",
+          artist: "Mario",
+          year: "2004",
+          genre: "2000s R&B",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Baby, I just don't get it. Do you enjoy being hurt? I know you smelled the perfume, the make-up on his shirt. You should let me love you...",
+          missingLyrics: "LET ME BE THE ONE TO GIVE YOU EVERYTHING YOU WANT AND NEED",
+          acceptableAnswers: ["let me be the one to give you everything you want and need", "let me be the one", "give you everything you want and need"],
+          hint: "Ne-Yo penned smash single from Mario's 'Turning Point' album."
+        },
+        {
+          song: "So Sick",
+          artist: "Ne-Yo",
+          year: "2005",
+          genre: "2000s R&B",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Gotta change my answering machine, now that I'm alone. 'Cause right now it says that we can't come to the phone. And I'm so sick of love songs...",
+          missingLyrics: "SO TIRED OF TEARS",
+          acceptableAnswers: ["so tired of tears", "tired of tears", "so sick of love songs so tired of tears"],
+          hint: "Stargate-produced debut single about hearing heartbreak songs on the radio."
+        },
+        {
+          song: "Kill Bill",
+          artist: "SZA",
+          year: "2022",
+          genre: "Modern R&B",
+          category: "2000S R&B ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "I might kill my ex, not the best idea. His new girlfriend's next, how'd I get here? I might kill my ex, I still love him though...",
+          missingLyrics: "RATHER BE IN JAIL THAN ALONE",
+          acceptableAnswers: ["rather be in jail than alone", "rather be in hell than alone", "in jail than alone"],
+          hint: "SZA's smash record inspired by Quentin Tarantino's revenge film."
+        },
+
+        // ==========================================
+        // SOUL & MOTOWN CLASSICS
+        // ==========================================
+        {
+          song: "Isn't She Lovely",
+          artist: "Stevie Wonder",
+          year: "1976",
+          genre: "Motown / Classic Soul",
+          category: "SOUL & MOTOWN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Isn't she lovely? Isn't she wonderful? Isn't she precious, less than one minute old? I never thought through love we'd be making one as lovely as she. But isn't she lovely...",
+          missingLyrics: "MADE FROM LOVE",
+          acceptableAnswers: ["made from love", "truly made from love"],
+          hint: "Stevie celebrating the birth of his daughter Aisha on 'Songs in the Key of Life'."
+        },
+        {
+          song: "Never Too Much",
+          artist: "Luther Vandross",
+          year: "1981",
+          genre: "Soul / R&B",
+          category: "SOUL & MOTOWN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Oh, my love, a thousand kisses from you is never too much. I just don't wanna stop. Oh, my love, a million days in your arms is never too much...",
+          missingLyrics: "AND I JUST KEEP ON TICKIN' AND TOCKIN'",
+          acceptableAnswers: ["and i just keep on tickin and tockin", "and i just keep on ticking and tocking", "never too much", "a thousand kisses from you is never too much"],
+          hint: "Luther Vandross's upbeat funky debut that fills any dance floor."
+        },
+        {
+          song: "September",
+          artist: "Earth, Wind & Fire",
+          year: "1978",
+          genre: "Soul / Funk",
+          category: "SOUL & MOTOWN CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Do you remember the 21st night of September? Love was changin' the minds of pretenders, while chasin' the clouds away. Our hearts were ringin' in the key that our souls were singin'. As we danced in the night, remember...",
+          missingLyrics: "HOW THE STARS STOLE THE NIGHT AWAY",
+          acceptableAnswers: ["how the stars stole the night away", "the stars stole the night away"],
+          hint: "Maurice White and Al McKay timeless horn-driven party groove."
+        },
+        {
+          song: "Let's Stay Together",
+          artist: "Al Green",
+          year: "1971",
+          genre: "Soul",
+          category: "SOUL & MOTOWN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "I'm, I'm so in love with you. Whatever you want to do is all right with me, 'cause you make me feel so brand new. And I want to spend my life with you. Let's stay together...",
+          missingLyrics: "LOVIN' YOU WHETHER TIMES ARE GOOD OR BAD HAPPY OR SAD",
+          acceptableAnswers: ["lovin you whether times are good or bad happy or sad", "whether times are good or bad", "times are good or bad", "whether times are good or bad happy or sad"],
+          hint: "Willie Mitchell's Memphis soul classic later famously sung by President Obama."
+        },
+
+        // ==========================================
+        // TIMELESS LOVE SONGS & SLOW JAMS
+        // ==========================================
+        {
+          song: "Sweet Love",
+          artist: "Anita Baker",
+          year: "1986",
+          genre: "Quiet Storm / R&B",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "Sweet love, hear me calling out your name, I feel no shame, I'm in love. Sweet love, don't you ever go away, it'll always be this way. Oh, no, you've given me a love so true, and I will always...",
+          missingLyrics: "GIVE MY LOVE TO YOU",
+          acceptableAnswers: ["give my love to you", "love you", "give my love", "sweet love"],
+          hint: "The signature quiet storm masterpiece from 'Rapture' that won two Grammy Awards."
+        },
+        {
+          song: "All My Life",
+          artist: "K-Ci & JoJo",
+          year: "1997",
+          genre: "R&B / Love Ballad",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "All my life I prayed for someone like you, and I thank God that I, that I finally found you. All my life I prayed for someone like you, and I hope that you feel the same way too. Yes, I pray that you do...",
+          missingLyrics: "LOVE ME TOO",
+          acceptableAnswers: ["love me too", "love me", "feel the same way too"],
+          hint: "The Hailey brothers' heartfelt piano wedding vow that topped the Billboard Hot 100."
+        },
+        {
+          song: "Back at One",
+          artist: "Brian McKnight",
+          year: "1999",
+          genre: "R&B / Love Ballad",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "One, you're like a dream come true. Two, just wanna be with you. Three, girl, it's plain to see that you're the only one for me. And four, repeat steps one through three. Five, make you fall in love with me. If ever I believe my work is done, then I'll...",
+          missingLyrics: "START BACK AT ONE",
+          acceptableAnswers: ["start back at one", "start at one", "back at one", "go back at one"],
+          hint: "Brian McKnight's mathematical love countdown setting the golden standard for devotion."
+        },
+        {
+          song: "I Wanna Know",
+          artist: "Joe",
+          year: "2000",
+          genre: "R&B / Slow Jam",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "I wanna know what turns you on, I'd like to know so I can be all you need and more. I wanna know what turns you on, I'd like to know so I can be all that you need, and...",
+          missingLyrics: "LOVE YOU RIGHT",
+          acceptableAnswers: ["love you right", "treat you right", "be all you need"],
+          hint: "Joe's mega-hit featured on 'The Wood' soundtrack that spent 44 weeks on the charts."
+        },
+        {
+          song: "By Your Side",
+          artist: "Sade",
+          year: "2000",
+          genre: "Soul / Love Ballad",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "You think I'd leave your side, baby? You know me better than that. You think I'd leave you down when you're down on your knees? I wouldn't do that. Oh, when you're cold, I'll be there to hold you tight to me. When you're on the outside, baby, and you can't get in, I will show you...",
+          missingLyrics: "YOU'RE STILL MY FRIEND",
+          acceptableAnswers: ["you're still my friend", "youre still my friend", "you are still my friend", "still my friend"],
+          hint: "Sade's acoustic soul promise of unconditional loyalty and timeless love."
+        },
+        {
+          song: "Let's Get Married",
+          artist: "Jagged Edge",
+          year: "2000",
+          genre: "R&B / Romance",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "Meet me at the altar in your white dress. We ain't gettin' no younger, we might as well do it. Been chillin' for a minute in this sweet relationship, so we might as well get married, yeah. Can't you see us in that house with a picket fence...",
+          missingLyrics: "AND A BABY IN A CRIB",
+          acceptableAnswers: ["and a baby in a crib", "baby in a crib", "a baby in a crib"],
+          hint: "The quintessential 2000s proposal anthem written and sung by twin brothers Brandon and Brian Casey."
+        },
+        {
+          song: "My, My, My",
+          artist: "Johnny Gill",
+          year: "1990",
+          genre: "R&B / Slow Jam",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "Put on your red dress, baby, and slip on your high heel shoes. Oh yeah, we're gonna celebrate tonight, just me and you. And I'm gonna put on my favorite suit, yeah. Baby, tonight is your night. My, my, my, my, my...",
+          missingLyrics: "YOU SURE LOOK GOOD TONIGHT",
+          acceptableAnswers: ["you sure look good tonight", "you look good tonight", "my my my you sure look good tonight"],
+          hint: "Babyface-produced R&B romance classic with Kenny G's iconic saxophone solo."
+        },
+        {
+          song: "For You I Will",
+          artist: "Monica",
+          year: "1997",
+          genre: "R&B / Love Ballad",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "When you're feeling lost in the night, when you feel your world just ain't right, call on me, I will be waiting. Count on me, I will be there. Just mention my name and I'll walk in the rain, through the fire I would walk for you. For you I will...",
+          missingLyrics: "PROMISE YOU THE SKY",
+          acceptableAnswers: ["promise you the sky", "cross the ocean", "lay my life down for you", "for you i will"],
+          hint: "Diane Warren ballad from the multi-platinum 'Space Jam' soundtrack sung by teen sensation Monica."
+        },
+        {
+          song: "Sweet Lady",
+          artist: "Tyrese",
+          year: "1998",
+          genre: "R&B / Slow Jam",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "EASY",
+          lyricsSnippet: "Sweet lady, should I call you my baby? Can I come over and see you tonight? Sweet lady, will you be my baby? Come on, let me love you, 'cause you're so...",
+          missingLyrics: "SWEET AND YOU LOOK SO FLY",
+          acceptableAnswers: ["sweet and you look so fly", "sweet", "fly", "look so fly"],
+          hint: "The debut love slow jam that made Tyrese an R&B heartthrob."
+        },
+        {
+          song: "Ascension (Don't Ever Wonder)",
+          artist: "Maxwell",
+          year: "1996",
+          genre: "Neo-Soul / Romance",
+          category: "TIMELESS LOVE SONGS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "If you ever wonder, could this be magic at all? If you ever wonder, could this be love? Don't ever wonder, don't ever wonder. If you ever wonder, could this be love? So don't ever wonder...",
+          missingLyrics: "DON'T EVER WONDER",
+          acceptableAnswers: ["don't ever wonder", "dont ever wonder", "could this be love", "wonder"],
+          hint: "The sensual neo-soul groove from Maxwell's debut 'Urban Hang Suite'."
+        },
+
+        // ==========================================
+        // REGGAE & JAMAICAN CLASSICS
+        // ==========================================
+        {
+          song: "One Love / People Get Ready",
+          artist: "Bob Marley & The Wailers",
+          year: "1977",
+          genre: "Roots Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "One love, one heart! Let's get together and feel all right. Hear the children crying: One love! Hear the children crying: One heart! Saying: Give thanks and praise to the Lord and...",
+          missingLyrics: "I WILL FEEL ALL RIGHT",
+          acceptableAnswers: ["i will feel all right", "i will feel alright", "feel all right", "feel alright", "lets get together and feel all right"],
+          hint: "Universal anthem of peace and Rastafari unity, named Song of the Millennium by the BBC."
+        },
+        {
+          song: "Three Little Birds",
+          artist: "Bob Marley & The Wailers",
+          year: "1977",
+          genre: "Roots Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Rise up this mornin', smile with the risin' sun. Three little birds pitch by my doorstep, singin' sweet songs of melodies pure and true, sayin': This is my message to you-ou-ou. Singin' don't worry about a thing, 'cause every little thing...",
+          missingLyrics: "IS GONNA BE ALRIGHT",
+          acceptableAnswers: ["is gonna be alright", "is gonna be all right", "gonna be alright", "every little thing is gonna be alright"],
+          hint: "The quintessential message of optimism and reassurance from Bob Marley's landmark 'Exodus' album."
+        },
+        {
+          song: "Could You Be Loved",
+          artist: "Bob Marley & The Wailers",
+          year: "1980",
+          genre: "Reggae / Dance",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Could you be loved and be loved? Could you be loved and be loved? Don't let them fool ya, or even try to school ya, oh no! We've got a mind...",
+          missingLyrics: "OF OUR OWN",
+          acceptableAnswers: ["of our own", "a mind of our own", "we've got a mind of our own", "we got a mind of our own"],
+          hint: "Uptempo disco-reggae crossover groove written on an airplane in 1979."
+        },
+        {
+          song: "Rockaway",
+          artist: "Beres Hammond",
+          year: "2001",
+          genre: "Lovers Rock / Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Put on some music, sweet reggae music, and let's just rock away! When you hear the bassline hit, and the rhythm start to play... I feel like rocking away, girl, rocking away. Play me some reggae music...",
+          missingLyrics: "SWEET REGGAE MUSIC",
+          acceptableAnswers: ["sweet reggae music", "reggae music", "make me feel like dancing"],
+          hint: "Lovers rock icon Beres Hammond celebrating the golden nostalgia of Jamaican dancehalls."
+        },
+        {
+          song: "They Gonna Talk",
+          artist: "Beres Hammond",
+          year: "2001",
+          genre: "Lovers Rock",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "They gonna talk, they gonna talk, they gonna talk, talk, talk. But what can they say? They see we're holding hands, they don't understand. When true love is in your heart...",
+          missingLyrics: "NOTHING CAN TEAR US APART",
+          acceptableAnswers: ["nothing can tear us apart", "nothing can break us apart", "tear us apart"],
+          hint: "Beres Hammond's sweet reassurance to his lover to ignore the gossip in the neighborhood."
+        },
+        {
+          song: "She's Royal",
+          artist: "Tarrus Riley",
+          year: "2006",
+          genre: "Roots Reggae / Lovers Rock",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Now I see why you are queen, yes you're royal. The way you carry yourself, royal. Naturally a queen, you don't have to try. The beauty that shines from the inside, never denies that you're royal. One in a million...",
+          missingLyrics: "SO HARD TO FIND",
+          acceptableAnswers: ["so hard to find", "hard to find", "yes you're royal", "you're royal"],
+          hint: "Dean Fraser-produced acoustic reggae masterpiece honoring women with royal grace and dignity."
+        },
+        {
+          song: "Smile Jamaica",
+          artist: "Chronixx",
+          year: "2013",
+          genre: "Roots Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "She's sweet like sugar cane, cool like the morning rain. Even when trouble come her way, she put a smile pon her face. Sweet Jamaica, smile Jamaica! No matter what the people say...",
+          missingLyrics: "SMILE JAMAICA",
+          acceptableAnswers: ["smile jamaica", "sweet jamaica", "put a smile pon her face"],
+          hint: "Roots reggae revival leader Chronixx praising the warmth and beauty of his homeland."
+        },
+        {
+          song: "Toast",
+          artist: "Koffee",
+          year: "2018",
+          genre: "Reggae / Modern Roots",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Toast! Yeah, toast! Gratitude is a must, yeah. Me haffi thank God for the journey, the earnings, just watch how di blessing a flow like...",
+          missingLyrics: "RIVER",
+          acceptableAnswers: ["river", "a river", "water", "flow like river"],
+          hint: "Historic Grammy-winning breakout hit from Spanish Town's phenomenal Koffee."
+        },
+        {
+          song: "Destiny",
+          artist: "Buju Banton",
+          year: "1997",
+          genre: "Roots Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Set your heart free, you gotta let love lead the way. You have your own destiny to fulfill! I wanna rule my destiny, yeah. I wanna rule my destiny. Living in a world of frustration, can't take this stress no more. I wanna rule...",
+          missingLyrics: "MY DESTINY",
+          acceptableAnswers: ["my destiny", "rule my destiny", "i wanna rule my destiny"],
+          hint: "Buju Banton's soulful, conscious declaration of spiritual independence from 'Inna Heights'."
+        },
+        {
+          song: "Hold Yuh",
+          artist: "Gyptian",
+          year: "2010",
+          genre: "Reggae / Lovers Rock",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "EASY",
+          lyricsSnippet: "Shoo-wop, shoo-wop. Shoo-wop, shoo-wop. Gyal, mi wan' yuh fi hold mi tight, hold mi tight. Squeeze mi tight, squeeze mi tight. And make mi feel alright, make mi feel alright. Gyal, tonight is...",
+          missingLyrics: "YOUR NIGHT",
+          acceptableAnswers: ["your night", "the night", "tonight is your night", "alright"],
+          hint: "Ricky Blaze-produced hypnotic piano reggae track that crossed from Brooklyn dances to international stardom."
+        },
+        {
+          song: "Here I Come",
+          artist: "Dennis Brown",
+          year: "1981",
+          genre: "Roots Reggae",
+          category: "REGGAE & JAMAICAN CLASSICS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Here I come with love and not fighting! That's not my style. I'm taking you with love and affection, for a little while. Love and hate can never be friends, oh no! Here I come with love...",
+          missingLyrics: "AND NOT FIGHTING",
+          acceptableAnswers: ["and not fighting", "not fighting", "love and affection"],
+          hint: "The Crown Prince of Reggae Dennis Brown's unforgettable declaration of peace over conflict."
+        },
+
+        // ==========================================
+        // DANCEHALL PARTY ANTHEMS
+        // ==========================================
+        {
+          song: "Temperature",
+          artist: "Sean Paul",
+          year: "2005",
+          genre: "Dancehall",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "The gal dem schillaci, Sean Paul, so mi go so then! Well, woman di way you roll dat body give mi temperature! Boy from di day you seh you love mi girl you got di cure! Lord have his mercy girl you look good mi haffi holler out: I got the right temperature to...",
+          missingLyrics: "SHELTER YOU FROM THE STORM",
+          acceptableAnswers: ["shelter you from the storm", "shelter you from the rain", "shelter you", "keep you warm"],
+          hint: "Sean Paul's Billboard Hot 100 #1 hit on the iconic Applause riddim."
+        },
+        {
+          song: "Get Busy",
+          artist: "Sean Paul",
+          year: "2002",
+          genre: "Dancehall",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Shake that thing, miss Cana, Cana. Shake that thing, miss Annabella. Shake that thing, yan Donna, Donna. Jodi and Rebecca. Woman, don't test di champion sound! Can't you hear di beat a jump up from the underground? So let's get busy, just...",
+          missingLyrics: "SHAKE THAT THING",
+          acceptableAnswers: ["shake that thing", "get busy", "shake that thing miss cana cana"],
+          hint: "The Diwali riddim dancehall anthem that made Sean Paul a household name around the globe."
+        },
+        {
+          song: "No Letting Go",
+          artist: "Wayne Wonder",
+          year: "2002",
+          genre: "Dancehall / Lovers Rock",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Got somebody, she's a work of art. She got the finest body and the sweet, sweet heart. I wanna hold her, I wanna love her, and I'm never, never letting go! What you say? You're the one that I've been waiting for, and I won't let you...",
+          missingLyrics: "WALK OUT MY DOOR",
+          acceptableAnswers: ["walk out my door", "out my door", "go", "leave"],
+          hint: "Wayne Wonder's smooth, silky vocals on the Diwali riddim that took over radio worldwide."
+        },
+        {
+          song: "Girls Dem Sugar",
+          artist: "Beenie Man ft. Mýa",
+          year: "2000",
+          genre: "Dancehall / R&B",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Sim simma, who got the keys to my Bimma? Who am I? The girls dem sugar! How can I make love to a fellow in a rush? One girl a time and the rest haffi crush! Beenie Man and Mýa in di place, hear di King say: Excuse me, mister, can I get a...",
+          missingLyrics: "WITNESS",
+          acceptableAnswers: ["witness", "dance", "whine"],
+          hint: "The King of Dancehall joined by Mýa over a bouncy Neptunes groove."
+        },
+        {
+          song: "It Wasn't Me",
+          artist: "Shaggy ft. RikRok",
+          year: "2000",
+          genre: "Dancehall / Pop Reggae",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Honey came in and she caught me red-handed creeping with the girl next door. Picture this, we were both butt-naked banging on the bathroom floor. How could I forget that I had given her an extra key? All this time she was standing there, she never took her eyes off me! She caught me on the counter...",
+          missingLyrics: "IT WASN'T ME",
+          acceptableAnswers: ["it wasn't me", "it wasnt me", "wasnt me", "was not me"],
+          hint: "Shaggy's multi-platinum global anthem of comical and brazen relationship denial."
+        },
+        {
+          song: "Bam Bam",
+          artist: "Sister Nancy",
+          year: "1982",
+          genre: "Classic Dancehall",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "What a bam bam! Bam bam dilla, bam bam! This woman never trouble no one, I'm a lady, I'm not a man! MCs they come and they can't understand. What a bam bam, what a bam bam! I'm a lady, I'm not a man, MC is my...",
+          missingLyrics: "AMBITION",
+          acceptableAnswers: ["ambition", "profession", "mission"],
+          hint: "Pioneering dancehall DJ Sister Nancy on the Stalag 17 riddim — the most sampled reggae song in history."
+        },
+        {
+          song: "Gyal You A Party Animal",
+          artist: "Charly Black",
+          year: "2014",
+          genre: "Dancehall / Soca",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "EASY",
+          lyricsSnippet: "Wine and come up, gyal you a party animal! The way you bubble pon di riddim, gyal you full of talent, yuh a champion! Wine for me, darling, wine for me, baby! Gyal you a party...",
+          missingLyrics: "ANIMAL",
+          acceptableAnswers: ["animal", "party animal"],
+          hint: "Diamond-certified Latin and Caribbean party anthem from Jamaican deejay Charly Black."
+        },
+        {
+          song: "No Games",
+          artist: "Serani",
+          year: "2008",
+          genre: "Dancehall / R&B",
+          category: "DANCEHALL PARTY ANTHEMS",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "She told me that she love me, but she playing no games. She told me that she love me, but she playing no games! I want to be your man, girl, I can't even lie. But every time I look into your eyes, you tell me you're not...",
+          missingLyrics: "THAT KIND OF GIRL",
+          acceptableAnswers: ["that kind of girl", "that type of girl", "playing no games", "playing games"],
+          hint: "Serani's piano-heavy dancehall ballad on the Unfinished Business riddim."
+        },
+
+        // ==========================================
+        // CONTEMPORARY GOSPEL
+        // ==========================================
+        {
+          song: "Revolution",
+          artist: "Kirk Franklin",
+          year: "1998",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "Do you want a revolution? Whoop whoop! Sick and tired of people tellin' us what to do! We're the next generation, we got something to say to you! No more sitting back, we're taking it back! Tell me...",
+          missingLyrics: "DO YOU WANT A REVOLUTION",
+          acceptableAnswers: ["do you want a revolution", "revolution", "whoop whoop"],
+          hint: "Kirk Franklin bridging high-energy hip-hop and gospel on 'The Nu Nation Project'."
+        },
+        {
+          song: "Stomp",
+          artist: "Kirk Franklin & God's Property",
+          year: "1997",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "For those of you who think gospel music has gone too far, you think we got too radical with our message... Well, I got news for ya! You ain't heard nothin' yet! Lately I've been going through some things that's really got me down. I need someone to talk to, someone to...",
+          missingLyrics: "HEAR MY CRY AND KEEP ME SAFE AND SOUND",
+          acceptableAnswers: ["hear my cry and keep me safe and sound", "hear my cry", "keep me safe and sound"],
+          hint: "Featuring Cheryl 'Salt' James, this single dominated MTV and BET in 1997."
+        },
+        {
+          song: "I Smile",
+          artist: "Kirk Franklin",
+          year: "2011",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "I smile, even though I hurt see I smile. I know God is working so I smile. Even though I've been here for a while, I smile, smile. It's so hard to look up when you been down for so long, but...",
+          missingLyrics: "I LOOK IN THE MIRROR AND WHAT DO I SEE",
+          acceptableAnswers: ["i look in the mirror and what do i see", "a new me", "i smile even though i hurt"],
+          hint: "Kirk's joyful, infectious groove reminding everyone to keep smiling through the pain."
+        },
+        {
+          song: "Shackles (Praise You)",
+          artist: "Mary Mary",
+          year: "2000",
+          genre: "Contemporary Gospel / R&B",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "Take the shackles off my feet so I can dance! I just wanna praise you, I just wanna praise you! You broke the chains now I can lift my hands! And I'm gonna praise you...",
+          missingLyrics: "I'M GONNA PRAISE YOU",
+          acceptableAnswers: ["i'm gonna praise you", "im gonna praise you", "praise you", "take the shackles off my feet"],
+          hint: "Erica and Tina Campbell's global cross-over gospel smash produced by Warryn Campbell."
+        },
+        {
+          song: "Victory",
+          artist: "Tye Tribbett & G.A.",
+          year: "2006",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Look at yourself in the mirror, tell yourself: I've got the victory! We're marching in the light of God, we're stepping on the enemy's camp! When I say VICTORY, you say YES! Victory! (Yes!) Victory! (Yes!)...",
+          missingLyrics: "I'VE GOT THE VICTORY",
+          acceptableAnswers: ["i've got the victory", "ive got the victory", "got the victory", "victory"],
+          hint: "High-voltage marching band gospel energy from Tye Tribbett & Greater Anointing."
+        },
+        {
+          song: "Never Would Have Made It",
+          artist: "Marvin Sapp",
+          year: "2007",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "Never would have made it without you. I would have lost it all, but now I see how you were there for me. And I can say I'm stronger, I'm wiser. I'm better, much better. When I look back over...",
+          missingLyrics: "ALL YOU BROUGHT ME THROUGH",
+          acceptableAnswers: ["all you brought me through", "all youve brought me through", "everything you brought me through"],
+          hint: "Record-setting gospel anthem inspired by the loss of Marvin Sapp's father."
+        },
+        {
+          song: "Take Me to the King",
+          artist: "Tamela Mann",
+          year: "2012",
+          genre: "Contemporary Gospel",
+          category: "CONTEMPORARY GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "Take me to the King, I don't have much to bring. My heart is torn in pieces, it's my offering. Take me to the King. Truth is I'm tired, options are few. I'm trying to pray, but where are you? I'm all out of church and...",
+          missingLyrics: "I'M ALL OUT OF WORDS",
+          acceptableAnswers: ["i'm all out of words", "im all out of words", "all out of words", "take me to the king"],
+          hint: "Written and produced by Kirk Franklin, showcasing Tamela Mann's powerhouse vocals."
+        },
+
+        // ==========================================
+        // GOSPEL CHOIR & PRAISE
+        // ==========================================
+        {
+          song: "Every Praise",
+          artist: "Hezekiah Walker",
+          year: "2013",
+          genre: "Gospel Choir",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "EASY",
+          lyricsSnippet: "Every praise is to our God. Every word of worship with one accord. Every praise, every praise is to our God. Sing hallelujah to our God. Glory hallelujah is to our God...",
+          missingLyrics: "EVERY PRAISE EVERY PRAISE IS TO OUR GOD",
+          acceptableAnswers: ["every praise every praise is to our God", "every praise is to our god", "every praise"],
+          hint: "The international praise choir anthem that key-modulates four times into pure joy."
+        },
+        {
+          song: "No Weapon",
+          artist: "Fred Hammond & Radical for Christ",
+          year: "1996",
+          genre: "Praise & Worship",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "EASY",
+          lyricsSnippet: "No weapon formed against me shall prosper, it won't work! No weapon formed against me shall prosper, it won't work! God will do what He said He would do, He's not a man that He should lie...",
+          missingLyrics: "HE WILL COME THROUGH",
+          acceptableAnswers: ["he will come through", "he will stand by his word", "no weapon formed against me shall prosper", "it won't work"],
+          hint: "Fred Hammond's faith-affirming standard based on Isaiah 54:17."
+        },
+        {
+          song: "Blessed",
+          artist: "Fred Hammond",
+          year: "1998",
+          genre: "Praise & Worship",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Late in the midnight hour, God's gonna turn it around. It's gonna work in your favor! We're blessed in the city, we're blessed in the field. We're blessed in our going...",
+          missingLyrics: "AND WE'RE BLESSED IN OUR COMING",
+          acceptableAnswers: ["and we're blessed in our coming", "and were blessed in our coming", "blessed in our coming"],
+          hint: "Uplifting praise anthem quoting the Deuteronomy blessings."
+        },
+        {
+          song: "Total Praise",
+          artist: "Richard Smallwood",
+          year: "1996",
+          genre: "Gospel Choir",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "Lord, I will lift mine eyes to the hills. Knowing my help is coming from You. Your peace You give me in time of the storm. You are the source of my strength, You are the strength of my life...",
+          missingLyrics: "I LIFT MY HANDS IN TOTAL PRAISE TO YOU",
+          acceptableAnswers: ["i lift my hands in total praise to you", "in total praise to you", "total praise to you", "total praise"],
+          hint: "Majestic choral masterpiece written during the illness of Richard Smallwood's mother."
+        },
+        {
+          song: "Goodness of God",
+          artist: "CeCe Winans",
+          year: "2021",
+          genre: "Praise & Worship",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "EASY",
+          lyricsSnippet: "I love you, Lord, for your mercy never fails me. All my days, I've been held in your hands. From the moment that I wake up, until I lay my head, oh I will sing of...",
+          missingLyrics: "THE GOODNESS OF GOD",
+          acceptableAnswers: ["the goodness of god", "goodness of god", "your goodness"],
+          hint: "CeCe Winans's chart-topping version of the beloved worship ballad."
+        },
+        {
+          song: "More Abundantly",
+          artist: "Ricky Dillard & New G",
+          year: "1990",
+          genre: "Gospel Choir",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "I've got it, I've got it! Life more abundantly! Jesus came that I might have life, and that I might have it more abundantly! God has given me...",
+          missingLyrics: "POWER JOY PEACE AND HAPPINESS",
+          acceptableAnswers: ["power joy peace and happiness", "power and joy", "life more abundantly", "power"],
+          hint: "The high-stepping Chicago choir master Ricky Dillard's explosive breakout hit."
+        },
+        {
+          song: "Grateful",
+          artist: "Hezekiah Walker & The Love Fellowship Crusade Choir",
+          year: "2008",
+          genre: "Gospel Choir",
+          category: "GOSPEL CHOIR & PRAISE",
+          difficulty: "EASY",
+          lyricsSnippet: "I am grateful for the things that You have done. Yes, I'm grateful for the victories we've won. I could go on and on and on about Your works, because I'm grateful, so grateful...",
+          missingLyrics: "JUST TO PRAISE YOU LORD",
+          acceptableAnswers: ["just to praise you lord", "grateful just to praise you lord", "to praise you lord"],
+          hint: "Brooklyn bishop Hezekiah Walker's standard sung at Sunday morning communion services."
+        },
+
+        // ==========================================
+        // TRADITIONAL & INSPIRATIONAL GOSPEL
+        // ==========================================
+        {
+          song: "We Fall Down",
+          artist: "Donnie McClurkin",
+          year: "2000",
+          genre: "Traditional Gospel",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "We fall down, but we get up. We fall down, but we get up. We fall down, but we get up, for a saint is just a sinner who...",
+          missingLyrics: "FELL DOWN AND GOT UP",
+          acceptableAnswers: ["fell down and got up", "got up", "fell down and got back up"],
+          hint: "Donnie McClurkin's comforting reminder that grace restores every believer."
+        },
+        {
+          song: "Stand",
+          artist: "Donnie McClurkin",
+          year: "1996",
+          genre: "Traditional Gospel / Inspirational",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "What do you do when you've done all you can, and it seems like you can't make it through? What do you say when your friends turn away, and you're all alone into the night? After you've done all you can...",
+          missingLyrics: "YOU JUST STAND",
+          acceptableAnswers: ["you just stand", "just stand", "stand and be strong"],
+          hint: "Oprah Winfrey's favorite gospel encouragement anthem on holding fast."
+        },
+        {
+          song: "Hold My Mule",
+          artist: "Pastor Shirley Caesar",
+          year: "1988",
+          genre: "Traditional Gospel",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "When the deacons told old brother John he was making too much noise in church, John looked at the preacher and said: 'If you don't wanna praise Him, get out of my way! Somebody hold my mule while I...'",
+          missingLyrics: "SHOUT AND DANCE",
+          acceptableAnswers: ["shout and dance", "dance", "praise the lord", "shout", "dance for the lord"],
+          hint: "The First Lady of Gospel telling the hilarious story of 86-year-old John praising God in his field."
+        },
+        {
+          song: "Open My Heart",
+          artist: "Yolanda Adams",
+          year: "1999",
+          genre: "Inspirational Gospel",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "Alone in a room, it's just me and you. I feel so lost, 'cause I don't know what to do. Now what if I choose the wrong thing to do? I'm so afraid of disappointing you. So I need to talk to you, and ask you for your guidance. With one touch from you...",
+          missingLyrics: "MY WHOLE LIFE WILL BE CHANGED",
+          acceptableAnswers: ["my whole life will be changed", "my life will be changed", "open my heart", "open my heart dear lord"],
+          hint: "Jimmy Jam & Terry Lewis produced inspirational ballad from 'Mountain High... Valley Low'."
+        },
+        {
+          song: "Goin' Up Yonder",
+          artist: "Walter Hawkins & The Love Center Choir",
+          year: "1975",
+          genre: "Traditional Gospel",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "EASY",
+          lyricsSnippet: "If you want to know where I'm going, where I'm going, soon. If anybody ask you where I'm going, where I'm going, soon. I'm goin' up yonder...",
+          missingLyrics: "TO BE WITH MY LORD",
+          acceptableAnswers: ["to be with my lord", "to be with the lord", "with my lord", "up yonder to be with my lord"],
+          hint: "The Hawkins Family Oakland classic sung at homegoing celebrations across the world."
+        },
+        {
+          song: "You Brought the Sunshine",
+          artist: "The Clark Sisters",
+          year: "1981",
+          genre: "Gospel Soul / Reggae Groove",
+          category: "TRADITIONAL & INSPIRATIONAL GOSPEL",
+          difficulty: "MEDIUM",
+          lyricsSnippet: "You brought the sunshine in my life. You brought the sunshine in my life! You gave me peace, joy, and love. Everything I need comes from up above. Because of You...",
+          missingLyrics: "MY LIFE IS FULL OF HAPPINESS",
+          acceptableAnswers: ["my life is full of happiness", "you brought the sunshine in my life", "my life is full of joy"],
+          hint: "Twinkie Clark's Stevie Wonder-inspired reggae-gospel crossover that played in Studio 54."
+        }
+      ]
     }
   };
 
